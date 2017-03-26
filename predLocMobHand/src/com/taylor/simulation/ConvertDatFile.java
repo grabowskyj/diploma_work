@@ -22,42 +22,56 @@ public class ConvertDatFile {
         this.datFile = datFile;
     }
     
-    public void readDatFile() {
+    public ArrayList<String> readDatFile() {
         FileInputStream readFile = null;
-        int read;
         ArrayList<String> dataRow = new ArrayList<String>();
-        ArrayList<String> convertData = new ArrayList<String>();
+        ArrayList<String> headerData = new ArrayList<String>();
+        ArrayList<String> bestServerData = new ArrayList<String>();
+        ArrayList<String> fileData = new ArrayList<String>();
         String hexNewLine = "a";
         String hexCarriageReturn = "d";
         String readedChar = null;
-        int eastMin = 0;
+        int read;
+        /*int eastMin = 0;
         int eastMax = 0;
         int northMin = 0;
         int northMax = 0;
         int resolution = 0;
-        int bestServerDataRowLength = 10;
+        
+        ezek majd feldolgozasnal kellenek*/
         
         try {
             readFile = new FileInputStream(getDatFile());
             int c = 0;
             while((read = readFile.read()) != -1) {
                 readedChar = Integer.toHexString(read);
-                if (!readedChar.equals(hexNewLine) || !readedChar.equals(hexCarriageReturn)) {
+                if (!readedChar.equals(hexCarriageReturn) || !readedChar.equals(hexNewLine)) {
                     dataRow.add(readedChar);
+                    if ((headerData.size() == 2) && (dataRow.size() == 10)) {
+                        bestServerData.addAll(dataRow);
+                        dataRow.clear();
+                    }
                 }
                 if (readedChar.equals(hexCarriageReturn) && (dataRow.size() > 0)) {
-                    convertData.addAll(dataRow);
+                    headerData.addAll(dataRow);
+                    dataRow.clear();
                 }
+                
                 System.out.print(Integer.toHexString(read) + " ");
                 c++;
                 if (c == 100) {
                     System.exit(1);
                 }
             }
+            fileData.addAll(headerData);
+            fileData.addAll(bestServerData);
+            readFile.close();           
         } catch(Exception e) {
             System.out.println(e);
             e.printStackTrace();
         }
+        
+        return fileData;
     }
     
     public static void main(String[] args) {
