@@ -22,12 +22,12 @@ public class ConvertDatFile {
         this.datFile = datFile;
     }
     
-    public ArrayList<String> readDatFile() {
+    public ArrayList<ArrayList<String>> readDatFile() {
         FileInputStream readFile = null;
         ArrayList<String> dataRow = new ArrayList<String>();
-        ArrayList<String> headerData = new ArrayList<String>();
-        ArrayList<String> bestServerData = new ArrayList<String>();
-        ArrayList<String> fileData = new ArrayList<String>();
+        ArrayList<ArrayList<String>> headerData = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> bestServerData = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> fileData = new ArrayList<ArrayList<String>>();
         String hexNewLine = "a";
         String hexCarriageReturn = "d";
         String readedChar = null;
@@ -45,27 +45,42 @@ public class ConvertDatFile {
             int c = 0;
             while((read = readFile.read()) != -1) {
                 readedChar = Integer.toHexString(read);
-                if (!readedChar.equals(hexCarriageReturn) || !readedChar.equals(hexNewLine)) {
+                if (!readedChar.equals(hexCarriageReturn) && !readedChar.equals(hexNewLine)) {
                     dataRow.add(readedChar);
                     if ((headerData.size() == 2) && (dataRow.size() == 10)) {
-                        bestServerData.addAll(dataRow);
+                        bestServerData.add(dataRow);
                         dataRow.clear();
                     }
                 }
                 if (readedChar.equals(hexCarriageReturn) && (dataRow.size() > 0)) {
-                    headerData.addAll(dataRow);
+                    headerData.add(dataRow);
                     dataRow.clear();
                 }
                 
-                System.out.print(Integer.toHexString(read) + " ");
+                //System.out.print(Integer.toHexString(read) + " ");
                 c++;
-                if (c == 100) {
-                    System.exit(1);
+                if (c == 150) {
+                    //System.exit(1);
+                    break;
                 }
             }
+            readFile.close();
             fileData.addAll(headerData);
+            System.out.println("File Data Size: " + fileData.size());
             fileData.addAll(bestServerData);
-            readFile.close();           
+            System.out.println("File Data Size: " + fileData.size());
+            System.out.println("Header Data Size: " + headerData.size());
+            System.out.println("Best Server Data Size: " + bestServerData.size());
+            System.out.print("Header Data: ");
+            for (ArrayList<String> i : headerData) {
+                System.out.print(i + " ");
+            }
+            System.out.println("\n");
+            System.out.print("Best Server Data: ");
+            for (ArrayList<String> i : bestServerData) {
+                System.out.print(i + " ");
+            }
+            
         } catch(Exception e) {
             System.out.println(e);
             e.printStackTrace();
@@ -77,11 +92,10 @@ public class ConvertDatFile {
     public static void main(String[] args) {
         
         File simFile = new File("C:\\Users\\eptrszb\\git\\diploma_work\\minta1_25m_bestserver.dat");
-        
+        ArrayList<ArrayList<String>> simDataInList = new ArrayList<ArrayList<String>>();
         ConvertDatFile simData = new ConvertDatFile(simFile);
         
-        simData.readDatFile();    
-        
+        simDataInList = simData.readDatFile();
     }
     
 }
