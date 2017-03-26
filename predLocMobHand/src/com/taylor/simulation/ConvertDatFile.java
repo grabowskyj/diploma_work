@@ -54,6 +54,9 @@ public class ConvertDatFile {
                 }
                 if (readedChar.equals(hexCarriageReturn) && (dataRow.size() > 0)) {
                     headerData.add(dataRow);
+                    for (ArrayList<String> i : headerData) {
+                        System.out.print(i + " ");
+                    }
                     dataRow.clear();
                 }
                 
