@@ -151,6 +151,8 @@ public class ConvertDatFile {
             mapData.put("northMax", Integer.parseInt(mapDataRow[3]));
             mapData.put("resolution", Integer.parseInt(mapDataRow[4]));
             mapData.put("fileInfo", mapDataRow[5]);
+            bufferedWriter.write("X,Y,cellID,cellLayerID,signalStrength");
+            bufferedWriter.newLine();
             for (northVal = (int) mapData.get("northMax"); northVal > (int) mapData.get("northMin"); northVal = northVal - (int) mapData.get("resolution")) {
                 for (eastVal = (int) mapData.get("eastMin"); eastVal < (int) mapData.get("eastMax"); eastVal = eastVal + (int) mapData.get("resolution")) {
                     ArrayList<String> arrToCsvFile = new ArrayList<String>();
