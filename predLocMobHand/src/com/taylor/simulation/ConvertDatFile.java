@@ -9,7 +9,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class ConvertDatFile {
@@ -18,12 +17,12 @@ public class ConvertDatFile {
     private File convFile;
     private File csvFile;
 
-    ConvertDatFile(File datFile, File convFile, File csvFile) {
+    public ConvertDatFile(File datFile, File convFile, File csvFile) {
         this.setDatFile(datFile);
         this.setConvFile(convFile);
         this.setCsvFile(csvFile);
     }
-
+    
     public File getDatFile() {
         return datFile;
     }
@@ -32,7 +31,7 @@ public class ConvertDatFile {
         this.datFile = datFile;
     }
     
-    public File getconvFile() {
+    public File getConvFile() {
         return convFile;
     }
 
@@ -50,20 +49,19 @@ public class ConvertDatFile {
         createFile(this.csvFile);
     }
     
-    public void createFile (File file) {
+    public void createFile(File file) {
         if (file.exists()) {
             file.delete();
         }
-        
         try {
-            file.createNewFile();
+            file.createNewFile();  
         } catch (IOException e) {
             System.out.println(e);
             e.printStackTrace();
         }
     }
     
-    public void createRawData() {
+    private void createRawData() {
         FileInputStream readFile = null;
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
@@ -76,7 +74,7 @@ public class ConvertDatFile {
         
         try {
             readFile = new FileInputStream(getDatFile());
-            fileWriter = new FileWriter(getconvFile());
+            fileWriter = new FileWriter(getConvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
             while((read = readFile.read()) != -1) {
                 readedChar = Integer.toHexString(read);
@@ -111,8 +109,9 @@ public class ConvertDatFile {
             e.printStackTrace();
         } finally {
             try {
-                readFile.close();
                 bufferedWriter.close();
+                fileWriter.close();
+                readFile.close();
             } catch (Exception e) {
                 System.out.println(e);
                 e.printStackTrace();
@@ -120,22 +119,24 @@ public class ConvertDatFile {
         }
     }
     
-    public void convertRawData() {
+    private void convertRawData() {
         FileReader fileReader = null;
         FileWriter fileWriter = null;
         BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = null;
-        ArrayList<String> rawData = new ArrayList<String>(); 
+        ArrayList<String> rawData = new ArrayList<String>();
         int cellID = 0;
         int cellLayerID = 0;
         int signalStrength = 0;
         int dataRowNumFromRawData = 3;
+        int northVal = 0;
+        int eastVal = 0;
         int[] rowToWrite = new int[5];
         String[] mapDataRow;
         Hashtable<Object, Object> mapData = new Hashtable<>();
                 
         try {
-            fileReader = new FileReader(getconvFile());
+            fileReader = new FileReader(getConvFile());
             bufferedReader = new BufferedReader(fileReader);
             fileWriter = new FileWriter(getCsvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
@@ -150,8 +151,10 @@ public class ConvertDatFile {
             mapData.put("northMax", Integer.parseInt(mapDataRow[3]));
             mapData.put("resolution", Integer.parseInt(mapDataRow[4]));
             mapData.put("fileInfo", mapDataRow[5]);
-            for (int northVal = (int) mapData.get("northMax"); northVal >= (int) mapData.get("northMin"); northVal = northVal - (int) mapData.get("resolution")) {
-                for (int eastVal = (int) mapData.get("eastMin"); eastVal <= (int) mapData.get("eastMax"); eastVal = eastVal + (int) mapData.get("resolution")) {
+            for (northVal = (int) mapData.get("northMax"); northVal > (int) mapData.get("northMin"); northVal = northVal - (int) mapData.get("resolution")) {
+                for (eastVal = (int) mapData.get("eastMin"); eastVal < (int) mapData.get("eastMax"); eastVal = eastVal + (int) mapData.get("resolution")) {
+                    ArrayList<String> arrToCsvFile = new ArrayList<String>();
+                    String rowToCsvFile;
                     String[] processedLine = rawData.get(dataRowNumFromRawData).split(" ");
                     String[] hexCellID = Arrays.copyOfRange(processedLine, 0, 4);
                     String[] hexCellLayerID = Arrays.copyOfRange(processedLine, 4, 8);
@@ -159,35 +162,30 @@ public class ConvertDatFile {
                     cellID = convertHex2Dec(reversArray(hexCellID));
                     cellLayerID = convertHex2Dec(reversArray(hexCellLayerID));
                     signalStrength = convertHex2Dec(reversArray(hexSignalStrength));
-                    
                     rowToWrite = new int[]{eastVal, northVal, cellID, cellLayerID, signalStrength};
-                    //valami valahol rossz itt, el vannak csuszva a sorok a programmal konvertalt es az ezzel szamolt kozott
                     dataRowNumFromRawData++;
-                    String toCsvFile = Arrays.toString(rowToWrite);
-                    System.out.println(toCsvFile);
-                    System.out.println("CellID: " + cellID);
-                    
-                    System.out.println("LayerID: " + cellLayerID);
-                   
-                    System.out.println("SignalStrength: " + signalStrength);
+                    for (int value : rowToWrite) {
+                        arrToCsvFile.add(Integer.toString(value));
+                    }
+                    rowToCsvFile = String.join(",", arrToCsvFile);
+                    bufferedWriter.write(rowToCsvFile);
+                    bufferedWriter.newLine();
                 }
             }
-           
-            
         } catch(Exception e) {
             System.out.println(e);
             e.printStackTrace();
         } finally {
             try {
-                fileReader.close();
                 bufferedReader.close();
-                fileWriter.close();
+                fileReader.close();
                 bufferedWriter.close();
+                fileWriter.close();
             } catch (Exception e) {
                 System.out.println(e);
                 e.printStackTrace();
             }  
-        }
+        }        
     }
     
     public String[] reversArray(String[] array) {
@@ -215,17 +213,11 @@ public class ConvertDatFile {
         return value;
     }
     
-    public static void main(String[] args) {
+    public File convertDat2Csv() {
+        createRawData();
+        convertRawData();
+        getConvFile().delete();
         
-        File simFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\minta1_25m_bestserver.dat");
-        File convFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\minta1_25m_bestserver.conv");
-        File csvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\minta1_25m_bestserver.csv");
-              
-        ConvertDatFile baseData = new ConvertDatFile(simFile, convFile, csvFile);
-        
-        baseData.createRawData();
-        baseData.convertRawData();
-        
+        return getCsvFile();
     }
-    
 }
