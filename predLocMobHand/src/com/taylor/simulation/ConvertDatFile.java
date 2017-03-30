@@ -6,59 +6,48 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 
+import com.taylor.tools.*;
+
 public class ConvertDatFile {
     
-    private File datFile;
+    private File srcFile;
     private File convFile;
     private File csvFile;
 
-    public ConvertDatFile(File datFile, File convFile, File csvFile) {
-        this.setDatFile(datFile);
+    public ConvertDatFile(File srcFile, File convFile, File csvFile) {
+        this.setsrcFile(srcFile);
         this.setConvFile(convFile);
         this.setCsvFile(csvFile);
     }
     
-    public File getDatFile() {
-        return datFile;
+    public File getSrcFile() {
+        return srcFile;
     }
 
-    public void setDatFile(File datFile) {
-        this.datFile = datFile;
+    private void setsrcFile(File srcFile) {
+        this.srcFile = srcFile;
     }
     
     public File getConvFile() {
         return convFile;
     }
 
-    public void setConvFile(File convFile) {
+    private void setConvFile(File convFile) {
         this.convFile = convFile;
-        createFile(this.convFile);
+        Tools.createFile(this.convFile);
     }
     
     public File getCsvFile() {
         return csvFile;
     }
 
-    public void setCsvFile(File csvFile) {
+    private void setCsvFile(File csvFile) {
         this.csvFile = csvFile;
-        createFile(this.csvFile);
-    }
-    
-    public void createFile(File file) {
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            file.createNewFile();  
-        } catch (IOException e) {
-            System.out.println(e);
-            e.printStackTrace();
-        }
+        Tools.createFile(this.csvFile);
     }
     
     private void createRawData() {
@@ -66,16 +55,16 @@ public class ConvertDatFile {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         ArrayList<String> dataRow = new ArrayList<String>();
-        int carriageReturn = 0;
-        int read;
+        int carriageReturn = 0; 
         String hexNewLine = "a";
         String hexCarriageReturn = "d";
         String readedChar = null;
         
         try {
-            readFile = new FileInputStream(getDatFile());
+            readFile = new FileInputStream(getSrcFile());
             fileWriter = new FileWriter(getConvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
+            int read;
             while((read = readFile.read()) != -1) {
                 readedChar = Integer.toHexString(read);
                 if (!readedChar.equals(hexCarriageReturn) && !readedChar.equals(hexNewLine)) {
@@ -131,7 +120,8 @@ public class ConvertDatFile {
         int dataRowNumFromRawData = 3;
         int northVal = 0;
         int eastVal = 0;
-        int[] rowToWrite = new int[5];
+        int[] arrToWrite = new int[5];
+        String headerRow = "latitude,longitude,cellLayerID,cellID,signalStrength";
         String[] mapDataRow;
         Hashtable<Object, Object> mapData = new Hashtable<>();
                 
@@ -151,7 +141,7 @@ public class ConvertDatFile {
             mapData.put("northMax", Integer.parseInt(mapDataRow[3]));
             mapData.put("resolution", Integer.parseInt(mapDataRow[4]));
             mapData.put("fileInfo", mapDataRow[5]);
-            bufferedWriter.write("X,Y,cellID,cellLayerID,signalStrength");
+            bufferedWriter.write(headerRow);
             bufferedWriter.newLine();
             for (northVal = (int) mapData.get("northMax"); northVal > (int) mapData.get("northMin"); northVal = northVal - (int) mapData.get("resolution")) {
                 for (eastVal = (int) mapData.get("eastMin"); eastVal < (int) mapData.get("eastMax"); eastVal = eastVal + (int) mapData.get("resolution")) {
@@ -161,12 +151,12 @@ public class ConvertDatFile {
                     String[] hexCellID = Arrays.copyOfRange(processedLine, 0, 4);
                     String[] hexCellLayerID = Arrays.copyOfRange(processedLine, 4, 8);
                     String[] hexSignalStrength = Arrays.copyOfRange(processedLine, 8, 10);
-                    cellID = convertHex2Dec(reversArray(hexCellID));
-                    cellLayerID = convertHex2Dec(reversArray(hexCellLayerID));
-                    signalStrength = convertHex2Dec(reversArray(hexSignalStrength));
-                    rowToWrite = new int[]{eastVal, northVal, cellID, cellLayerID, signalStrength};
+                    cellID = Tools.convertHex2Dec(Tools.reversArray(hexCellID));
+                    cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
+                    signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
+                    arrToWrite = new int[]{northVal, eastVal, cellLayerID, cellID, signalStrength};
                     dataRowNumFromRawData++;
-                    for (int value : rowToWrite) {
+                    for (int value : arrToWrite) {
                         arrToCsvFile.add(Integer.toString(value));
                     }
                     rowToCsvFile = String.join(",", arrToCsvFile);
@@ -188,31 +178,6 @@ public class ConvertDatFile {
                 e.printStackTrace();
             }  
         }        
-    }
-    
-    public String[] reversArray(String[] array) {
-        int reverseArrayLength = array.length;
-        String[] reversArray = new String[reverseArrayLength];
-        for (int elementCounter = 0; elementCounter < array.length; elementCounter++ ) {
-            reversArray[--reverseArrayLength] = array[elementCounter];
-        }
-        
-        return reversArray;
-    }
-    
-    public int convertHex2Dec(String[] array) {
-        int value = 0;
-        String hexString = String.join("", array);
-        switch (array.length) {
-            case 2:
-                value = (short) Integer.parseInt(hexString, 16);
-                break;
-            case 4:
-                value = (int) Long.parseLong(hexString, 16);
-                break;
-        }     
-        
-        return value;
     }
     
     public File convertDat2Csv() {
