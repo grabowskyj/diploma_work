@@ -121,16 +121,21 @@ public class ConvertMeasurementFile {
 
     public static void main(String[] args) {
         
-        File datFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\sample_25m_bestserver.dat");
-        File convFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\sample_25m_bestserver.conv");
-        File simCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\sample_25m_bestserver.csv");
-        File measurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_rxl_2017_03_25_08_08_06.txt");
-        File measurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\gmon_gsm_rxl_2017_03_25_08_08_06.csv");
+        File datFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver_bestserver.dat");
+        File convFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\veresegyhaz_25m_bestserver.conv");
+        File simCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\veresegyhaz_25m_bestserver.csv");
+        File dat2File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\sample_25m_bestserver.dat");
+        File conv2File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\sample_25m_bestserver.conv");
+        File sim2CsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\sample_25m_bestserver.csv");
+        //File measurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_rxl_2017_03_25_08_08_06.txt");
+        //File measurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\gmon_gsm_rxl_2017_03_25_08_08_06.csv");
         
         ConvertDatFile sim = new ConvertDatFile(datFile, convFile, simCsvFile);
-        ConvertMeasurementFile measurement = new ConvertMeasurementFile(measurementFile, measurementCsvFile);
-        
+        ConvertDatFile sim2 = new ConvertDatFile(dat2File, conv2File, sim2CsvFile);
+        //ConvertMeasurementFile measurement = new ConvertMeasurementFile(measurementFile, measurementCsvFile);
+        sim2.convertDat2Csv();
         sim.convertDat2Csv();
-        measurement.convertMeasurement2Csv();
+        
+        //measurement.convertMeasurement2Csv();
     }
 }

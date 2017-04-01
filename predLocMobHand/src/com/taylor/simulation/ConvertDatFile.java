@@ -55,7 +55,8 @@ public class ConvertDatFile {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         ArrayList<String> dataRow = new ArrayList<String>();
-        int carriageReturn = 0; 
+        int carriageReturnSensor = 0;
+        int emptyLineSize = 2;
         String hexNewLine = "a";
         String hexCarriageReturn = "d";
         String readedChar = null;
@@ -67,30 +68,36 @@ public class ConvertDatFile {
             int read;
             while((read = readFile.read()) != -1) {
                 readedChar = Integer.toHexString(read);
-                if (!readedChar.equals(hexCarriageReturn) && !readedChar.equals(hexNewLine)) {
-                    dataRow.add(readedChar);
-                    if ((carriageReturn == 3) && (dataRow.size() == 10)) {
-                        for (String data : dataRow) {
-                            bufferedWriter.write(data + " ");
+                //meg kell oldani, hogy a 0-val kezdodo hex szam eseten ne vagja le 0-t
+                //http://stackoverflow.com/questions/30410753/how-to-count-the-number-of-digits-in-an-int-value
+                dataRow.add(readedChar);
+                if ((carriageReturnSensor == 3) && (dataRow.size() == 10)) {
+                    for (String data : dataRow) {
+                        bufferedWriter.write(data + " ");
+                    }
+                    bufferedWriter.newLine();
+                    dataRow.clear();
+                }
+                if (readedChar.equals(hexNewLine)) {
+                    if (carriageReturnSensor < 3) {
+                        if (dataRow.size() != emptyLineSize) {
+                            dataRow.remove(hexNewLine);
+                            dataRow.remove(hexCarriageReturn);
+                            for (String data : dataRow) {
+                                int data2decimal = Integer.parseInt(data, 16);
+                                char character = (char) data2decimal; 
+                                bufferedWriter.write(character);
+                            }
+                            bufferedWriter.newLine();
+                        } else {
+                            dataRow.remove(hexNewLine);
+                            dataRow.remove(hexCarriageReturn);
+                            bufferedWriter.write("NO ENTRY");
+                            bufferedWriter.newLine();
                         }
-                        bufferedWriter.newLine();
+                        carriageReturnSensor++;
                         dataRow.clear();
                     }
-                }
-                if (readedChar.equals(hexCarriageReturn)) {
-                    if (dataRow.size() > 0) {
-                        for (String data : dataRow) {
-                            int data2decimal = Integer.parseInt(data, 16);
-                            char character = (char) data2decimal; 
-                            bufferedWriter.write(character);
-                        }
-                        bufferedWriter.newLine();
-                    } else {
-                        bufferedWriter.write("NO ENTRY");
-                        bufferedWriter.newLine();
-                    }
-                    carriageReturn++;
-                    dataRow.clear();
                 }
             }
         } catch(Exception e) {
@@ -146,20 +153,24 @@ public class ConvertDatFile {
             for (northVal = (int) mapData.get("northMax"); northVal > (int) mapData.get("northMin"); northVal = northVal - (int) mapData.get("resolution")) {
                 for (eastVal = (int) mapData.get("eastMin"); eastVal < (int) mapData.get("eastMax"); eastVal = eastVal + (int) mapData.get("resolution")) {
                     ArrayList<String> arrToCsvFile = new ArrayList<String>();
-                    String rowToCsvFile;
+                    String rowToCsvFile = null;
                     String[] processedLine = rawData.get(dataRowNumFromRawData).split(" ");
-                    String[] hexCellID = Arrays.copyOfRange(processedLine, 0, 4);
-                    String[] hexCellLayerID = Arrays.copyOfRange(processedLine, 4, 8);
-                    String[] hexSignalStrength = Arrays.copyOfRange(processedLine, 8, 10);
-                    cellID = Tools.convertHex2Dec(Tools.reversArray(hexCellID));
-                    cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
-                    signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
-                    arrToWrite = new int[]{northVal, eastVal, cellLayerID, cellID, signalStrength};
-                    dataRowNumFromRawData++;
-                    for (int value : arrToWrite) {
-                        arrToCsvFile.add(Integer.toString(value));
+                    if (processedLine.length == 10) {
+                        String[] hexCellID = Arrays.copyOfRange(processedLine, 0, 4);
+                        String[] hexCellLayerID = Arrays.copyOfRange(processedLine, 4, 8);
+                        String[] hexSignalStrength = Arrays.copyOfRange(processedLine, 8, 10);
+                        cellID = Tools.convertHex2Dec(Tools.reversArray(hexCellID));
+                        cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
+                        signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
+                        arrToWrite = new int[]{northVal, eastVal, cellLayerID, cellID, signalStrength};
+                        dataRowNumFromRawData++;
+                        for (int value : arrToWrite) {
+                            arrToCsvFile.add(Integer.toString(value));
+                        }
+                        rowToCsvFile = String.join(",", arrToCsvFile);
+                    } else {
+                        rowToCsvFile = Integer.toString(northVal) + "," + Integer.toString(eastVal) + ",N/A,N/A,N/A";
                     }
-                    rowToCsvFile = String.join(",", arrToCsvFile);
                     bufferedWriter.write(rowToCsvFile);
                     bufferedWriter.newLine();
                 }
@@ -183,7 +194,7 @@ public class ConvertDatFile {
     public File convertDat2Csv() {
         createRawData();
         convertRawData();
-        getConvFile().delete();
+        //getConvFile().delete();
         
         return getCsvFile();
     }
