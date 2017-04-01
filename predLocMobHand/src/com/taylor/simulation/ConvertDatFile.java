@@ -57,8 +57,10 @@ public class ConvertDatFile {
         ArrayList<String> dataRow = new ArrayList<String>();
         int carriageReturnSensor = 0;
         int emptyLineSize = 2;
-        String hexNewLine = "a";
-        String hexCarriageReturn = "d";
+        int readedCharLength;
+        String hexNewLine = "0a";
+        String hexCarriageReturn = "0d";
+        String zeroChar = "0";
         String readedChar = null;
         
         try {
@@ -68,8 +70,10 @@ public class ConvertDatFile {
             int read;
             while((read = readFile.read()) != -1) {
                 readedChar = Integer.toHexString(read);
-                //meg kell oldani, hogy a 0-val kezdodo hex szam eseten ne vagja le 0-t
-                //http://stackoverflow.com/questions/30410753/how-to-count-the-number-of-digits-in-an-int-value
+                readedCharLength = readedChar.length();
+                if (readedCharLength == 1) {
+                    readedChar = zeroChar.concat(readedChar);
+                }
                 dataRow.add(readedChar);
                 if ((carriageReturnSensor == 3) && (dataRow.size() == 10)) {
                     for (String data : dataRow) {
@@ -155,22 +159,18 @@ public class ConvertDatFile {
                     ArrayList<String> arrToCsvFile = new ArrayList<String>();
                     String rowToCsvFile = null;
                     String[] processedLine = rawData.get(dataRowNumFromRawData).split(" ");
-                    if (processedLine.length == 10) {
-                        String[] hexCellID = Arrays.copyOfRange(processedLine, 0, 4);
-                        String[] hexCellLayerID = Arrays.copyOfRange(processedLine, 4, 8);
-                        String[] hexSignalStrength = Arrays.copyOfRange(processedLine, 8, 10);
-                        cellID = Tools.convertHex2Dec(Tools.reversArray(hexCellID));
-                        cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
-                        signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
-                        arrToWrite = new int[]{northVal, eastVal, cellLayerID, cellID, signalStrength};
-                        dataRowNumFromRawData++;
-                        for (int value : arrToWrite) {
-                            arrToCsvFile.add(Integer.toString(value));
-                        }
-                        rowToCsvFile = String.join(",", arrToCsvFile);
-                    } else {
-                        rowToCsvFile = Integer.toString(northVal) + "," + Integer.toString(eastVal) + ",N/A,N/A,N/A";
+                    String[] hexCellID = Arrays.copyOfRange(processedLine, 0, 4);
+                    String[] hexCellLayerID = Arrays.copyOfRange(processedLine, 4, 8);
+                    String[] hexSignalStrength = Arrays.copyOfRange(processedLine, 8, 10);
+                    cellID = Tools.convertHex2Dec(Tools.reversArray(hexCellID));
+                    cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
+                    signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
+                    arrToWrite = new int[]{northVal, eastVal, cellLayerID, cellID, signalStrength};
+                    dataRowNumFromRawData++;
+                    for (int value : arrToWrite) {
+                        arrToCsvFile.add(Integer.toString(value));
                     }
+                    rowToCsvFile = String.join(",", arrToCsvFile);
                     bufferedWriter.write(rowToCsvFile);
                     bufferedWriter.newLine();
                 }
@@ -194,7 +194,7 @@ public class ConvertDatFile {
     public File convertDat2Csv() {
         createRawData();
         convertRawData();
-        //getConvFile().delete();
+        getConvFile().delete();
         
         return getCsvFile();
     }
