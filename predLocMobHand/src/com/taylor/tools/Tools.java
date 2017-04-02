@@ -32,6 +32,13 @@ public class Tools {
         return value;
     }
     
+    public static char convertHex2Char(String hex) {
+        int hex2decimal = Integer.parseInt(hex, 16);
+        char character = (char) hex2decimal;
+        
+        return character;
+    }
+    
     public static String[] reversArray(String[] array) {
         int reverseArrayLength = array.length;
         String[] reversArray = new String[reverseArrayLength];
