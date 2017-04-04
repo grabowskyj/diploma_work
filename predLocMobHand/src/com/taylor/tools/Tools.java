@@ -2,6 +2,8 @@ package com.taylor.tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
+
 import org.gdal.osr.*;
 
 public class Tools {
@@ -50,28 +52,34 @@ public class Tools {
         return reversArray;
     }
     
-    public static double[] wgs84ToHd72Eov(double latitude, double longitude) {
+    public static Hashtable<Object, Object> wgs84ToHd72Eov(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
         wgs84.ImportFromEPSG(4326);
         hd72eov.ImportFromEPSG(23700);
         CoordinateTransformation wgs84ToHd72Eov = new CoordinateTransformation(wgs84, hd72eov);
-      //kimeneteket helyesseget ellenorizni
-        double[] transformation = wgs84ToHd72Eov.TransformPoint(longitude, latitude);
+        double[] transformation = wgs84ToHd72Eov.TransformPoint(x, y);
+        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {{
+           put("latitude",transformation[0]);
+           put("longitude",transformation[1]);
+        }};
         
-        return transformation;
+        return coordinates;
     }
     
-    public static double[] hd72EovToWgs84(double latitude, double longitude) {
+    public static Hashtable<Object, Object> hd72EovToWgs84(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
         wgs84.ImportFromEPSG(4326);
         hd72eov.ImportFromEPSG(23700);
         CoordinateTransformation hd72EovTowgs84 = new CoordinateTransformation(hd72eov, wgs84);
-      
-        double[] transformation = hd72EovTowgs84.TransformPoint(latitude, longitude);
-      //kimeneteket helyesseget ellenorizni
-        return transformation;
+        double[] transformation = hd72EovTowgs84.TransformPoint(y, x);
+        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {{
+           put("latitude",transformation[1]);
+           put("longitude",transformation[0]);
+        }};
+        
+        return coordinates;
     }
     
     

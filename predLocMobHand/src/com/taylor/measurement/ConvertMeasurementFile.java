@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import com.taylor.simulation.ConvertDatFile;
@@ -78,7 +79,7 @@ public class ConvertMeasurementFile {
         try {
             fileWriter = new FileWriter(getCsvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(headerRowToCsv);//kimeneteket helyesseget ellenorizni
+            bufferedWriter.write(headerRowToCsv);
             bufferedWriter.newLine();
             for (int rowCounter = 1; rowCounter < data.size(); rowCounter++ ) {
                 dataRow = data.get(rowCounter).trim().split(separator);
@@ -104,7 +105,12 @@ public class ConvertMeasurementFile {
     
     private String prepareArrayForWrite(String[] array) {
         List<String> setOfData = new ArrayList<String>();
-        int[] neededCellOfArray = new int[]{12,13,1,6,19,21,22,24,25,27,28,30,31,33,34,36}; 
+        int[] neededCellOfArray = new int[]{1,6,19,21,22,24,25,27,28,30,31,33,34,36};
+        Hashtable<Object, Object> coordinates = Tools.wgs84ToHd72Eov(Double.parseDouble(array[12]), Double.parseDouble(array[13]));
+        String latitude = Double.toString((double) coordinates.get("latitude"));
+        String longitude = Double.toString((double) coordinates.get("longitude"));
+        setOfData.add(latitude);
+        setOfData.add(longitude);
         for (int cellNum : neededCellOfArray) {
             if (cellNum <= (array.length - 1)) {
                 setOfData.add(array[cellNum]);

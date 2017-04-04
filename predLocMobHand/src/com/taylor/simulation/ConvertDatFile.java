@@ -187,8 +187,8 @@ public class ConvertDatFile {
         ArrayList<String> arrToCsvFile = null;
         List<Integer> arrToWrite = Arrays.asList();
         int dataRowNumFromRawData = 3;
-        int northVal = 0;
-        int eastVal = 0;
+        int hd72EovYcoordinate = 0;
+        int hd72EovXcoordinate = 0;
         String headerRow = null;
         String rowToCsvFile;
         String[] mapDataRow;
@@ -226,13 +226,13 @@ public class ConvertDatFile {
             mapData.put("fileInfo", mapDataRow[5]);
             bufferedWriter.write(headerRow);
             bufferedWriter.newLine();
-            for (northVal = (int) mapData.get("northMax"); northVal > (int) mapData.get("northMin"); northVal = northVal - (int) mapData.get("resolution")) {
-                for (eastVal = (int) mapData.get("eastMin"); eastVal < (int) mapData.get("eastMax"); eastVal = eastVal + (int) mapData.get("resolution")) {
+            for (hd72EovYcoordinate = (int) mapData.get("northMax"); hd72EovYcoordinate > (int) mapData.get("northMin"); hd72EovYcoordinate = hd72EovYcoordinate - (int) mapData.get("resolution")) {
+                for (hd72EovXcoordinate = (int) mapData.get("eastMin"); hd72EovXcoordinate < (int) mapData.get("eastMax"); hd72EovXcoordinate = hd72EovXcoordinate + (int) mapData.get("resolution")) {
                     arrToCsvFile = new ArrayList<String>();
                     arrToWrite = new ArrayList<Integer>();
                     rowToCsvFile = null;
-                    arrToWrite.add(eastVal);
-                    arrToWrite.add(northVal);
+                    arrToWrite.add(hd72EovXcoordinate);
+                    arrToWrite.add(hd72EovYcoordinate);
                     if (fileType.equals("BESTSERVER")) {
                         processedLine = rawData.get(dataRowNumFromRawData).split(" ");
                         cellData = getCellData(processedLine);
@@ -264,9 +264,8 @@ public class ConvertDatFile {
                             arrToCsvFile.add(Integer.toString(value));
                         }
                     } else {
-                      //kimeneteket sorrendjet ellenorizni
-                        arrToCsvFile.add(Integer.toString(eastVal));
-                        arrToCsvFile.add(Integer.toString(northVal));
+                        arrToCsvFile.add(Integer.toString(hd72EovXcoordinate));
+                        arrToCsvFile.add(Integer.toString(hd72EovYcoordinate));
                         arrToCsvFile.add("NO DATA");
                     }
                     rowToCsvFile = String.join(",", arrToCsvFile);
