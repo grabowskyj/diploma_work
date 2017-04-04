@@ -78,7 +78,7 @@ public class ConvertMeasurementFile {
         try {
             fileWriter = new FileWriter(getCsvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(headerRowToCsv);
+            bufferedWriter.write(headerRowToCsv);//kimeneteket helyesseget ellenorizni
             bufferedWriter.newLine();
             for (int rowCounter = 1; rowCounter < data.size(); rowCounter++ ) {
                 dataRow = data.get(rowCounter).trim().split(separator);
@@ -117,31 +117,5 @@ public class ConvertMeasurementFile {
         String rowToWrite = String.join(",", filledArray);
         
         return rowToWrite;
-    }
-
-    public static void main(String[] args) {
-        
-        File datFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver_bestserver.dat");
-        File convFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\veresegyhaz_25m_bestserver.conv");
-        File simCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\veresegyhaz_25m_bestserver.csv");
-        File dat2File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\sample_25m_bestserver.dat");
-        File conv2File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\sample_25m_bestserver.conv");
-        File sim2CsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\sample_25m_bestserver.csv");
-        File dat3File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver_nthserver.dat");
-        File conv3File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_bestserver_nthserver.conv");
-        File sim3CsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_bestserver_nthserver.csv");
-        //File measurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_rxl_2017_03_25_08_08_06.txt");
-        //File measurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\gmon_gsm_rxl_2017_03_25_08_08_06.csv");
-        
-        ConvertDatFile sim = new ConvertDatFile(datFile, convFile, simCsvFile);
-        ConvertDatFile sim2 = new ConvertDatFile(dat2File, conv2File, sim2CsvFile);
-        ConvertDatFile sim3 = new ConvertDatFile(dat3File, conv3File, sim3CsvFile);
-        //ConvertMeasurementFile measurement = new ConvertMeasurementFile(measurementFile, measurementCsvFile);
-        
-        sim.convertDat2Csv();
-        sim2.convertDat2Csv();
-        sim3.convertDat2Csv();
-        
-        //measurement.convertMeasurement2Csv();
     }
 }

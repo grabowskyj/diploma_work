@@ -2,6 +2,7 @@ package com.taylor.tools;
 
 import java.io.File;
 import java.io.IOException;
+import org.gdal.osr.*;
 
 public class Tools {
     
@@ -48,5 +49,30 @@ public class Tools {
         
         return reversArray;
     }
+    
+    public static double[] wgs84ToHd72Eov(double latitude, double longitude) {
+        SpatialReference wgs84 = new SpatialReference();
+        SpatialReference hd72eov = new SpatialReference();
+        wgs84.ImportFromEPSG(4326);
+        hd72eov.ImportFromEPSG(23700);
+        CoordinateTransformation wgs84ToHd72Eov = new CoordinateTransformation(wgs84, hd72eov);
+      //kimeneteket helyesseget ellenorizni
+        double[] transformation = wgs84ToHd72Eov.TransformPoint(longitude, latitude);
+        
+        return transformation;
+    }
+    
+    public static double[] hd72EovToWgs84(double latitude, double longitude) {
+        SpatialReference wgs84 = new SpatialReference();
+        SpatialReference hd72eov = new SpatialReference();
+        wgs84.ImportFromEPSG(4326);
+        hd72eov.ImportFromEPSG(23700);
+        CoordinateTransformation hd72EovTowgs84 = new CoordinateTransformation(hd72eov, wgs84);
+      
+        double[] transformation = hd72EovTowgs84.TransformPoint(latitude, longitude);
+      //kimeneteket helyesseget ellenorizni
+        return transformation;
+    }
+    
     
 }

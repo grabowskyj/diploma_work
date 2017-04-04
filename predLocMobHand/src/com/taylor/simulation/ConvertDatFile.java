@@ -231,8 +231,8 @@ public class ConvertDatFile {
                     arrToCsvFile = new ArrayList<String>();
                     arrToWrite = new ArrayList<Integer>();
                     rowToCsvFile = null;
-                    arrToWrite.add(northVal);
                     arrToWrite.add(eastVal);
+                    arrToWrite.add(northVal);
                     if (fileType.equals("BESTSERVER")) {
                         processedLine = rawData.get(dataRowNumFromRawData).split(" ");
                         cellData = getCellData(processedLine);
@@ -264,8 +264,9 @@ public class ConvertDatFile {
                             arrToCsvFile.add(Integer.toString(value));
                         }
                     } else {
-                        arrToCsvFile.add(Integer.toString(northVal));
+                      //kimeneteket sorrendjet ellenorizni
                         arrToCsvFile.add(Integer.toString(eastVal));
+                        arrToCsvFile.add(Integer.toString(northVal));
                         arrToCsvFile.add("NO DATA");
                     }
                     rowToCsvFile = String.join(",", arrToCsvFile);
