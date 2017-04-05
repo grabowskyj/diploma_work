@@ -190,9 +190,9 @@ public class ConvertDatFile {
         int hd72EovYcoordinate = 0;
         int hd72EovXcoordinate = 0;
         String headerRow = null;
-        String rowToCsvFile;
-        String[] mapDataRow;
-        String[] processedLine;
+        String rowToCsvFile = null;
+        String[] mapDataRow = null;
+        String[] processedLine = null;
         String[] hexCharBuffer = new String[10];
         Hashtable<Object, Object> mapData = new Hashtable<>();
         Hashtable<String,Integer> cellData = null;
@@ -201,9 +201,9 @@ public class ConvertDatFile {
             headerRow = "latitude,longitude,cellLayerID,cellID,signalStrength";
         }
         if (fileType.equals("NTHSERVER")) {
-            headerRow = "latitude,longitude,";
-            for (int serverCounter = 1; serverCounter <= maxNoOfServers; serverCounter++) {
-                String headerRowForNthServer = "n" + serverCounter + "cellLayerID,n" + serverCounter + "cellID,n" + serverCounter + "signalStrength";
+            headerRow = "latitude,longitude,cellLayerID,cellID,signalStrength,";
+            for (int serverCounter = 1; serverCounter < maxNoOfServers; serverCounter++) {
+                String headerRowForNthServer = "n" + serverCounter + "cellLayerID,n" + serverCounter + "cellID,n" + serverCounter + "signalStrength,";
                 headerRow = headerRow.concat(headerRowForNthServer);
             }
         }

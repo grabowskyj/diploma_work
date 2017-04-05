@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Random;
 
 import com.taylor.simulation.ConvertDatFile;
 import com.taylor.tools.*;
@@ -47,7 +49,7 @@ public class ConvertMeasurementFile {
         try {
             fileReader = new FileReader(getSrcFile());
             bufferedReader = new BufferedReader(fileReader);
-            String readedLine;
+            String readedLine = null;
             while((readedLine = bufferedReader.readLine()) != null){
                 data.add(readedLine);
             }
