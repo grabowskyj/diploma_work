@@ -1,6 +1,7 @@
 package com.taylor.localization;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import com.taylor.measurement.ConvertMeasurementFile;
 import com.taylor.simulation.ConvertDatFile;
@@ -8,46 +9,78 @@ import com.taylor.tools.Tools;
 
 public class Localization {
     
+    private File dataBaseFile;
+    private File measurementFile;
+    final ArrayList<String> dataBase = Tools.readFileToMemory(getDataBase());
+    
+    public Localization(File dataBase, File measurement) {
+        this.setDataBase(dataBase);
+        this.setMeasurement(measurement);   
+    }
+    
+    public File getDataBase() {
+        return dataBaseFile;
+    }
+
+    private void setDataBase(File dataBaseFile) {
+        this.dataBaseFile = dataBaseFile;
+    }
+
+    public File getMeasurement() {
+        return measurementFile;
+    }
+
+    private void setMeasurement(File measurementFile) {
+        this.measurementFile = measurementFile;
+    }
+    
+
+    
+    
+    
     public static void main(String[] args) {
         
-        /*File datFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver_bestserver.dat");
-        File convFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\veresegyhaz_25m_bestserver.conv");
-        File simCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\veresegyhaz_25m_bestserver.csv");
-        File dat2File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver_nthserver.dat");
-        File conv2File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_bestserver_nthserver.conv");
-        File sim2CsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_bestserver_nthserver.csv");
+        File veresegyhazBestDatFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver.dat");
+        File veresegyhazBestConvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_bestserver.conv");
+        File veresegyhazBestSimCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_bestserver.csv");
+        File veresegyhazNthDatFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_nthserver.dat");
+        File veresegyhazNthConvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_nthserver.conv");
+        File veresegyhazNthSimCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_nthserver.csv");
         
-        ConvertDatFile sim = new ConvertDatFile(datFile, convFile, simCsvFile);
-        ConvertDatFile sim2 = new ConvertDatFile(dat2File, conv2File, sim2CsvFile);
+        ConvertDatFile simVeresBest = new ConvertDatFile(veresegyhazBestDatFile, veresegyhazBestConvFile, veresegyhazBestSimCsvFile);
+        ConvertDatFile simVeresNth = new ConvertDatFile(veresegyhazNthDatFile, veresegyhazNthConvFile, veresegyhazNthSimCsvFile);
         
-        sim.convertDat2Csv();
-        sim2.convertDat2Csv();
+        simVeresBest.convertDat2Csv();
+        simVeresNth.convertDat2Csv();
         
-        File measurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_rxl_2017_03_25_08_08_06_veresegyhaz.txt");
-        File measurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\gmon_gsm_rxl_2017_03_25_08_08_06_veresegyhaz.csv");
-        File measurement2File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_rxl_2017_04_01_15_13_03_budapest.txt");
-        File measurement2CsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\gmon_gsm_rxl_2017_04_01_15_13_03_budapest.csv");
-        File measurement3File = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_rxl_2017_03_25_08_49_11_veresegyhaz.txt");
-        File measurement3CsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\gmon_gsm_rxl_2017_03_25_08_49_11_veresegyhaz.csv");
+        File veresegyhazNo1MeasurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_1.txt");
+        File veresegyhazNo1MeasurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_1.csv");
+        File budapestMeasurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_budapest.txt");
+        File budapestMeasurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\gmon_gsm_budapest.csv");
+        File veresegyhazNo2MeasurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_2.txt");
+        File veresegyhazNo2MeasurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_2.csv");
         
-        File createdMeasurement = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\created_measurement.csv");
-        File createdMeasurement2 = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\created_measurement2.csv");
-        File createdMeasurement3 = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\created_measurement3.csv");
-        File createdMeasurement4 = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\created_measurement4.csv");
-        File createdMeasurement5 = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\created_measurement5.csv");
+        ConvertMeasurementFile measurementVeresegyhazNo1 = new ConvertMeasurementFile(veresegyhazNo1MeasurementFile, veresegyhazNo1MeasurementCsvFile);
+        ConvertMeasurementFile measurementBudapest = new ConvertMeasurementFile(budapestMeasurementFile, budapestMeasurementCsvFile);
+        ConvertMeasurementFile measurementVeresegyhazNo2 = new ConvertMeasurementFile(veresegyhazNo2MeasurementFile, veresegyhazNo2MeasurementCsvFile);
         
-        ConvertMeasurementFile measurement = new ConvertMeasurementFile(measurementFile, measurementCsvFile);
-        ConvertMeasurementFile measurement2 = new ConvertMeasurementFile(measurement2File, measurement2CsvFile);
-        ConvertMeasurementFile measurement3 = new ConvertMeasurementFile(measurement3File, measurement3CsvFile);
+        measurementVeresegyhazNo1.convertMeasurement2Csv();
+        measurementBudapest.convertMeasurement2Csv();
+        measurementVeresegyhazNo2.convertMeasurement2Csv();
         
-        measurement.convertMeasurement2Csv();
-        measurement2.convertMeasurement2Csv();
-        measurement3.convertMeasurement2Csv();
+        File createdMeasurementVeresegyhazBest = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_bestserver_created_measurement.csv");
+        File createdMeasurementVeresegyhazNth = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_nthserver_created_measurement.csv");
+        File createdMeasurementVeresegyhaz1Gmon = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_1_gmon_created_measurement.csv");
+        File createdMeasurementVeresegyhaz2Gmon = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_2_gmon_created_measurement.csv");
+        File createdMeasurementBudapestGmon = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\budapest_gmon_created_measurement.csv");
+
+        Tools.createTestMeasurementFile(3, veresegyhazBestSimCsvFile, createdMeasurementVeresegyhazBest);
+        Tools.createTestMeasurementFile(3, veresegyhazNthSimCsvFile, createdMeasurementVeresegyhazNth);
+        Tools.createTestMeasurementFile(3, veresegyhazNo1MeasurementCsvFile, createdMeasurementVeresegyhaz1Gmon);
+        Tools.createTestMeasurementFile(3, budapestMeasurementCsvFile, createdMeasurementBudapestGmon);
+        Tools.createTestMeasurementFile(3, veresegyhazNo2MeasurementCsvFile, createdMeasurementVeresegyhaz2Gmon);
         
-        Tools.createTestMeasurementFile(3, simCsvFile, createdMeasurement);
-        Tools.createTestMeasurementFile(3, sim2CsvFile, createdMeasurement2);
-        Tools.createTestMeasurementFile(3, measurementCsvFile, createdMeasurement3);
-        Tools.createTestMeasurementFile(3, measurement2CsvFile, createdMeasurement4);
-        Tools.createTestMeasurementFile(3, measurement3CsvFile, createdMeasurement5);*/
+        
+        
     }
 }

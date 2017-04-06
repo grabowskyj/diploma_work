@@ -1,17 +1,11 @@
 package com.taylor.measurement;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Random;
-
-import com.taylor.simulation.ConvertDatFile;
 import com.taylor.tools.*;
 
 public class ConvertMeasurementFile {
@@ -40,39 +34,11 @@ public class ConvertMeasurementFile {
     public File getCsvFile() {
         return csvFile;
     }
-
-    private ArrayList<String> readMeasurement() {
-        FileReader fileReader = null;
-        BufferedReader bufferedReader = null;
-        ArrayList<String> data = new ArrayList<String>();
-        
-        try {
-            fileReader = new FileReader(getSrcFile());
-            bufferedReader = new BufferedReader(fileReader);
-            String readedLine = null;
-            while((readedLine = bufferedReader.readLine()) != null){
-                data.add(readedLine);
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
-        } finally {
-            try {
-                bufferedReader.close();
-                fileReader.close();
-            } catch (Exception e) {
-                System.out.println(e);
-                e.printStackTrace();
-            }
-        }
-        
-        return data;
-    }
     
     public File convertMeasurement2Csv() {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
-        ArrayList<String> data = readMeasurement();
+        ArrayList<String> data = Tools.readFileToMemory(getSrcFile());
         String separator = ";";
         String headerRowToCsv = "latitude,longitude,cellID,signalStrength,n1cellID,n1signalStrength,n2cellID,n2signalStrength,n3cellID,n3signalStrength,n4cellID,n4signalStrength,n5cellID,n5signalStrength,n6cellID,n6signalStrength";
         String dataRowToCsv = null;

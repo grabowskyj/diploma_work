@@ -19,6 +19,7 @@ public class Tools {
         if (file.exists()) {
             file.delete();
         }
+        
         try {
             file.createNewFile();  
         } catch (IOException e) {
@@ -57,6 +58,34 @@ public class Tools {
         }
         
         return reversArray;
+    }
+    
+    public static ArrayList<String> readFileToMemory(File dataBase) {
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
+        ArrayList<String> dataInMemory = new ArrayList<String>();
+        
+        try {
+            fileReader = new FileReader(dataBase);
+            bufferedReader = new BufferedReader(fileReader);
+            String readedLine = null;
+            while((readedLine = bufferedReader.readLine()) != null){
+                dataInMemory.add(readedLine);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+        } finally {
+            try {
+                bufferedReader.close();
+                fileReader.close();
+            } catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
+        }
+        
+        return dataInMemory;
     }
     
     public static Hashtable<Object, Object> wgs84ToHd72Eov(double y, double x) {

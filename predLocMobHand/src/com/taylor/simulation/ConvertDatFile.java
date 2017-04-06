@@ -179,9 +179,7 @@ public class ConvertDatFile {
     }
     
     private void convertRawData() {
-        FileReader fileReader = null;
         FileWriter fileWriter = null;
-        BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = null;
         ArrayList<String> rawData = new ArrayList<String>();
         ArrayList<String> arrToCsvFile = null;
@@ -198,25 +196,20 @@ public class ConvertDatFile {
         Hashtable<String,Integer> cellData = null;
         
         if (fileType.equals("BESTSERVER")) {
-            headerRow = "latitude,longitude,cellLayerID,cellID,signalStrength";
+            headerRow = "latitude,longitude,cellID,signalStrength";
         }
         if (fileType.equals("NTHSERVER")) {
-            headerRow = "latitude,longitude,cellLayerID,cellID,signalStrength,";
+            headerRow = "latitude,longitude,cellID,signalStrength,";
             for (int serverCounter = 1; serverCounter < maxNoOfServers; serverCounter++) {
-                String headerRowForNthServer = "n" + serverCounter + "cellLayerID,n" + serverCounter + "cellID,n" + serverCounter + "signalStrength,";
+                String headerRowForNthServer = "n" + serverCounter + "cellID,n" + serverCounter + "signalStrength,";
                 headerRow = headerRow.concat(headerRowForNthServer);
             }
         }
                 
         try {
-            fileReader = new FileReader(getConvFile());
-            bufferedReader = new BufferedReader(fileReader);
             fileWriter = new FileWriter(getCsvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
-            String readedLine;
-            while ((readedLine = bufferedReader.readLine()) != null) {
-                rawData.add(readedLine.trim());
-            }
+            rawData = Tools.readFileToMemory(getConvFile());
             mapDataRow = rawData.get(1).split(" ",6);
             mapData.put("eastMin", Integer.parseInt(mapDataRow[0]));
             mapData.put("eastMax", Integer.parseInt(mapDataRow[1]));
@@ -236,7 +229,7 @@ public class ConvertDatFile {
                     if (fileType.equals("BESTSERVER")) {
                         processedLine = rawData.get(dataRowNumFromRawData).split(" ");
                         cellData = getCellData(processedLine);
-                        arrToWrite.add(cellData.get("cellLayerID"));
+                        //arrToWrite.add(cellData.get("cellLayerID"));
                         arrToWrite.add(cellData.get("cellID"));
                         arrToWrite.add(cellData.get("signalStrength"));
                     }
@@ -249,7 +242,7 @@ public class ConvertDatFile {
                                 hexCharCounter++;
                                 if (hexChar.equals("ff") && hexCharCounter == 10) {
                                     cellData = getCellData(hexCharBuffer);
-                                    arrToWrite.add(cellData.get("cellLayerID"));
+                                    //arrToWrite.add(cellData.get("cellLayerID"));
                                     arrToWrite.add(cellData.get("cellID"));
                                     arrToWrite.add(cellData.get("signalStrength"));
                                     hexCharCounter = 0;
@@ -278,8 +271,6 @@ public class ConvertDatFile {
             e.printStackTrace();
         } finally {
             try {
-                bufferedReader.close();
-                fileReader.close();
                 bufferedWriter.close();
                 fileWriter.close();
             } catch (Exception e) {
@@ -291,14 +282,14 @@ public class ConvertDatFile {
     
     private Hashtable<String,Integer> getCellData(String[] processedCell){
         String[] hexCellID = Arrays.copyOfRange(processedCell, 0, 4);
-        String[] hexCellLayerID = Arrays.copyOfRange(processedCell, 4, 8);
+        //String[] hexCellLayerID = Arrays.copyOfRange(processedCell, 4, 8);
         String[] hexSignalStrength = Arrays.copyOfRange(processedCell, 8, 10);
         int cellID = Tools.convertHex2Dec(Tools.reversArray(hexCellID));
-        int cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
+        //int cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
         int signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
         Hashtable<String, Integer> cellData = new Hashtable<String, Integer>(){{
                 put("cellID",cellID);
-                put("cellLayerID",cellLayerID);
+                //put("cellLayerID",cellLayerID);
                 put("signalStrength",signalStrength);
         }};
             
