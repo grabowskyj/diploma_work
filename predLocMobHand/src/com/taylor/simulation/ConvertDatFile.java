@@ -1,10 +1,8 @@
 package com.taylor.simulation;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -205,7 +203,7 @@ public class ConvertDatFile {
                 headerRow = headerRow.concat(headerRowForNthServer);
             }
         }
-                
+        
         try {
             fileWriter = new FileWriter(getCsvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
@@ -259,7 +257,6 @@ public class ConvertDatFile {
                     } else {
                         arrToCsvFile.add(Integer.toString(hd72EovXcoordinate));
                         arrToCsvFile.add(Integer.toString(hd72EovYcoordinate));
-                        arrToCsvFile.add("NO DATA");
                     }
                     rowToCsvFile = String.join(",", arrToCsvFile);
                     bufferedWriter.write(rowToCsvFile);
@@ -287,6 +284,7 @@ public class ConvertDatFile {
         int cellID = Tools.convertHex2Dec(Tools.reversArray(hexCellID));
         //int cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
         int signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
+        @SuppressWarnings("serial")
         Hashtable<String, Integer> cellData = new Hashtable<String, Integer>(){{
                 put("cellID",cellID);
                 //put("cellLayerID",cellLayerID);

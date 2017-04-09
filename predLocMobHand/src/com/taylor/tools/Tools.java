@@ -95,6 +95,7 @@ public class Tools {
         hd72eov.ImportFromEPSG(23700);
         CoordinateTransformation wgs84ToHd72Eov = new CoordinateTransformation(wgs84, hd72eov);
         double[] transformation = wgs84ToHd72Eov.TransformPoint(x, y);
+        @SuppressWarnings("serial")
         Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {{
            put("latitude",transformation[0]);
            put("longitude",transformation[1]);
@@ -110,6 +111,7 @@ public class Tools {
         hd72eov.ImportFromEPSG(23700);
         CoordinateTransformation hd72EovTowgs84 = new CoordinateTransformation(hd72eov, wgs84);
         double[] transformation = hd72EovTowgs84.TransformPoint(y, x);
+        @SuppressWarnings("serial")
         Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {{
            put("latitude",transformation[1]);
            put("longitude",transformation[0]);

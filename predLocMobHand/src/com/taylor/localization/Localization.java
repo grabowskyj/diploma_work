@@ -2,7 +2,7 @@ package com.taylor.localization;
 
 import java.io.File;
 import java.util.ArrayList;
-
+import java.util.Hashtable;
 import com.taylor.measurement.ConvertMeasurementFile;
 import com.taylor.simulation.ConvertDatFile;
 import com.taylor.tools.Tools;
@@ -11,33 +11,68 @@ public class Localization {
     
     private File dataBaseFile;
     private File measurementFile;
-    final ArrayList<String> dataBase = Tools.readFileToMemory(getDataBase());
+    private ArrayList<String> simulationData;
+    private ArrayList<String> measurementData;
     
-    public Localization(File dataBase, File measurement) {
-        this.setDataBase(dataBase);
-        this.setMeasurement(measurement);   
+    public Localization(File dataBaseFile, File measurementFile) {
+        this.setDataBaseFile(dataBaseFile);
+        this.setMeasurementFile(measurementFile);
     }
-    
-    public File getDataBase() {
+
+    public File getDataBaseFile() {
         return dataBaseFile;
     }
 
-    private void setDataBase(File dataBaseFile) {
+    private void setDataBaseFile(File dataBaseFile) {
         this.dataBaseFile = dataBaseFile;
     }
 
-    public File getMeasurement() {
+    public File getMeasurementFile() {
         return measurementFile;
     }
 
-    private void setMeasurement(File measurementFile) {
+    private void setMeasurementFile(File measurementFile) {
         this.measurementFile = measurementFile;
     }
     
+    private boolean readFilesToMemory(File simulationFile, File measurementFile) {
+        boolean areFilesReaded = false;
+        simulationData = Tools.readFileToMemory(simulationFile);
+        measurementData = Tools.readFileToMemory(measurementFile);
+        if (!simulationData.isEmpty() && !measurementData.isEmpty()) {
+            areFilesReaded = true;
+        }
+        
+        return areFilesReaded;  
+    }
+    
+    private Hashtable<String, ArrayList<String>> createDataBase() {
+        Hashtable<String, ArrayList<String>> dataBase = null;
+        String[] simulationDataHeader = null;
+        boolean isReadToMemorySuccess = readFilesToMemory(dataBaseFile, measurementFile);
+        if (isReadToMemorySuccess == true) {
+            simulationDataHeader = simulationData.get(0).trim().split(",");
+            dataBase = new Hashtable<String, ArrayList<String>>();
+            for (int headerElement = 0; headerElement < simulationDataHeader.length; headerElement++) {
+                dataBase.put(simulationDataHeader[headerElement], new ArrayList<String>());
+            }
+            for (int simulationDataRowCounter = 1; simulationDataRowCounter < simulationData.size(); simulationDataRowCounter++) {
+                String[] splittedSimulationDataRow = simulationData.get(simulationDataRowCounter).split(",");
+                int simulationDataHeaderElementCounter = 0;
+                for (String simulationDataHeaderElement : simulationDataHeader) {
+                    if (simulationDataHeaderElementCounter < splittedSimulationDataRow.length) {
+                        ((ArrayList<String>) dataBase.get(simulationDataHeaderElement)).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);
+                    } else {
+                        ((ArrayList<String>) dataBase.get(simulationDataHeaderElement)).add("0");
+                    }
+                    simulationDataHeaderElementCounter++;
+                }
+            }
+        }
+        
+        return dataBase;
+    }
 
-    
-    
-    
     public static void main(String[] args) {
         
         File veresegyhazBestDatFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver.dat");
@@ -79,6 +114,12 @@ public class Localization {
         Tools.createTestMeasurementFile(3, veresegyhazNo1MeasurementCsvFile, createdMeasurementVeresegyhaz1Gmon);
         Tools.createTestMeasurementFile(3, budapestMeasurementCsvFile, createdMeasurementBudapestGmon);
         Tools.createTestMeasurementFile(3, veresegyhazNo2MeasurementCsvFile, createdMeasurementVeresegyhaz2Gmon);
+        
+        Localization newLocaction = new Localization(veresegyhazNo2MeasurementCsvFile, createdMeasurementVeresegyhaz2Gmon);
+        
+        
+        Hashtable<String, ArrayList<String>> dataBase = newLocaction.createDataBase();
+        System.out.println(dataBase.get("latitude"));
         
         
         
