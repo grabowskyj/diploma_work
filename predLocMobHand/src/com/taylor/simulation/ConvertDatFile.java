@@ -197,9 +197,9 @@ public class ConvertDatFile {
             headerRow = "latitude,longitude,cellID,signalStrength";
         }
         if (fileType.equals("NTHSERVER")) {
-            headerRow = "latitude,longitude,cellID,signalStrength,";
+            headerRow = "latitude,longitude,cellID,signalStrength";
             for (int serverCounter = 1; serverCounter < maxNoOfServers; serverCounter++) {
-                String headerRowForNthServer = "n" + serverCounter + "cellID,n" + serverCounter + "signalStrength,";
+                String headerRowForNthServer = ",n" + serverCounter + "cellID,n" + serverCounter + "signalStrength";
                 headerRow = headerRow.concat(headerRowForNthServer);
             }
         }
