@@ -116,6 +116,15 @@ public class Localization {
 
     public static void main(String[] args) {
         
+        //File veresegyhazBestDatFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver.dat");
+        //File veresegyhazBestConvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\Veresegyhaz_bestserver.conv");
+        //File veresegyhazBestSimCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_bestserver.csv");
+        //File veresegyhazNthDatFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_nthserver.dat");
+        //File veresegyhazNthConvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\Veresegyhaz_nthserver.conv");
+        //File veresegyhazNthSimCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_nthserver.csv");
+        //ConvertDatFile simVeresBest = new ConvertDatFile(veresegyhazBestDatFileOnE, veresegyhazBestConvFileOnE, veresegyhazBestSimCsvFileOnE);
+        //ConvertDatFile simVeresNth = new ConvertDatFile(veresegyhazNthDatFileOnE, veresegyhazNthConvFileOnE, veresegyhazNthSimCsvFileOnE);
+        
         //File veresegyhazBestDatFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver.dat");
         //File veresegyhazBestConvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_bestserver.conv");
         //File veresegyhazBestSimCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_bestserver.csv");
