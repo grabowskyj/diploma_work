@@ -137,6 +137,8 @@ public class Tools {
         String rowToWrite = null;
         String[] headerRow = null;
         String[] row = null;
+        String[] rowWithoutCoordinates = null;
+        String[] headerRowWithoutCoordinates = null;
         ArrayList<String> csvData = new ArrayList<String>();
         ArrayList<String> headerRowArrayList = null;
         
@@ -158,7 +160,8 @@ public class Tools {
             if (headerRowArrayList.contains("cellLayerID") && headerRowArrayList.contains("n1cellLayerID")) {
                 typeOfMeasurement = "NTHSERVER";
             }
-            bufferedWriter.write(String.join(",", headerRow));
+            headerRowWithoutCoordinates = Arrays.copyOfRange(headerRow, 2, headerRow.length);
+            bufferedWriter.write(String.join(",", headerRowWithoutCoordinates));
             bufferedWriter.newLine();
             if (nthRow == 0) {
                 nthRow = 1;
@@ -183,7 +186,8 @@ public class Tools {
                             row[rowElement] = Integer.toString(signalStrength);
                         }
                     }
-                    rowToWrite = String.join(",", row);
+                    rowWithoutCoordinates = Arrays.copyOfRange(row, 2, row.length);
+                    rowToWrite = String.join(",", rowWithoutCoordinates);
                     bufferedWriter.write(rowToWrite);
                     bufferedWriter.newLine();
                 } 
