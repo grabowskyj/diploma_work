@@ -2,6 +2,7 @@ package com.taylor.localization;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,9 +52,9 @@ public class Localization {
                 int simulationDataHeaderElementCounter = 0;
                 for (String simulationDataHeaderElement : simulationDataHeader) {
                     if (simulationDataHeaderElementCounter < splittedSimulationDataRow.length) {
-                        ((ArrayList<String>) database.get(simulationDataHeaderElement)).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);
+                        database.get(simulationDataHeaderElement).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);
                     } else {
-                        ((ArrayList<String>) database.get(simulationDataHeaderElement)).add("0");
+                        database.get(simulationDataHeaderElement).add("0");
                     }
                     simulationDataHeaderElementCounter++;
                 }
@@ -63,10 +64,28 @@ public class Localization {
         return database;
     }
     
-    private List<Integer> getIndexListForNewDatabase(LinkedList<String> elementNameAndElement, Hashtable<String, ArrayList<String>> database){
+    private Hashtable<String, ArrayList<String>> createDatabaseFromSelection(String indexListName, List<Integer> indexList, Hashtable<String, ArrayList<String>> srcDatabase){
+        Hashtable<String, ArrayList<String>> databaseSubset = new Hashtable<String, ArrayList<String>>();
+        String elementName = null;
+        String srcElement = null;
+        srcDatabase.remove(indexListName);
+        Enumeration<String> keys = srcDatabase.keys();
+        while (keys.hasMoreElements()) {
+            elementName = keys.nextElement();
+            databaseSubset.put(elementName, new ArrayList<String>());
+            for (int index : indexList) {
+                srcElement = srcDatabase.get(elementName).get(index);
+                databaseSubset.get(elementName).add(srcElement);
+            }
+        }
+        
+        return databaseSubset;
+    }
+    
+    private List<Integer> getIndexListForNewDatabase(String[] elementNameAndElement, Hashtable<String, ArrayList<String>> database){
         List<Integer> indexListOfElement = new ArrayList<Integer>();
-        String elementName = elementNameAndElement.getFirst();
-        String element = elementNameAndElement.getLast();
+        String elementName = elementNameAndElement[0];
+        String element = elementNameAndElement[1];
         ArrayList<String> dataset = database.get(elementName);
         for (int datasetElementCounter = 0; datasetElementCounter < dataset.size(); datasetElementCounter++) {
             if (element.equals(dataset.get(datasetElementCounter))) {
@@ -74,8 +93,38 @@ public class Localization {
             }
         }
         
-        return indexListOfElement;
+        return indexListOfElement; 
+    }
+    
+    private List<Integer> checkSideValues(String[] elementNameAndElement, Hashtable<String, ArrayList<String>> database) {
+        List<Integer> indexListOfElement = new ArrayList<Integer>();
+        List<Integer> positiveSideIndexList = new ArrayList<Integer>();
+        List<Integer> negativeSideIndexList = new ArrayList<Integer>();
+        String elementName = elementNameAndElement[0];
+        int element = Integer.parseInt(elementNameAndElement[1]);
+        ArrayList<String> dataset = database.get(elementName);
+        boolean isValueFound = false;
+        int checkRange = 10;
+        int positiveRangeNumber = 0;
+        int negativeRangeNumber = 0;
+        while (isValueFound == false) {
+            for (int range = 1; range <= checkRange; range++ ) {
+                positiveRangeNumber = element + range;
+                negativeRangeNumber = element - range;
+                if (dataset.contains(Integer.toString(positiveRangeNumber))) {
+                    int startIndex = dataset.indexOf(Integer.toString(positiveRangeNumber));
+                    int endIndex = dataset.lastIndexOf(Integer.toString(positiveRangeNumber));
+                    for (int index = startIndex; index <= endIndex; index++ ) {
+                        if (positiveRangeNumber == Integer.parseInt(dataset.get(index))) {
+                            positiveSideIndexList.add(index);
+                        }
+                    }
+                }//pozitiv tartomany vegigjarasa jonak tunik, de azert meg ellenorizni, valamint negativ tartomany vegigjarasat megcsinalni
+            }
+        }
         
+        
+        return indexListOfElement;
     }
     
     private Hashtable<String, Double> getLocationFromDatabase(Hashtable<String, ArrayList<String>> database) {
@@ -84,24 +133,40 @@ public class Localization {
             put("latitude", 0.0);
             put("longitude", 0.0);
         }};
+        Hashtable<String, ArrayList<String>> transitionalDatabase = new Hashtable<String, ArrayList<String>>();
         List<Integer> indexListOfElements = new ArrayList<Integer>();
+        List<String> latitude = new ArrayList<String>();
+        List<String> longitude = new ArrayList<String>();
         ArrayList<String> measurement = Tools.readFileToMemory(measurementFile);
-        LinkedList<String> elementNameAndElement = new LinkedList<String>();
+        String[] elementNameAndElement = new String[2];
         String[] splittedMeasurementRow = null;
         String[] measurementDataHeader = measurement.get(0).split(",");
+        String elementName = null;
         for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
             splittedMeasurementRow = measurement.get(measurementDataRowCounter).split(",");
             int measurementDataHeaderElementCounter = 0;
             for (String splittedMeasurementRowElement : splittedMeasurementRow) {
-                elementNameAndElement.addFirst(measurementDataHeader[measurementDataHeaderElementCounter]);
-                elementNameAndElement.add(splittedMeasurementRowElement);
-                System.out.println(elementNameAndElement);
-                indexListOfElements = getIndexListForNewDatabase(elementNameAndElement, database); //listaepitest ellenorizni, de elvileg ugy nez ki, hogy mukodik; a lista elemeibol kell egy uj adatbazist felepiteni
-                System.out.println(indexListOfElements);
-                elementNameAndElement.clear();
+                elementName = measurementDataHeader[measurementDataHeaderElementCounter];
+                elementNameAndElement[0] = elementName;
+                elementNameAndElement[1] = splittedMeasurementRowElement;
+                indexListOfElements = getIndexListForNewDatabase(elementNameAndElement, database);
+                if (!indexListOfElements.isEmpty()) {
+                    transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, database);
+                }
+                if (indexListOfElements.isEmpty() && measurementDataHeaderElementCounter % 2 != 0) {
+                    indexListOfElements = checkSideValues(elementNameAndElement, database);
+                }
+                if (!transitionalDatabase.isEmpty()) {
+                    database = transitionalDatabase;
+                }
+                latitude = database.get("latitude");
+                longitude = database.get("longitude");
+                System.out.println(latitude);
+                System.out.println(longitude);
                 measurementDataHeaderElementCounter++;
+                System.exit(1);
             }
-            System.exit(1);
+            
             
             
         }
