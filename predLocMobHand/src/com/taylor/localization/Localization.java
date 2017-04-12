@@ -208,16 +208,16 @@ public class Localization {
         //simVeresNth.convertDat2Csv();
         
         ////E PC files
-        /*File veresegyhazNo1MeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_1.txt");
-        File veresegyhazNo1MeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_1.csv");
-        File budapestMeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_budapest.txt");
-        File budapestMeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_budapest.csv");
-        File veresegyhazNo2MeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_2.txt");
+        //File veresegyhazNo1MeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_1.txt");
+        //File veresegyhazNo1MeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_1.csv");
+        //File budapestMeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_budapest.txt");
+        //File budapestMeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_budapest.csv");
+        //File veresegyhazNo2MeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_2.txt");
         File veresegyhazNo2MeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_2.csv");
         
-        ConvertMeasurementFile measurementVeresegyhazNo1 = new ConvertMeasurementFile(veresegyhazNo1MeasurementFileOnE, veresegyhazNo1MeasurementCsvFileOnE);
-        ConvertMeasurementFile measurementBudapest = new ConvertMeasurementFile(budapestMeasurementFileOnE, budapestMeasurementCsvFileOnE);
-        ConvertMeasurementFile measurementVeresegyhazNo2 = new ConvertMeasurementFile(veresegyhazNo2MeasurementFileOnE, veresegyhazNo2MeasurementCsvFileOnE);*/
+        //ConvertMeasurementFile measurementVeresegyhazNo1 = new ConvertMeasurementFile(veresegyhazNo1MeasurementFileOnE, veresegyhazNo1MeasurementCsvFileOnE);
+        //ConvertMeasurementFile measurementBudapest = new ConvertMeasurementFile(budapestMeasurementFileOnE, budapestMeasurementCsvFileOnE);
+        //ConvertMeasurementFile measurementVeresegyhazNo2 = new ConvertMeasurementFile(veresegyhazNo2MeasurementFileOnE, veresegyhazNo2MeasurementCsvFileOnE);
         
         ////home PC files
         //File veresegyhazNo1MeasurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_1.txt");
@@ -236,17 +236,17 @@ public class Localization {
         //measurementVeresegyhazNo2.convertMeasurement2Csv();
         
         ////E PC files
-        /*File createdMeasurementVeresegyhazBestOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_bestserver_created_measurement.csv");
-        File createdMeasurementVeresegyhazNthOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_nthserver_created_measurement.csv");
-        File createdMeasurementVeresegyhaz1GmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_1_gmon_created_measurement.csv");
+        //File createdMeasurementVeresegyhazBestOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_bestserver_created_measurement.csv");
+        //File createdMeasurementVeresegyhazNthOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_nthserver_created_measurement.csv");
+        //File createdMeasurementVeresegyhaz1GmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_1_gmon_created_measurement.csv");
         File createdMeasurementVeresegyhaz2GmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_2_gmon_created_measurement.csv");
-        File createdMeasurementBudapestGmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\budapest_gmon_created_measurement.csv");
+        //File createdMeasurementBudapestGmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\budapest_gmon_created_measurement.csv");
 
-        Tools.createTestMeasurementFile(3, veresegyhazBestSimCsvFileOnE, createdMeasurementVeresegyhazBestOnE);
-        Tools.createTestMeasurementFile(3, veresegyhazNthSimCsvFileOnE, createdMeasurementVeresegyhazNthOnE);
-        Tools.createTestMeasurementFile(3, veresegyhazNo1MeasurementCsvFileOnE, createdMeasurementVeresegyhaz1GmonOnE);
-        Tools.createTestMeasurementFile(3, budapestMeasurementCsvFileOnE, createdMeasurementBudapestGmonOnE);
-        Tools.createTestMeasurementFile(3, veresegyhazNo2MeasurementCsvFileOnE, createdMeasurementVeresegyhaz2GmonOnE);*/
+        //Tools.createTestMeasurementFile(3, veresegyhazBestSimCsvFileOnE, createdMeasurementVeresegyhazBestOnE);
+        //Tools.createTestMeasurementFile(3, veresegyhazNthSimCsvFileOnE, createdMeasurementVeresegyhazNthOnE);
+        //Tools.createTestMeasurementFile(3, veresegyhazNo1MeasurementCsvFileOnE, createdMeasurementVeresegyhaz1GmonOnE);
+        //Tools.createTestMeasurementFile(3, budapestMeasurementCsvFileOnE, createdMeasurementBudapestGmonOnE);
+        //Tools.createTestMeasurementFile(3, veresegyhazNo2MeasurementCsvFileOnE, createdMeasurementVeresegyhaz2GmonOnE);
         
         ////home PC files
         //File createdMeasurementVeresegyhazBest = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_bestserver_created_measurement.csv");
@@ -261,12 +261,12 @@ public class Localization {
         //Tools.createTestMeasurementFile(3, budapestMeasurementCsvFile, createdMeasurementBudapestGmon);
         //Tools.createTestMeasurementFile(3, veresegyhazNo2MeasurementCsvFile, createdMeasurementVeresegyhaz2Gmon);
         
+        Localization newLocaction = new Localization(veresegyhazNo2MeasurementCsvFileOnE, createdMeasurementVeresegyhaz2GmonOnE);
         //Localization newLocaction = new Localization(veresegyhazNo2MeasurementCsvFile, createdMeasurementVeresegyhaz2Gmon);
         
-        
-        //Hashtable<String, ArrayList<String>> database = newLocaction.createDatabase();
+        Hashtable<String, ArrayList<String>> database = newLocaction.createDatabase();
         //System.out.println(database.get("latitude"));
-        //newLocaction.getLocationFromDatabase(database);
+        newLocaction.getLocationFromDatabase(database);
         
         
         
