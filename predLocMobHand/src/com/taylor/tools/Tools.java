@@ -16,6 +16,22 @@ import org.gdal.osr.*;
 public class Tools {
     
     public static enum FILETYPE {BESTSERVER, NTHSERVER, UNDEFINED};
+    
+    public enum COORDINATES {
+        LATITUDE ("latitude"),
+        LONGITUDE ("longitude");
+        
+        private final String axis;
+        
+        private COORDINATES(final String axis) {
+            this.axis = axis;
+        }
+
+        @Override
+        public String toString() {
+            return axis;
+        }
+    }
 
     public static void createFile(File file) {
         if (file.exists()) {
@@ -100,8 +116,8 @@ public class Tools {
         @SuppressWarnings("serial")
         Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {
             {
-                put("latitude", transformation[0]);
-                put("longitude", transformation[1]);
+                put(COORDINATES.LATITUDE, transformation[0]);
+                put(COORDINATES.LONGITUDE, transformation[1]);
             }
         };
 
@@ -121,8 +137,8 @@ public class Tools {
         @SuppressWarnings("serial")
         Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {
             {
-                put("latitude", transformation[1]);
-                put("longitude", transformation[0]);
+                put(COORDINATES.LATITUDE, transformation[1]);
+                put(COORDINATES.LONGITUDE, transformation[0]);
             }
         };
 
