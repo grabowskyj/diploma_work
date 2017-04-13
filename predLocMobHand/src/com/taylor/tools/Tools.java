@@ -15,19 +15,21 @@ import org.gdal.osr.*;
 
 public class Tools {
     
+    public static enum FILETYPE {BESTSERVER, NTHSERVER, UNDEFINED};
+
     public static void createFile(File file) {
         if (file.exists()) {
             file.delete();
         }
-        
+
         try {
-            file.createNewFile();  
+            file.createNewFile();
         } catch (IOException e) {
             System.out.println(e);
             e.printStackTrace();
         }
     }
-    
+
     public static int convertHex2Dec(String[] array) {
         int value = 0;
         String hexString = String.join("", array);
@@ -38,38 +40,38 @@ public class Tools {
             case 4:
                 value = (int) Long.parseLong(hexString, 16);
                 break;
-        }     
-        
+            }
+
         return value;
     }
-    
+
     public static char convertHex2Char(String hex) {
         int hex2decimal = Integer.parseInt(hex, 16);
         char character = (char) hex2decimal;
-        
+
         return character;
     }
-    
+
     public static String[] reversArray(String[] array) {
         int reverseArrayLength = array.length;
         String[] reversArray = new String[reverseArrayLength];
-        for (int elementCounter = 0; elementCounter < array.length; elementCounter++ ) {
+        for (int elementCounter = 0; elementCounter < array.length; elementCounter++) {
             reversArray[--reverseArrayLength] = array[elementCounter];
         }
-        
+
         return reversArray;
     }
-    
+
     public static ArrayList<String> readFileToMemory(File dataBase) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         ArrayList<String> dataInMemory = new ArrayList<String>();
-        
+
         try {
             fileReader = new FileReader(dataBase);
             bufferedReader = new BufferedReader(fileReader);
             String readedLine = null;
-            while((readedLine = bufferedReader.readLine()) != null){
+            while ((readedLine = bufferedReader.readLine()) != null) {
                 dataInMemory.add(readedLine);
             }
         } catch (Exception e) {
@@ -84,10 +86,10 @@ public class Tools {
                 e.printStackTrace();
             }
         }
-        
+
         return dataInMemory;
     }
-    
+
     public static Hashtable<Object, Object> wgs84ToHd72Eov(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
@@ -96,44 +98,52 @@ public class Tools {
         CoordinateTransformation wgs84ToHd72Eov = new CoordinateTransformation(wgs84, hd72eov);
         double[] transformation = wgs84ToHd72Eov.TransformPoint(x, y);
         @SuppressWarnings("serial")
-        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {{
-           put("latitude",transformation[0]);
-           put("longitude",transformation[1]);
-        }};
-        
+        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {
+            {
+                put("latitude", transformation[0]);
+                put("longitude", transformation[1]);
+            }
+        };
+
         return coordinates;
     }
-    
+
     public static Hashtable<Object, Object> hd72EovToWgs84(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
+        CoordinateTransformation hd72EovTowgs84;
+
         wgs84.ImportFromEPSG(4326);
         hd72eov.ImportFromEPSG(23700);
-        CoordinateTransformation hd72EovTowgs84 = new CoordinateTransformation(hd72eov, wgs84);
+        hd72EovTowgs84 = new CoordinateTransformation(hd72eov, wgs84);
         double[] transformation = hd72EovTowgs84.TransformPoint(y, x);
+
         @SuppressWarnings("serial")
-        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {{
-           put("latitude",transformation[1]);
-           put("longitude",transformation[0]);
-        }};
-        
+        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {
+            {
+                put("latitude", transformation[1]);
+                put("longitude", transformation[0]);
+            }
+        };
+
         return coordinates;
     }
-    
-    public static int generateRandomValue(int symmetricRangeOf) {
+
+    public static int generateRandomValue(int symmetricRange) {
         Random generateRandomValue = new Random();
-        int randomValue = generateRandomValue.nextInt((2 * symmetricRangeOf) + 1) - symmetricRangeOf;
-        
+        int randomValue = generateRandomValue.nextInt((2 * symmetricRange) + 1) - symmetricRange;
+
         return randomValue;
     }
-    
-    public static File createTestMeasurementFile(int nthRow, File inputFile, File outputFile) {
+
+    public static File createTestMeasurementFile(int nthRow, File inputFile, File outputFile, int range) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         int signalStrength = 0;
-        String typeOfMeasurement = null;
+        int randomValue = 0;
+        FILETYPE typeOfMeasurement = null;
         String rowToWrite = null;
         String[] headerRow = null;
         String[] row = null;
@@ -141,7 +151,7 @@ public class Tools {
         String[] headerRowWithoutCoordinates = null;
         ArrayList<String> csvData = new ArrayList<String>();
         ArrayList<String> headerRowArrayList = null;
-        
+
         try {
             fileReader = new FileReader(inputFile);
             bufferedReader = new BufferedReader(fileReader);
@@ -149,16 +159,16 @@ public class Tools {
             fileWriter = new FileWriter(outputFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             String readedLine = null;
-            while((readedLine = bufferedReader.readLine()) != null){
+            while ((readedLine = bufferedReader.readLine()) != null) {
                 csvData.add(readedLine);
             }
             headerRow = csvData.get(0).trim().split(",");
             headerRowArrayList = new ArrayList<String>(Arrays.asList(headerRow));
             if (headerRowArrayList.contains("cellLayerID")) {
-                typeOfMeasurement = "BESTSERVER";
+                typeOfMeasurement = FILETYPE.BESTSERVER;
             }
             if (headerRowArrayList.contains("cellLayerID") && headerRowArrayList.contains("n1cellLayerID")) {
-                typeOfMeasurement = "NTHSERVER";
+                typeOfMeasurement = FILETYPE.NTHSERVER;
             }
             headerRowWithoutCoordinates = Arrays.copyOfRange(headerRow, 2, headerRow.length);
             bufferedWriter.write(String.join(",", headerRowWithoutCoordinates));
@@ -169,20 +179,21 @@ public class Tools {
             for (int rowCounter = 1; rowCounter < csvData.size(); rowCounter++) {
                 if (rowCounter % nthRow == 0) {
                     row = csvData.get(rowCounter).trim().split(",");
-                    if (typeOfMeasurement == "BESTSERVER") {
+                    randomValue = generateRandomValue(range);
+                    if (typeOfMeasurement == FILETYPE.BESTSERVER) {
                         signalStrength = Integer.parseInt(row[4]);
-                        signalStrength = signalStrength + generateRandomValue(5);
+                        signalStrength = signalStrength + randomValue;
                         row[4] = Integer.toString(signalStrength);
-                    } else if (typeOfMeasurement == "NTHSERVER") {
+                    } else if (typeOfMeasurement == FILETYPE.NTHSERVER) {
                         for (int rowElement = 4; rowElement < row.length; rowElement = rowElement + 3) {
                             signalStrength = Integer.parseInt(row[rowElement]);
-                            signalStrength = signalStrength + generateRandomValue(5);
+                            signalStrength = signalStrength + randomValue;
                             row[rowElement] = Integer.toString(signalStrength);
-                        }   
+                        }
                     } else {
                         for (int rowElement = 3; rowElement < row.length; rowElement = rowElement + 2) {
                             signalStrength = Integer.parseInt(row[rowElement]);
-                            signalStrength = signalStrength + generateRandomValue(5);
+                            signalStrength = signalStrength + randomValue;
                             row[rowElement] = Integer.toString(signalStrength);
                         }
                     }
@@ -190,7 +201,7 @@ public class Tools {
                     rowToWrite = String.join(",", rowWithoutCoordinates);
                     bufferedWriter.write(rowToWrite);
                     bufferedWriter.newLine();
-                } 
+                }
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -206,8 +217,8 @@ public class Tools {
                 e.printStackTrace();
             }
         }
-        
+
         return outputFile;
     }
-    
+
 }

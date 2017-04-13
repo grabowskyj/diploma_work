@@ -2,9 +2,9 @@ package com.taylor.localization;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.taylor.measurement.ConvertMeasurementFile;
@@ -39,8 +39,10 @@ public class Localization {
 
     private Hashtable<String, ArrayList<String>> createDatabase() {
         Hashtable<String, ArrayList<String>> database = null;
-        String[] simulationDataHeader = null;
         ArrayList<String> data = Tools.readFileToMemory(databaseFile);
+        int simulationDataHeaderElementCounter;
+        String[] simulationDataHeader = null;
+
         if (!data.isEmpty()) {
             simulationDataHeader = data.get(0).trim().split(",");
             database = new Hashtable<String, ArrayList<String>>();
@@ -49,7 +51,7 @@ public class Localization {
             }
             for (int simulationDataRowCounter = 1; simulationDataRowCounter < data.size(); simulationDataRowCounter++) {
                 String[] splittedSimulationDataRow = data.get(simulationDataRowCounter).split(",");
-                int simulationDataHeaderElementCounter = 0;
+                simulationDataHeaderElementCounter = 0;
                 for (String simulationDataHeaderElement : simulationDataHeader) {
                     if (simulationDataHeaderElementCounter < splittedSimulationDataRow.length) {
                         database.get(simulationDataHeaderElement).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);
@@ -97,7 +99,7 @@ public class Localization {
     }
     
     private List<Integer> checkSideValues(String[] elementNameAndElement, Hashtable<String, ArrayList<String>> database) {
-        List<Integer> indexListOfElement = new ArrayList<Integer>();
+        List<Integer> indexListOfElements = new ArrayList<Integer>();
         List<Integer> positiveSideIndexList = new ArrayList<Integer>();
         List<Integer> negativeSideIndexList = new ArrayList<Integer>();
         String elementName = elementNameAndElement[0];
@@ -105,26 +107,43 @@ public class Localization {
         ArrayList<String> dataset = database.get(elementName);
         boolean isValueFound = false;
         int checkRange = 10;
+        int range = 1;
         int positiveRangeNumber = 0;
         int negativeRangeNumber = 0;
-        while (isValueFound == false) {
-            for (int range = 1; range <= checkRange; range++ ) {
-                positiveRangeNumber = element + range;
-                negativeRangeNumber = element - range;
-                if (dataset.contains(Integer.toString(positiveRangeNumber))) {
-                    int startIndex = dataset.indexOf(Integer.toString(positiveRangeNumber));
-                    int endIndex = dataset.lastIndexOf(Integer.toString(positiveRangeNumber));
-                    for (int index = startIndex; index <= endIndex; index++ ) {
-                        if (positiveRangeNumber == Integer.parseInt(dataset.get(index))) {
-                            positiveSideIndexList.add(index);
-                        }
+        while (isValueFound == false && range <= checkRange) {
+            positiveRangeNumber = element + range;
+            negativeRangeNumber = element - range;
+            if (dataset.contains(Integer.toString(positiveRangeNumber))) {
+                int startIndex = dataset.indexOf(Integer.toString(positiveRangeNumber));
+                int endIndex = dataset.lastIndexOf(Integer.toString(positiveRangeNumber));
+                for (int index = startIndex; index <= endIndex; index++ ) {
+                    if (positiveRangeNumber == Integer.parseInt(dataset.get(index))) {
+                        positiveSideIndexList.add(index);
                     }
-                }//pozitiv tartomany vegigjarasa jonak tunik, de azert meg ellenorizni, valamint negativ tartomany vegigjarasat megcsinalni
+                }
+                isValueFound = true;
             }
+            if (dataset.contains(Integer.toString(negativeRangeNumber))) {
+                int startIndex = dataset.indexOf(Integer.toString(negativeRangeNumber));
+                int endIndex = dataset.lastIndexOf(Integer.toString(negativeRangeNumber));
+                for (int index = startIndex; index <= endIndex; index++ ) {
+                    if (negativeRangeNumber == Integer.parseInt(dataset.get(index))) {
+                        negativeSideIndexList.add(index);
+                    }
+                }
+                isValueFound = true;
+            }
+            range++;
         }
+        if (!positiveSideIndexList.isEmpty()) {
+            indexListOfElements.addAll(positiveSideIndexList);
+        }
+        if (!negativeSideIndexList.isEmpty()) {
+            indexListOfElements.addAll(negativeSideIndexList);
+        }
+        Collections.sort(indexListOfElements);
         
-        
-        return indexListOfElement;
+        return indexListOfElements;
     }
     
     private Hashtable<String, Double> getLocationFromDatabase(Hashtable<String, ArrayList<String>> database) {
@@ -133,7 +152,6 @@ public class Localization {
             put("latitude", 0.0);
             put("longitude", 0.0);
         }};
-        Hashtable<String, ArrayList<String>> transitionalDatabase = new Hashtable<String, ArrayList<String>>();
         List<Integer> indexListOfElements = new ArrayList<Integer>();
         List<String> latitude = new ArrayList<String>();
         List<String> longitude = new ArrayList<String>();
@@ -151,121 +169,83 @@ public class Localization {
                 elementNameAndElement[1] = splittedMeasurementRowElement;
                 indexListOfElements = getIndexListForNewDatabase(elementNameAndElement, database);
                 if (!indexListOfElements.isEmpty()) {
-                    transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, database);
+                    database = createDatabaseFromSelection(elementName, indexListOfElements, database);
+                } else {
+                    indexListOfElements = checkSideValues(elementNameAndElement, database);
+                    database = createDatabaseFromSelection(elementName, indexListOfElements, database);
                 }
-                if (indexListOfElements.isEmpty() && measurementDataHeaderElementCounter % 2 != 0) {
-                    //indexListOfElements = checkSideValues(elementNameAndElement, database);
-                }
-                if (!transitionalDatabase.isEmpty()) {
-                    database = transitionalDatabase;
-                }
+
                 latitude = database.get("latitude");
                 longitude = database.get("longitude");
-                System.out.println(latitude);
-                System.out.println(longitude);
+                System.out.println(measurementDataHeaderElementCounter);
+                System.out.println("latitude: " + latitude);
+                System.out.println("longitude: " + longitude);
                 measurementDataHeaderElementCounter++;
-                System.exit(1);
+                //itt kepbe johet az R, ugyanis szamitsa ki a koordinatak atlagat, ha az utolso elem illesztese utan egy tobbelemu tomb keletkezik
             }
-            
+            System.exit(1);
             
             
         }
-        
-        
-        
-        
-        
         
         return coordinates;
     }
 
     public static void main(String[] args) {
         
-        ////E PC files
-        /*File veresegyhazBestDatFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver.dat");
-        File veresegyhazBestConvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\Veresegyhaz_bestserver.conv");
-        File veresegyhazBestSimCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_bestserver.csv");
-        File veresegyhazNthDatFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_nthserver.dat");
-        File veresegyhazNthConvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\Veresegyhaz_nthserver.conv");
-        File veresegyhazNthSimCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_nthserver.csv");
+        String GIT_DIRECTORY = System.getenv("GIT_DIRECTORY") + "\\";
+        String MEASUREMENT_DATA = "diploma_work\\test_dir\\measurement_data\\";
+        String CONVERTED_DATA = "diploma_work\\test_dir\\converted_data\\";
         
-        ConvertDatFile simVeresBest = new ConvertDatFile(veresegyhazBestDatFileOnE, veresegyhazBestConvFileOnE, veresegyhazBestSimCsvFileOnE);
-        ConvertDatFile simVeresNth = new ConvertDatFile(veresegyhazNthDatFileOnE, veresegyhazNthConvFileOnE, veresegyhazNthSimCsvFileOnE);*/
+        File veresegyhaz_bestserverDAT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "veresegyhaz_bestserver.dat");
+        File veresegyhaz_bestserverCONV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_bestserver.conv");
+        File veresegyhaz_bestserverCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_bestserver.csv");
+        File veresegyhaz_nthserverDAT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "veresegyhaz_nthserver.dat");
+        File veresegyhaz_nthserverCONV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver.conv");
+        File veresegyhaz_nthserverCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver.csv");
         
+        ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserverDAT, veresegyhaz_bestserverCONV, veresegyhaz_bestserverCSV);
+        ConvertDatFile veresegyhaz_nthserver = new ConvertDatFile(veresegyhaz_nthserverDAT, veresegyhaz_nthserverCONV, veresegyhaz_nthserverCSV);
         
-        ////home PC files
-        //File veresegyhazBestDatFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_bestserver.dat");
-        //File veresegyhazBestConvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_bestserver.conv");
-        //File veresegyhazBestSimCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_bestserver.csv");
-        //File veresegyhazNthDatFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\Veresegyhaz_nthserver.dat");
-        //File veresegyhazNthConvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\Veresegyhaz_nthserver.conv");
-        //File veresegyhazNthSimCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\Veresegyhaz_nthserver.csv");
+        veresegyhaz_bestserver.convertDat2Csv();
+        veresegyhaz_nthserver.convertDat2Csv();
         
-        //ConvertDatFile simVeresBest = new ConvertDatFile(veresegyhazBestDatFile, veresegyhazBestConvFile, veresegyhazBestSimCsvFile);
-        //ConvertDatFile simVeresNth = new ConvertDatFile(veresegyhazNthDatFile, veresegyhazNthConvFile, veresegyhazNthSimCsvFile);
+        File gmon_gsm_veresegyhaz_1TXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
+        File gmon_gsm_veresegyhaz_1CSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
+        File gmon_gsm_veresegyhaz_2TXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_2.txt");
+        File gmon_gsm_veresegyhaz_2CSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_2.csv");
+        File gmon_gsm_budapestTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_budapest.txt");
+        File gmon_gsm_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_budapest.csv");
+        File gmon_umts_budapestTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_umts_budapest.txt");
+        File gmon_umts_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_umts_budapest.csv");
         
-        //simVeresBest.convertDat2Csv();
-        //simVeresNth.convertDat2Csv();
+        ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1TXT, gmon_gsm_veresegyhaz_1CSV);
+        ConvertMeasurementFile gmon_gsm_veresegyhaz_2 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_2TXT, gmon_gsm_veresegyhaz_2CSV);
+        ConvertMeasurementFile gmon_gsm_budapest = new ConvertMeasurementFile(gmon_gsm_budapestTXT, gmon_gsm_budapestCSV);
+        ConvertMeasurementFile gmon_umts_budapest = new ConvertMeasurementFile(gmon_umts_budapestTXT, gmon_umts_budapestCSV);
         
-        ////E PC files
-        //File veresegyhazNo1MeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_1.txt");
-        //File veresegyhazNo1MeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_1.csv");
-        //File budapestMeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_budapest.txt");
-        //File budapestMeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_budapest.csv");
-        //File veresegyhazNo2MeasurementFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_2.txt");
-        File veresegyhazNo2MeasurementCsvFileOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_2.csv");
+        gmon_gsm_veresegyhaz_1.convertMeasurement2Csv();
+        gmon_gsm_veresegyhaz_2.convertMeasurement2Csv();
+        gmon_gsm_budapest.convertMeasurement2Csv();
+        gmon_umts_budapest.convertMeasurement2Csv();
         
-        //ConvertMeasurementFile measurementVeresegyhazNo1 = new ConvertMeasurementFile(veresegyhazNo1MeasurementFileOnE, veresegyhazNo1MeasurementCsvFileOnE);
-        //ConvertMeasurementFile measurementBudapest = new ConvertMeasurementFile(budapestMeasurementFileOnE, budapestMeasurementCsvFileOnE);
-        //ConvertMeasurementFile measurementVeresegyhazNo2 = new ConvertMeasurementFile(veresegyhazNo2MeasurementFileOnE, veresegyhazNo2MeasurementCsvFileOnE);
-        
-        ////home PC files
-        //File veresegyhazNo1MeasurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_1.txt");
-        //File veresegyhazNo1MeasurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_1.csv");
-        //File budapestMeasurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_budapest.txt");
-        //File budapestMeasurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\gmon_gsm_budapest.csv");
-        //File veresegyhazNo2MeasurementFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\measurement_data\\gmon_gsm_veresegyhaz_2.txt");
-        //File veresegyhazNo2MeasurementCsvFile = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\gmon_gsm_veresegyhaz_2.csv");
-        
-        //ConvertMeasurementFile measurementVeresegyhazNo1 = new ConvertMeasurementFile(veresegyhazNo1MeasurementFile, veresegyhazNo1MeasurementCsvFile);
-        //ConvertMeasurementFile measurementBudapest = new ConvertMeasurementFile(budapestMeasurementFile, budapestMeasurementCsvFile);
-        //ConvertMeasurementFile measurementVeresegyhazNo2 = new ConvertMeasurementFile(veresegyhazNo2MeasurementFile, veresegyhazNo2MeasurementCsvFile);
-        
-        //measurementVeresegyhazNo1.convertMeasurement2Csv();
-        //measurementBudapest.convertMeasurement2Csv();
-        //measurementVeresegyhazNo2.convertMeasurement2Csv();
-        
-        ////E PC files
-        //File createdMeasurementVeresegyhazBestOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_bestserver_created_measurement.csv");
-        //File createdMeasurementVeresegyhazNthOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_nthserver_created_measurement.csv");
-        //File createdMeasurementVeresegyhaz1GmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_1_gmon_created_measurement.csv");
-        File createdMeasurementVeresegyhaz2GmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\veresegyhaza_2_gmon_created_measurement.csv");
-        //File createdMeasurementBudapestGmonOnE = new File("C:\\Users\\eptrszb\\git\\diploma_work\\test_dir\\converted_data\\budapest_gmon_created_measurement.csv");
+        File veresegyhaz_bestserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_bestserver_created.csv");
+        File veresegyhaz_nthserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver_created.csv");
+        File veresegyhaz_1_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_1_gmon_gsm_created.csv");
+        File veresegyhaz_2_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_2_gmon_gsm_created.csv");
+        File budapest_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "budapest_gmon_gsm_created.csv");
+        File budapest_gmon_umts_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "budapest_gmon_umts_created.csv");
 
-        //Tools.createTestMeasurementFile(3, veresegyhazBestSimCsvFileOnE, createdMeasurementVeresegyhazBestOnE);
-        //Tools.createTestMeasurementFile(3, veresegyhazNthSimCsvFileOnE, createdMeasurementVeresegyhazNthOnE);
-        //Tools.createTestMeasurementFile(3, veresegyhazNo1MeasurementCsvFileOnE, createdMeasurementVeresegyhaz1GmonOnE);
-        //Tools.createTestMeasurementFile(3, budapestMeasurementCsvFileOnE, createdMeasurementBudapestGmonOnE);
-        //Tools.createTestMeasurementFile(3, veresegyhazNo2MeasurementCsvFileOnE, createdMeasurementVeresegyhaz2GmonOnE);
+        Tools.createTestMeasurementFile(3, veresegyhaz_bestserverCSV, veresegyhaz_bestserver_created, 3);
+        Tools.createTestMeasurementFile(3, veresegyhaz_nthserverCSV, veresegyhaz_nthserver_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1CSV, veresegyhaz_1_gmon_gsm_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_2CSV, veresegyhaz_2_gmon_gsm_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, 3);
         
-        ////home PC files
-        //File createdMeasurementVeresegyhazBest = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_bestserver_created_measurement.csv");
-        //File createdMeasurementVeresegyhazNth = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_nthserver_created_measurement.csv");
-        //File createdMeasurementVeresegyhaz1Gmon = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_1_gmon_created_measurement.csv");
-        //File createdMeasurementVeresegyhaz2Gmon = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\veresegyhaza_2_gmon_created_measurement.csv");
-        //File createdMeasurementBudapestGmon = new File("D:\\Dokumentumok\\GIT\\diploma_work\\test_dir\\converted_data\\budapest_gmon_created_measurement.csv");
-
-        //Tools.createTestMeasurementFile(3, veresegyhazBestSimCsvFile, createdMeasurementVeresegyhazBest);
-        //Tools.createTestMeasurementFile(3, veresegyhazNthSimCsvFile, createdMeasurementVeresegyhazNth);
-        //Tools.createTestMeasurementFile(3, veresegyhazNo1MeasurementCsvFile, createdMeasurementVeresegyhaz1Gmon);
-        //Tools.createTestMeasurementFile(3, budapestMeasurementCsvFile, createdMeasurementBudapestGmon);
-        //Tools.createTestMeasurementFile(3, veresegyhazNo2MeasurementCsvFile, createdMeasurementVeresegyhaz2Gmon);
-        
-        Localization newLocaction = new Localization(veresegyhazNo2MeasurementCsvFileOnE, createdMeasurementVeresegyhaz2GmonOnE);
-        //Localization newLocaction = new Localization(veresegyhazNo2MeasurementCsvFile, createdMeasurementVeresegyhaz2Gmon);
+        Localization newLocaction = new Localization(gmon_umts_budapestCSV, budapest_gmon_umts_created);
         
         Hashtable<String, ArrayList<String>> database = newLocaction.createDatabase();
-        //System.out.println(database.get("latitude"));
         newLocaction.getLocationFromDatabase(database);
         
         

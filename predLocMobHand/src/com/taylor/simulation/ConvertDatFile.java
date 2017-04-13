@@ -10,14 +10,15 @@ import java.util.Hashtable;
 import java.util.List;
 
 import com.taylor.tools.*;
+import com.taylor.tools.Tools.FILETYPE;
 
 public class ConvertDatFile {
     
     private File srcFile;
     private File convFile;
     private File csvFile;
-    private static String fileType = "UNDEFINED";
     private static int maxNoOfServers = 0;
+    private static FILETYPE fileType = FILETYPE.UNDEFINED;
 
     public ConvertDatFile(File srcFile, File convFile, File csvFile) {
         this.setsrcFile(srcFile);
@@ -75,21 +76,21 @@ public class ConvertDatFile {
             fileWriter = new FileWriter(getConvFile());
             bufferedWriter = new BufferedWriter(fileWriter);
             int read;
-            while((read = readFile.read()) != -1) {
+            while ((read = readFile.read()) != -1) {
                 readedChar = Integer.toHexString(read);
                 readedCharLength = readedChar.length();
                 if (readedCharLength == 1) {
                     readedChar = zeroChar.concat(readedChar);
                 }
                 dataRow.add(readedChar);
-                if (fileType.equals("BESTSERVER") && carriageReturnSensor == 3 && dataRow.size() == 10) {
+                if (fileType == FILETYPE.BESTSERVER  && carriageReturnSensor == 3 && dataRow.size() == 10) {
                     for (String data : dataRow) {
                         bufferedWriter.write(data + " ");
                     }
                     bufferedWriter.newLine();
                     dataRow.clear();
                 }
-                if (fileType.equals("NTHSERVER") && carriageReturnSensor == 3) { 
+                if (fileType == FILETYPE.NTHSERVER && carriageReturnSensor == 3) { 
                     if (dataRow.size() == numOfServersCharLength && isNumOfServersSet == false) {
                         numOfServers = new StringBuilder();
                         for (String data : dataRow) {
@@ -145,9 +146,9 @@ public class ConvertDatFile {
                             String[] headerRowArray = headerRow.toString().trim().split(" ");
                             ArrayList<String> headerRowArrayList = new ArrayList<String>(Arrays.asList(headerRowArray));
                             if (headerRowArrayList.contains("BESTSERVER")) {
-                                fileType = "BESTSERVER";
+                                fileType = FILETYPE.BESTSERVER;
                             } else if (headerRowArrayList.contains("NTHSERVER")) {
-                                fileType = "NTHSERVER";
+                                fileType = FILETYPE.NTHSERVER;
                                 maxNoOfServers = Integer.parseInt(headerRowArrayList.get(headerRowArrayList.size() - 1));
                             }
                         } else {
@@ -193,10 +194,10 @@ public class ConvertDatFile {
         Hashtable<Object, Object> mapData = new Hashtable<>();
         Hashtable<String,Integer> cellData = null;
         
-        if (fileType.equals("BESTSERVER")) {
+        if (fileType == FILETYPE.BESTSERVER) {
             headerRow = "latitude,longitude,cellID,signalStrength";
         }
-        if (fileType.equals("NTHSERVER")) {
+        if (fileType == FILETYPE.NTHSERVER) {
             headerRow = "latitude,longitude,cellID,signalStrength";
             for (int serverCounter = 1; serverCounter < maxNoOfServers; serverCounter++) {
                 String headerRowForNthServer = ",n" + serverCounter + "cellID,n" + serverCounter + "signalStrength";
@@ -224,14 +225,14 @@ public class ConvertDatFile {
                     rowToCsvFile = null;
                     arrToWrite.add(hd72EovXcoordinate);
                     arrToWrite.add(hd72EovYcoordinate);
-                    if (fileType.equals("BESTSERVER")) {
+                    if (fileType == FILETYPE.BESTSERVER) {
                         processedLine = rawData.get(dataRowNumFromRawData).split(" ");
                         cellData = getCellData(processedLine);
                         //arrToWrite.add(cellData.get("cellLayerID"));
                         arrToWrite.add(cellData.get("cellID"));
                         arrToWrite.add(cellData.get("signalStrength"));
                     }
-                    if (fileType.equals("NTHSERVER")) {
+                    if (fileType == FILETYPE.NTHSERVER) {
                         processedLine = rawData.get(dataRowNumFromRawData).split(" ");
                         int hexCharCounter = 0;
                         for (String hexChar : processedLine) {
