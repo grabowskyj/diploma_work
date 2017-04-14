@@ -17,7 +17,6 @@ public class Localization {
     private File databaseFile;
     private File measurementFile;
 
-    
     public Localization(File databaseFile, File measurementFile) {
         this.setdatabaseFile(databaseFile);
         this.setMeasurementFile(measurementFile);
@@ -180,13 +179,9 @@ public class Localization {
         return indexListOfElements;
     }
     
-    private Hashtable<COORDINATES, Double> getLocationFromDatabase(Hashtable<String, ArrayList<String>> database) {
-        @SuppressWarnings("serial")
-        Hashtable<COORDINATES, Double> coordinates = new Hashtable<COORDINATES, Double>() {{
-            put(COORDINATES.LATITUDE, 0.0);
-            put(COORDINATES.LONGITUDE, 0.0);
-        }};
+    private void getLocationFromDatabase(Hashtable<String, ArrayList<String>> database) {
         Hashtable<String, ArrayList<String>> transitionalDatabase = null; 
+        Hashtable<String, ArrayList<String>> savedDatabase = null;
         List<Integer> indexListOfElements = new ArrayList<Integer>();
         List<String> latitude = new ArrayList<String>();
         List<String> longitude = new ArrayList<String>();
@@ -207,34 +202,33 @@ public class Localization {
                 elementNameAndElement[1] = splittedMeasurementRowElement;
                 indexListOfElements = getIndexListForNewDatabase(elementNameAndElement, transitionalDatabase);
                 
+                savedDatabase = transitionalDatabase;
                 if (!indexListOfElements.isEmpty()) {
-                    System.out.println("IF");
-                    System.out.println(transitionalDatabase);
                     transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
-                    
                 } else {
-                    System.out.println("ELSE");
-                    System.out.println(transitionalDatabase);
                     indexListOfElements = checkSideValues(elementNameAndElement, transitionalDatabase);
                     transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
                 }
-                //hiba itt, mert nincs olyan programresz, ami lekezelne azt az esetet, hogy elraktarozza az utolso nem nulla eredmenyt
-                //futtatni ezt a kodot, megnezni a 7. eredmenyt es latni fogom
-                
+
                 latitude = transitionalDatabase.get(COORDINATES.LATITUDE.toString());
                 longitude = transitionalDatabase.get(COORDINATES.LONGITUDE.toString());
                 
+                if (indexListOfElements.isEmpty()) {
+                    latitude = savedDatabase.get(COORDINATES.LATITUDE.toString());
+                    longitude = savedDatabase.get(COORDINATES.LONGITUDE.toString());
+                    break;
+                }
+                
                 measurementDataHeaderElementCounter++;
+
                 //itt kepbe johet az R, ugyanis szamitsa ki a koordinatak atlagat, ha az utolso elem illesztese utan egy tobbelemu tomb keletkezik
+                //meghozza lehet hogy a kovetkeztetos megoldassal kellene
             }
-            System.out.println(measurementDataRowCounter);
-            System.out.println(transitionalDatabase);
+            System.out.println("C: " + measurementDataRowCounter);
             System.out.println("latitude: " + latitude);
             System.out.println("longitude: " + longitude);
-            
+            //ide kell majd egy olyan, ahogy csupan a lat long erteteket irja bele egy csv fajlba - de ez majd csak azutan, hogy minden egyes sorra csak egy eredmeny lesz 
         }
-        System.out.println(coordinates);
-        return coordinates;
     }
 
     @SuppressWarnings("unused")
