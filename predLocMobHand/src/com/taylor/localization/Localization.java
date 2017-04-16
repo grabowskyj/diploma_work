@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+
+import org.rosuda.JRI.Rengine;
 
 import com.taylor.measurement.ConvertMeasurementFile;
 import com.taylor.simulation.ConvertDatFile;
@@ -150,7 +153,7 @@ public class Localization {
         while (isValueFound == false && range <= checkRange) {
             positiveRangeNumber = element + range;
             negativeRangeNumber = element - range;
-            
+
             if (dataset.contains(Integer.toString(positiveRangeNumber))) {
                 positiveSideIndexList = assembleSideValues(positiveRangeNumber, dataset);
             }
@@ -179,6 +182,39 @@ public class Localization {
         return indexListOfElements;
     }
     
+    private List<String> sortOutExtremCoordinates(List<String> axis) {
+        List<String> assortedAxis = new ArrayList<String>();
+        Iterator<String> iterableAxis = axis.iterator();
+        double significantDifference = 70; 
+        double previousValue = 0;
+        double nextValue = 0;
+        double difference = 0;
+        //lat-long parsolas: valahogy egyszerre kell oket vinni, kulonben egyik ateshet a suron a masik meg nem, de egyebkent jol mukodik a szuro
+        previousValue = Double.parseDouble(iterableAxis.next());
+        assortedAxis.add(Double.toString(previousValue));
+        
+        while (iterableAxis.hasNext()) {
+            
+            nextValue = Double.parseDouble(iterableAxis.next());
+            
+            if (previousValue <= nextValue) {
+                difference = nextValue - previousValue;
+            } else {
+                difference = previousValue - nextValue;
+            }
+            
+            if (difference < significantDifference) {
+                assortedAxis.add(Double.toString(nextValue));
+            } else {
+                break;
+            }
+            
+            previousValue = nextValue;
+        }
+        
+        return assortedAxis;
+    }
+    
     private void getLocationFromDatabase(Hashtable<String, ArrayList<String>> database) {
         Hashtable<String, ArrayList<String>> transitionalDatabase = null; 
         Hashtable<String, ArrayList<String>> savedDatabase = null;
@@ -200,11 +236,12 @@ public class Localization {
                 elementName = measurementDataHeader[measurementDataHeaderElementCounter];
                 elementNameAndElement[0] = elementName;
                 elementNameAndElement[1] = splittedMeasurementRowElement;
+                savedDatabase = transitionalDatabase;
                 indexListOfElements = getIndexListForNewDatabase(elementNameAndElement, transitionalDatabase);
                 
-                savedDatabase = transitionalDatabase;
                 if (!indexListOfElements.isEmpty()) {
                     transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
+                    
                 } else {
                     indexListOfElements = checkSideValues(elementNameAndElement, transitionalDatabase);
                     transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
@@ -224,9 +261,13 @@ public class Localization {
                 //itt kepbe johet az R, ugyanis szamitsa ki a koordinatak atlagat, ha az utolso elem illesztese utan egy tobbelemu tomb keletkezik
                 //meghozza lehet hogy a kovetkeztetos megoldassal kellene
             }
+            
+            latitude = sortOutExtremCoordinates(latitude);
+            longitude = sortOutExtremCoordinates(longitude);
             System.out.println("C: " + measurementDataRowCounter);
             System.out.println("latitude: " + latitude);
             System.out.println("longitude: " + longitude);
+
             //ide kell majd egy olyan, ahogy csupan a lat long erteteket irja bele egy csv fajlba - de ez majd csak azutan, hogy minden egyes sorra csak egy eredmeny lesz 
         }
     }
@@ -276,18 +317,45 @@ public class Localization {
         File veresegyhaz_2_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_2_gmon_gsm_created.csv");
         File budapest_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "budapest_gmon_gsm_created.csv");
         File budapest_gmon_umts_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "budapest_gmon_umts_created.csv");
+        
+        File checkFile_veresegyhaz_bestserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_veresegyhaz_bestserver_created.csv");
+        File checkFile_veresegyhaz_nthserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_veresegyhaz_nthserver_created.csv");
+        File checkFile_veresegyhaz_1_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_veresegyhaz_1_gmon_gsm_created.csv");
+        File checkFile_veresegyhaz_2_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_veresegyhaz_2_gmon_gsm_created.csv");
+        File checkFile_budapest_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_gsm_created.csv");
+        File checkFile_budapest_gmon_umts_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_umts_created.csv");
 
-        /*Tools.createTestMeasurementFile(3, veresegyhaz_bestserverCSV, veresegyhaz_bestserver_created, 3);
-        Tools.createTestMeasurementFile(3, veresegyhaz_nthserverCSV, veresegyhaz_nthserver_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1CSV, veresegyhaz_1_gmon_gsm_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_2CSV, veresegyhaz_2_gmon_gsm_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, 3);*/
+        /*Tools.createTestMeasurementFile(3, veresegyhaz_bestserverCSV, veresegyhaz_bestserver_created, checkFile_veresegyhaz_bestserver_created, 3);
+        Tools.createTestMeasurementFile(3, veresegyhaz_nthserverCSV, veresegyhaz_nthserver_created, checkFile_veresegyhaz_nthserver_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1CSV, veresegyhaz_1_gmon_gsm_created, checkFile_veresegyhaz_1_gmon_gsm_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_2CSV, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);*/
         
         Localization newLocaction = new Localization(gmon_umts_budapestCSV, budapest_gmon_umts_created);
         
         Hashtable<String, ArrayList<String>> database = newLocaction.createDatabase();
         newLocaction.getLocationFromDatabase(database);
+        
+        // Create an R vector in the form of a string.
+        String javaVector = "c(1,2,3,4,5)";
+
+        // Start Rengine.
+        Rengine engine = new Rengine(new String[] { "--no-save" }, false, null);
+
+        // The vector that was created in JAVA context is stored in 'rVector' which is a variable in R context.
+        engine.eval("rVector=" + javaVector);
+        
+        //Calculate MEAN of vector using R syntax.
+        engine.eval("meanVal=mean(rVector)");
+        
+        //Retrieve MEAN value
+        double mean = engine.eval("meanVal").asDouble();
+        
+        //Print output values
+        System.out.println("Vector: " + javaVector);
+        System.out.println("Mean of given vector is: " + mean);
+        engine.end();
         
         
         

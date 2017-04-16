@@ -152,11 +152,13 @@ public class Tools {
         return randomValue;
     }
 
-    public static File createTestMeasurementFile(int nthRow, File inputFile, File outputFile, int range) {
+    public static File createTestMeasurementFile(int nthRow, File inputFile, File outputFile, File checkFile, int range) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
+        FileWriter checkFileWriter = null;
+        BufferedWriter checkFileBufferedWriter = null;
         int signalStrength = 0;
         int randomValue = 0;
         FILETYPE typeOfMeasurement = null;
@@ -167,13 +169,16 @@ public class Tools {
         String[] headerRowWithoutCoordinates = null;
         ArrayList<String> csvData = new ArrayList<String>();
         ArrayList<String> headerRowArrayList = null;
+        
+        createFile(checkFile);
 
         try {
             fileReader = new FileReader(inputFile);
             bufferedReader = new BufferedReader(fileReader);
-            Tools.createFile(outputFile);
             fileWriter = new FileWriter(outputFile);
             bufferedWriter = new BufferedWriter(fileWriter);
+            checkFileWriter = new FileWriter(checkFile);
+            checkFileBufferedWriter = new BufferedWriter(checkFileWriter);
             String readedLine = null;
             while ((readedLine = bufferedReader.readLine()) != null) {
                 csvData.add(readedLine);
@@ -213,6 +218,9 @@ public class Tools {
                             row[rowElement] = Integer.toString(signalStrength);
                         }
                     }
+                    rowToWrite = String.join(",", row);
+                    checkFileBufferedWriter.write(rowToWrite);
+                    checkFileBufferedWriter.newLine();
                     rowWithoutCoordinates = Arrays.copyOfRange(row, 2, row.length);
                     rowToWrite = String.join(",", rowWithoutCoordinates);
                     bufferedWriter.write(rowToWrite);
