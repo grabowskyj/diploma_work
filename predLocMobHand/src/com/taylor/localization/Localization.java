@@ -1,6 +1,9 @@
 package com.taylor.localization;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.nio.BufferUnderflowException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -182,66 +185,90 @@ public class Localization {
         return indexListOfElements;
     }
     
-    private void getLocationFromDatabase(Hashtable<String, ArrayList<String>> database) {
+    private void getLocationFromDatabase(Hashtable<String, ArrayList<String>> database, File resultsFile) {
+        FileWriter fileWriter = null;
+        BufferedWriter bufferedWriter = null;
         Hashtable<String, ArrayList<String>> transitionalDatabase = null; 
         Hashtable<String, ArrayList<String>> savedDatabase = null;
         Hashtable<String, Double> coordinates = new Hashtable<String, Double>();
         List<Integer> indexListOfElements = new ArrayList<Integer>();
-        List<String> latitude = new ArrayList<String>();
-        List<String> longitude = new ArrayList<String>();
+        List<String> lstLatitude = new ArrayList<String>();
+        List<String> lstLongitude = new ArrayList<String>();
         ArrayList<String> measurement = Tools.readFileToMemory(measurementFile);
         String[] elementNameAndElement = new String[2];
         String[] splittedMeasurementRow = null;
         String[] measurementDataHeader = measurement.get(0).split(",");
         String elementName = null;
+        String rowToWrite = null;
+        String pointLatitude = null;
+        String pointLongitude = null;
+        int measurementDataHeaderElementCounter;
         
-        Rengine rEngine = new Rengine(new String[] { "--no-save" }, false, null);
+        Tools.createFile(resultsFile);
 
-        for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
-            transitionalDatabase = database;
-            splittedMeasurementRow = measurement.get(measurementDataRowCounter).split(",");
-            int measurementDataHeaderElementCounter = 0;
+        try {
+            fileWriter = new FileWriter(resultsFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            Rengine rEngine = new Rengine(new String[] { "--no-save" }, false, null);
             
-            for (String splittedMeasurementRowElement : splittedMeasurementRow) {
-                elementName = measurementDataHeader[measurementDataHeaderElementCounter];
-                elementNameAndElement[0] = elementName;
-                elementNameAndElement[1] = splittedMeasurementRowElement;
-                savedDatabase = transitionalDatabase;
-                indexListOfElements = getIndexListForNewDatabase(elementNameAndElement, transitionalDatabase);
+            for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
+                transitionalDatabase = database;
+                splittedMeasurementRow = measurement.get(measurementDataRowCounter).split(",");
+                measurementDataHeaderElementCounter = 0;
                 
-                if (!indexListOfElements.isEmpty()) {
-                    transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
+                for (String splittedMeasurementRowElement : splittedMeasurementRow) {
+                    elementName = measurementDataHeader[measurementDataHeaderElementCounter];
+                    elementNameAndElement[0] = elementName;
+                    elementNameAndElement[1] = splittedMeasurementRowElement;
+                    savedDatabase = transitionalDatabase;
+                    indexListOfElements = getIndexListForNewDatabase(elementNameAndElement, transitionalDatabase);
                     
-                } else {
-                    indexListOfElements = checkSideValues(elementNameAndElement, transitionalDatabase);
-                    transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
+                    if (!indexListOfElements.isEmpty()) {
+                        transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
+                        
+                    } else {
+                        indexListOfElements = checkSideValues(elementNameAndElement, transitionalDatabase);
+                        transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
+                    }
+    
+                    lstLatitude = transitionalDatabase.get(COORDINATES.LATITUDE.toString());
+                    lstLongitude = transitionalDatabase.get(COORDINATES.LONGITUDE.toString());
+                    
+                    if (indexListOfElements.isEmpty()) {
+                        lstLatitude = savedDatabase.get(COORDINATES.LATITUDE.toString());
+                        lstLongitude = savedDatabase.get(COORDINATES.LONGITUDE.toString());
+                        break;
+                    }
+                    
+                    measurementDataHeaderElementCounter++;
                 }
-
-                latitude = transitionalDatabase.get(COORDINATES.LATITUDE.toString());
-                longitude = transitionalDatabase.get(COORDINATES.LONGITUDE.toString());
                 
-                if (indexListOfElements.isEmpty()) {
-                    latitude = savedDatabase.get(COORDINATES.LATITUDE.toString());
-                    longitude = savedDatabase.get(COORDINATES.LONGITUDE.toString());
-                    break;
-                }
-                
-                measurementDataHeaderElementCounter++;
+                coordinates = Tools.getMeanValueOfCoordinates(rEngine, lstLatitude, lstLongitude);
+                pointLatitude = Double.toString(coordinates.get(COORDINATES.LATITUDE.toString()));
+                pointLongitude = Double.toString(coordinates.get(COORDINATES.LONGITUDE.toString()));
+                rowToWrite = "Point" + measurementDataRowCounter + "," + pointLatitude + "," + pointLongitude;
+                bufferedWriter.write(rowToWrite);
+                bufferedWriter.newLine();
+                coordinates.clear();
             }
             
-            coordinates = Tools.getMeanValueOfCoordinates(rEngine, latitude, longitude);
+            rEngine.end();
             
-            System.out.println("C: " + measurementDataRowCounter);
-            System.out.println("latitude: " + coordinates.get(COORDINATES.LATITUDE.toString()));
-            System.out.println("longitude: " + coordinates.get(COORDINATES.LONGITUDE.toString()));
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
             
-            coordinates.clear();
+        } finally {
             
-            //ide kell majd egy olyan, ahogy csupan a lat long erteteket irja bele egy csv fajlba - de ez majd csak azutan, hogy minden egyes sorra csak egy eredmeny lesz 
+            try {
+                bufferedWriter.close();
+                fileWriter.close();
+                
+            } catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
         }
-        
-        rEngine.end();;
-        
     }
 
     @SuppressWarnings("unused")
@@ -258,11 +285,11 @@ public class Localization {
         File veresegyhaz_nthserverCONV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver.conv");
         File veresegyhaz_nthserverCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver.csv");
         
-        /*ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserverDAT, veresegyhaz_bestserverCONV, veresegyhaz_bestserverCSV);
+        ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserverDAT, veresegyhaz_bestserverCONV, veresegyhaz_bestserverCSV);
         ConvertDatFile veresegyhaz_nthserver = new ConvertDatFile(veresegyhaz_nthserverDAT, veresegyhaz_nthserverCONV, veresegyhaz_nthserverCSV);
         
         veresegyhaz_bestserver.convertDat2Csv();
-        veresegyhaz_nthserver.convertDat2Csv();*/
+        veresegyhaz_nthserver.convertDat2Csv();
         
         File gmon_gsm_veresegyhaz_1TXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1CSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
@@ -273,7 +300,7 @@ public class Localization {
         File gmon_umts_budapestTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_umts_budapest.txt");
         File gmon_umts_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_umts_budapest.csv");
         
-        /*ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1TXT, gmon_gsm_veresegyhaz_1CSV);
+        ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1TXT, gmon_gsm_veresegyhaz_1CSV);
         ConvertMeasurementFile gmon_gsm_veresegyhaz_2 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_2TXT, gmon_gsm_veresegyhaz_2CSV);
         ConvertMeasurementFile gmon_gsm_budapest = new ConvertMeasurementFile(gmon_gsm_budapestTXT, gmon_gsm_budapestCSV);
         ConvertMeasurementFile gmon_umts_budapest = new ConvertMeasurementFile(gmon_umts_budapestTXT, gmon_umts_budapestCSV);
@@ -281,7 +308,7 @@ public class Localization {
         gmon_gsm_veresegyhaz_1.convertMeasurement2Csv();
         gmon_gsm_veresegyhaz_2.convertMeasurement2Csv();
         gmon_gsm_budapest.convertMeasurement2Csv();
-        gmon_umts_budapest.convertMeasurement2Csv();*/
+        gmon_umts_budapest.convertMeasurement2Csv();
         
         File veresegyhaz_bestserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_bestserver_created.csv");
         File veresegyhaz_nthserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver_created.csv");
@@ -290,6 +317,8 @@ public class Localization {
         File budapest_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "budapest_gmon_gsm_created.csv");
         File budapest_gmon_umts_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "budapest_gmon_umts_created.csv");
         
+        File localization_results = new File (GIT_DIRECTORY + MEASUREMENT_DATA + "localization_results.csv");
+        
         File checkFile_veresegyhaz_bestserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_veresegyhaz_bestserver_created.csv");
         File checkFile_veresegyhaz_nthserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_veresegyhaz_nthserver_created.csv");
         File checkFile_veresegyhaz_1_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_veresegyhaz_1_gmon_gsm_created.csv");
@@ -297,17 +326,17 @@ public class Localization {
         File checkFile_budapest_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_gsm_created.csv");
         File checkFile_budapest_gmon_umts_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_umts_created.csv");
 
-        /*Tools.createTestMeasurementFile(3, veresegyhaz_bestserverCSV, veresegyhaz_bestserver_created, checkFile_veresegyhaz_bestserver_created, 3);
+        Tools.createTestMeasurementFile(3, veresegyhaz_bestserverCSV, veresegyhaz_bestserver_created, checkFile_veresegyhaz_bestserver_created, 3);
         Tools.createTestMeasurementFile(3, veresegyhaz_nthserverCSV, veresegyhaz_nthserver_created, checkFile_veresegyhaz_nthserver_created, 3);
         Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1CSV, veresegyhaz_1_gmon_gsm_created, checkFile_veresegyhaz_1_gmon_gsm_created, 3);
         Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_2CSV, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created, 3);
         Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);*/
+        Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);
         
         Localization newLocaction = new Localization(gmon_umts_budapestCSV, budapest_gmon_umts_created);
         
         Hashtable<String, ArrayList<String>> database = newLocaction.createDatabase();
-        newLocaction.getLocationFromDatabase(database);
+        newLocaction.getLocationFromDatabase(database, localization_results);
         
 
         
