@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 
 import org.gdal.osr.*;
+import org.rosuda.JRI.Rengine;
 
 public class Tools {
     
@@ -244,5 +246,42 @@ public class Tools {
 
         return outputFile;
     }
+    
+    public static Hashtable<String, Double> getMeanValueOfCoordinates(List<String> latitudeCoordinates, List<String> longitudeCoordinates) {
+        Hashtable<String, Double> coordinates = new Hashtable<String, Double>();
+        double latitudeCoordinate = 0;
+        double longitudeCoordinate = 0;
+        String arrLatitudeVector[] = null;
+        String arrLongitudeVector[] = null;
+        String latitudeVector = null;
+        String longitudeVector = null;
+        
+        arrLatitudeVector = new String[latitudeCoordinates.size()];
+        arrLongitudeVector = new String[longitudeCoordinates.size()];
+        
+        arrLatitudeVector = latitudeCoordinates.toArray(arrLatitudeVector);
+        arrLongitudeVector = longitudeCoordinates.toArray(arrLongitudeVector);
+        
+        latitudeVector = "c(" + String.join(",", arrLatitudeVector) + ")";
+        longitudeVector = "c(" + String.join(",", arrLongitudeVector) + ")";
+        
+        Rengine engine = new Rengine(new String[] { "--no-save" }, false, null);
+        //hiba valahol itt, mintha nem akarna ujra letrehozni a threadet a kovetkezo futas alkalmaval
+        
+        engine.eval("latitudeVector=" + latitudeVector);
+        engine.eval("longitudeVector=" + longitudeVector);
 
+        engine.eval("latitudeVectorMean=mean(latitudeVector)");
+        engine.eval("longitudeVectorMean=mean(longitudeVector)");
+        
+        latitudeCoordinate = engine.eval("latitudeVectorMean").asDouble();
+        longitudeCoordinate = engine.eval("longitudeVectorMean").asDouble();
+        
+        engine.end();
+        
+        coordinates.put(COORDINATES.LATITUDE.toString(), latitudeCoordinate);
+        coordinates.put(COORDINATES.LONGITUDE.toString(), longitudeCoordinate);
+        
+        return coordinates;
+    }
 }
