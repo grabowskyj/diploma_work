@@ -187,10 +187,10 @@ public class Tools {
             }
             headerRow = csvData.get(0).trim().split(",");
             headerRowArrayList = new ArrayList<String>(Arrays.asList(headerRow));
-            if (headerRowArrayList.contains("cellLayerID")) {
+            if (headerRowArrayList.contains("cellID")) {
                 typeOfMeasurement = FILETYPE.BESTSERVER;
             }
-            if (headerRowArrayList.contains("cellLayerID") && headerRowArrayList.contains("n1cellLayerID")) {
+            if (headerRowArrayList.contains("cellID") && headerRowArrayList.contains("n1cellID")) {
                 typeOfMeasurement = FILETYPE.NTHSERVER;
             }
             headerRowWithoutCoordinates = Arrays.copyOfRange(headerRow, 2, headerRow.length);
@@ -206,9 +206,9 @@ public class Tools {
                     if (typeOfMeasurement == FILETYPE.BESTSERVER) {
                         signalStrength = Integer.parseInt(row[4]);
                         signalStrength = signalStrength + randomValue;
-                        row[4] = Integer.toString(signalStrength);
+                        row[3] = Integer.toString(signalStrength);
                     } else if (typeOfMeasurement == FILETYPE.NTHSERVER) {
-                        for (int rowElement = 4; rowElement < row.length; rowElement = rowElement + 3) {
+                        for (int rowElement = 3; rowElement < row.length; rowElement = rowElement + 2) {
                             signalStrength = Integer.parseInt(row[rowElement]);
                             signalStrength = signalStrength + randomValue;
                             row[rowElement] = Integer.toString(signalStrength);
@@ -220,13 +220,15 @@ public class Tools {
                             row[rowElement] = Integer.toString(signalStrength);
                         }
                     }
-                    rowToWrite = String.join(",", row);
-                    checkFileBufferedWriter.write(rowToWrite);
-                    checkFileBufferedWriter.newLine();
-                    rowWithoutCoordinates = Arrays.copyOfRange(row, 2, row.length);
-                    rowToWrite = String.join(",", rowWithoutCoordinates);
-                    bufferedWriter.write(rowToWrite);
-                    bufferedWriter.newLine();
+                    if (row.length > 2) {
+                        rowToWrite = String.join(",", row);
+                        checkFileBufferedWriter.write(rowToWrite);
+                        checkFileBufferedWriter.newLine();
+                        rowWithoutCoordinates = Arrays.copyOfRange(row, 2, row.length);
+                        rowToWrite = String.join(",", rowWithoutCoordinates);
+                        bufferedWriter.write(rowToWrite);
+                        bufferedWriter.newLine();
+                    }
                 }
             }
         } catch (Exception e) {
@@ -238,6 +240,8 @@ public class Tools {
                 fileReader.close();
                 bufferedWriter.close();
                 fileWriter.close();
+                checkFileBufferedWriter.close();
+                checkFileWriter.close();
             } catch (Exception e) {
                 System.out.println(e);
                 e.printStackTrace();
