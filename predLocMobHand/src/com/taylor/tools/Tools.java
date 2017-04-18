@@ -19,7 +19,7 @@ public class Tools {
     
     public static enum FILETYPE {BESTSERVER, NTHSERVER, UNDEFINED};
     
-    public enum COORDINATES {
+    public static enum COORDINATES {
         LATITUDE ("latitude"),
         LONGITUDE ("longitude");
         
@@ -247,7 +247,7 @@ public class Tools {
         return outputFile;
     }
     
-    public static Hashtable<String, Double> getMeanValueOfCoordinates(List<String> latitudeCoordinates, List<String> longitudeCoordinates) {
+    public static Hashtable<String, Double> getMeanValueOfCoordinates(Rengine rEngine, List<String> latitudeCoordinates, List<String> longitudeCoordinates) {
         Hashtable<String, Double> coordinates = new Hashtable<String, Double>();
         double latitudeCoordinate = 0;
         double longitudeCoordinate = 0;
@@ -265,19 +265,14 @@ public class Tools {
         latitudeVector = "c(" + String.join(",", arrLatitudeVector) + ")";
         longitudeVector = "c(" + String.join(",", arrLongitudeVector) + ")";
         
-        Rengine engine = new Rengine(new String[] { "--no-save" }, false, null);
-        //hiba valahol itt, mintha nem akarna ujra letrehozni a threadet a kovetkezo futas alkalmaval
-        
-        engine.eval("latitudeVector=" + latitudeVector);
-        engine.eval("longitudeVector=" + longitudeVector);
+        rEngine.eval("latitudeVector=" + latitudeVector);
+        rEngine.eval("longitudeVector=" + longitudeVector);
 
-        engine.eval("latitudeVectorMean=mean(latitudeVector)");
-        engine.eval("longitudeVectorMean=mean(longitudeVector)");
+        rEngine.eval("latitudeVectorMean=mean(latitudeVector)");
+        rEngine.eval("longitudeVectorMean=mean(longitudeVector)");
         
-        latitudeCoordinate = engine.eval("latitudeVectorMean").asDouble();
-        longitudeCoordinate = engine.eval("longitudeVectorMean").asDouble();
-        
-        engine.end();
+        latitudeCoordinate = rEngine.eval("latitudeVectorMean").asDouble();
+        longitudeCoordinate = rEngine.eval("longitudeVectorMean").asDouble();
         
         coordinates.put(COORDINATES.LATITUDE.toString(), latitudeCoordinate);
         coordinates.put(COORDINATES.LONGITUDE.toString(), longitudeCoordinate);

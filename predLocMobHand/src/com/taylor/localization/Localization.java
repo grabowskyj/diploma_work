@@ -7,6 +7,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.rosuda.JRI.Rengine;
+
 import com.taylor.measurement.ConvertMeasurementFile;
 import com.taylor.simulation.ConvertDatFile;
 import com.taylor.tools.Tools;
@@ -192,6 +194,8 @@ public class Localization {
         String[] splittedMeasurementRow = null;
         String[] measurementDataHeader = measurement.get(0).split(",");
         String elementName = null;
+        
+        Rengine rEngine = new Rengine(new String[] { "--no-save" }, false, null);
 
         for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
             transitionalDatabase = database;
@@ -225,7 +229,7 @@ public class Localization {
                 measurementDataHeaderElementCounter++;
             }
             
-            coordinates = Tools.getMeanValueOfCoordinates(latitude, longitude);
+            coordinates = Tools.getMeanValueOfCoordinates(rEngine, latitude, longitude);
             
             System.out.println("C: " + measurementDataRowCounter);
             System.out.println("latitude: " + coordinates.get(COORDINATES.LATITUDE.toString()));
@@ -235,6 +239,9 @@ public class Localization {
             
             //ide kell majd egy olyan, ahogy csupan a lat long erteteket irja bele egy csv fajlba - de ez majd csak azutan, hogy minden egyes sorra csak egy eredmeny lesz 
         }
+        
+        rEngine.end();;
+        
     }
 
     @SuppressWarnings("unused")
