@@ -80,13 +80,13 @@ public class Tools {
         return reversArray;
     }
 
-    public static ArrayList<String> readFileToMemory(File dataBase) {
+    public static ArrayList<String> readFileToMemory(File data) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         ArrayList<String> dataInMemory = new ArrayList<String>();
 
         try {
-            fileReader = new FileReader(dataBase);
+            fileReader = new FileReader(data);
             bufferedReader = new BufferedReader(fileReader);
             String readedLine = null;
             while ((readedLine = bufferedReader.readLine()) != null) {
@@ -154,7 +154,7 @@ public class Tools {
         return randomValue;
     }
 
-    public static File createTestMeasurementFile(int nthRow, File inputFile, File outputFile, File checkFile, int range) {
+    public static File[] createTestMeasurementFile(int nthRow, File inputFile, File derivedMeasurementFile, File checkFile, int range) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         FileWriter fileWriter = null;
@@ -171,13 +171,14 @@ public class Tools {
         String[] headerRowWithoutCoordinates = null;
         ArrayList<String> csvData = new ArrayList<String>();
         ArrayList<String> headerRowArrayList = null;
+        File[] resultFiles = new File[]{derivedMeasurementFile, checkFile};
         
         createFile(checkFile);
 
         try {
             fileReader = new FileReader(inputFile);
             bufferedReader = new BufferedReader(fileReader);
-            fileWriter = new FileWriter(outputFile);
+            fileWriter = new FileWriter(derivedMeasurementFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             checkFileWriter = new FileWriter(checkFile);
             checkFileBufferedWriter = new BufferedWriter(checkFileWriter);
@@ -196,6 +197,8 @@ public class Tools {
             headerRowWithoutCoordinates = Arrays.copyOfRange(headerRow, 2, headerRow.length);
             bufferedWriter.write(String.join(",", headerRowWithoutCoordinates));
             bufferedWriter.newLine();
+            checkFileBufferedWriter.write(String.join(",", headerRowWithoutCoordinates));
+            checkFileBufferedWriter.newLine();
             if (nthRow == 0) {
                 nthRow = 1;
             }
@@ -204,7 +207,7 @@ public class Tools {
                     row = csvData.get(rowCounter).trim().split(",");
                     randomValue = generateRandomValue(range);
                     if (typeOfMeasurement == FILETYPE.BESTSERVER) {
-                        signalStrength = Integer.parseInt(row[4]);
+                        signalStrength = Integer.parseInt(row[3]);
                         signalStrength = signalStrength + randomValue;
                         row[3] = Integer.toString(signalStrength);
                     } else if (typeOfMeasurement == FILETYPE.NTHSERVER) {
@@ -248,7 +251,7 @@ public class Tools {
             }
         }
 
-        return outputFile;
+        return resultFiles;
     }
     
     public static Hashtable<String, Double> getMeanValueOfCoordinates(Rengine rEngine, List<String> latitudeCoordinates, List<String> longitudeCoordinates) {

@@ -185,7 +185,7 @@ public class Localization {
         return indexListOfElements;
     }
     
-    private void getLocationFromDatabase(Hashtable<String, ArrayList<String>> database, File resultsFile) {
+    private void getLocationFromDatabase(Hashtable<String, ArrayList<String>> database, File resultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         Hashtable<String, ArrayList<String>> transitionalDatabase = null; 
@@ -202,13 +202,19 @@ public class Localization {
         String rowToWrite = null;
         String pointLatitude = null;
         String pointLongitude = null;
+        String resultFileHeader = null;
         int measurementDataHeaderElementCounter;
         
-        Tools.createFile(resultsFile);
+        Tools.createFile(resultFile);
 
         try {
-            fileWriter = new FileWriter(resultsFile);
+            fileWriter = new FileWriter(resultFile);
             bufferedWriter = new BufferedWriter(fileWriter);
+            
+            resultFileHeader = "point," + COORDINATES.LATITUDE.toString() + "," + COORDINATES.LONGITUDE.toString();
+            bufferedWriter.write(resultFileHeader);
+            bufferedWriter.newLine();
+            
             Rengine rEngine = new Rengine(new String[] { "--no-save" }, false, null);
             
             for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
@@ -285,11 +291,11 @@ public class Localization {
         File veresegyhaz_nthserverCONV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver.conv");
         File veresegyhaz_nthserverCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver.csv");
         
-        ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserverDAT, veresegyhaz_bestserverCONV, veresegyhaz_bestserverCSV);
+        /*ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserverDAT, veresegyhaz_bestserverCONV, veresegyhaz_bestserverCSV);
         ConvertDatFile veresegyhaz_nthserver = new ConvertDatFile(veresegyhaz_nthserverDAT, veresegyhaz_nthserverCONV, veresegyhaz_nthserverCSV);
         
         veresegyhaz_bestserver.convertDat2Csv();
-        veresegyhaz_nthserver.convertDat2Csv();
+        veresegyhaz_nthserver.convertDat2Csv();*/
         
         File gmon_gsm_veresegyhaz_1TXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1CSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
@@ -300,7 +306,7 @@ public class Localization {
         File gmon_umts_budapestTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_umts_budapest.txt");
         File gmon_umts_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_umts_budapest.csv");
         
-        ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1TXT, gmon_gsm_veresegyhaz_1CSV);
+        /*ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1TXT, gmon_gsm_veresegyhaz_1CSV);
         ConvertMeasurementFile gmon_gsm_veresegyhaz_2 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_2TXT, gmon_gsm_veresegyhaz_2CSV);
         ConvertMeasurementFile gmon_gsm_budapest = new ConvertMeasurementFile(gmon_gsm_budapestTXT, gmon_gsm_budapestCSV);
         ConvertMeasurementFile gmon_umts_budapest = new ConvertMeasurementFile(gmon_umts_budapestTXT, gmon_umts_budapestCSV);
@@ -308,7 +314,7 @@ public class Localization {
         gmon_gsm_veresegyhaz_1.convertMeasurement2Csv();
         gmon_gsm_veresegyhaz_2.convertMeasurement2Csv();
         gmon_gsm_budapest.convertMeasurement2Csv();
-        gmon_umts_budapest.convertMeasurement2Csv();
+        gmon_umts_budapest.convertMeasurement2Csv();*/
         
         File veresegyhaz_bestserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_bestserver_created.csv");
         File veresegyhaz_nthserver_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_nthserver_created.csv");
@@ -326,12 +332,12 @@ public class Localization {
         File checkFile_budapest_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_gsm_created.csv");
         File checkFile_budapest_gmon_umts_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_umts_created.csv");
 
-        Tools.createTestMeasurementFile(3, veresegyhaz_bestserverCSV, veresegyhaz_bestserver_created, checkFile_veresegyhaz_bestserver_created, 3);
-        Tools.createTestMeasurementFile(3, veresegyhaz_nthserverCSV, veresegyhaz_nthserver_created, checkFile_veresegyhaz_nthserver_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1CSV, veresegyhaz_1_gmon_gsm_created, checkFile_veresegyhaz_1_gmon_gsm_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_2CSV, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
-        Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);
+        //Tools.createTestMeasurementFile(3, veresegyhaz_bestserverCSV, veresegyhaz_bestserver_created, checkFile_veresegyhaz_bestserver_created, 3);
+        //Tools.createTestMeasurementFile(200, veresegyhaz_nthserverCSV, veresegyhaz_nthserver_created, checkFile_veresegyhaz_nthserver_created, 2);
+        //Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1CSV, veresegyhaz_1_gmon_gsm_created, checkFile_veresegyhaz_1_gmon_gsm_created, 3);
+        //Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_2CSV, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created, 3);
+        //Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
+        //Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);
         
         Localization newLocaction = new Localization(gmon_umts_budapestCSV, budapest_gmon_umts_created);
         
