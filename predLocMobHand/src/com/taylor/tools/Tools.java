@@ -197,7 +197,7 @@ public class Tools {
             headerRowWithoutCoordinates = Arrays.copyOfRange(headerRow, 2, headerRow.length);
             bufferedWriter.write(String.join(",", headerRowWithoutCoordinates));
             bufferedWriter.newLine();
-            checkFileBufferedWriter.write(String.join(",", headerRowWithoutCoordinates));
+            checkFileBufferedWriter.write(String.join(",", headerRow));
             checkFileBufferedWriter.newLine();
             if (nthRow == 0) {
                 nthRow = 1;
