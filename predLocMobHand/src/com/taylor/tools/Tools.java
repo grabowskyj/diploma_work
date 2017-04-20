@@ -34,7 +34,36 @@ public class Tools {
             return axis;
         }
     }
-
+    
+    @SuppressWarnings("serial")
+    final public static Hashtable<String, String> convertCellID = new Hashtable<String, String>() {
+        {
+            put("21431", "veresegy_m_9001");
+            put("21432", "veresegy_m_9002");
+            put("21434", "veresegy_m_9004");
+            put("21831", "veresegyd_9001");
+            put("21833", "veresegyd_9003");
+            put("21437", "veresegyq_m_18002");
+            put("21438", "veresegyq_m_18003");
+            put("41631", "Csomad_9001");
+            put("41632", "Csomad_9002");
+            put("41633", "Csomad_9003");
+            put("41636", "Csomadq_18001");
+            put("41637", "Csomadq_18002");
+            put("41638", "Csomadq_18003");
+            put("21921", "GodolloI_m_9001");
+            put("21923", "GodolloI_m_9003");
+            put("60553", "Vegyhcity_9003");
+            put("41013", "erdokert_9003");
+            put("51612", "vacratot_9002");
+            put("41052", "szodliget_9002");
+            put("60557", "Vegyhcity_18002");
+            put("60556", "Vegyhcity_18001");
+            put("41451", "r30godollo_9001");
+            put("49191", "hungring_9001");
+        }
+    };
+    
     public static void createFile(File file) {
         if (file.exists()) {
             file.delete();
@@ -108,7 +137,7 @@ public class Tools {
         return dataInMemory;
     }
 
-    public static Hashtable<Object, Object> wgs84ToHd72Eov(double y, double x) {
+    public static Hashtable<String, Double> wgs84ToHd72Eov(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
         wgs84.ImportFromEPSG(4326);
@@ -116,17 +145,17 @@ public class Tools {
         CoordinateTransformation wgs84ToHd72Eov = new CoordinateTransformation(wgs84, hd72eov);
         double[] transformation = wgs84ToHd72Eov.TransformPoint(x, y);
         @SuppressWarnings("serial")
-        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {
+        Hashtable<String, Double> coordinates = new Hashtable<String, Double>() {
             {
-                put(COORDINATES.LATITUDE, transformation[0]);
-                put(COORDINATES.LONGITUDE, transformation[1]);
+                put(COORDINATES.LATITUDE.toString(), transformation[0]);
+                put(COORDINATES.LONGITUDE.toString(), transformation[1]);
             }
         };
 
         return coordinates;
     }
 
-    public static Hashtable<Object, Object> hd72EovToWgs84(double y, double x) {
+    public static Hashtable<String, Double> hd72EovToWgs84(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
         CoordinateTransformation hd72EovTowgs84;
@@ -137,10 +166,10 @@ public class Tools {
         double[] transformation = hd72EovTowgs84.TransformPoint(y, x);
 
         @SuppressWarnings("serial")
-        Hashtable<Object, Object> coordinates = new Hashtable<Object, Object>() {
+        Hashtable<String, Double> coordinates = new Hashtable<String, Double>() {
             {
-                put(COORDINATES.LATITUDE, transformation[1]);
-                put(COORDINATES.LONGITUDE, transformation[0]);
+                put(COORDINATES.LATITUDE.toString(), transformation[1]);
+                put(COORDINATES.LONGITUDE.toString(), transformation[0]);
             }
         };
 

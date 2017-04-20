@@ -286,11 +286,13 @@ public class ConvertDatFile {
         //int cellLayerID = Tools.convertHex2Dec(Tools.reversArray(hexCellLayerID));
         int signalStrength = Tools.convertHex2Dec(Tools.reversArray(hexSignalStrength));
         @SuppressWarnings("serial")
-        Hashtable<String, Integer> cellData = new Hashtable<String, Integer>(){{
+        Hashtable<String, Integer> cellData = new Hashtable<String, Integer>() {
+            {
                 put("cellID",cellID);
                 //put("cellLayerID",cellLayerID);
                 put("signalStrength",signalStrength);
-        }};
+            }
+        };
             
         return cellData;
     }
