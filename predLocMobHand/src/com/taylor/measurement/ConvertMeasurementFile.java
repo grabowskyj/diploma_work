@@ -51,7 +51,6 @@ public class ConvertMeasurementFile {
                 + "n5cellID,n5signalStrength,n6cellID,n6signalStrength";
         String dataRowToCsv = null;
         String[] dataRow = null;
-        
         data = Tools.readFileToMemory(getSrcFile());
         
         try {
@@ -64,8 +63,10 @@ public class ConvertMeasurementFile {
             for (int rowCounter = 1; rowCounter < data.size(); rowCounter++ ) {
                 dataRow = data.get(rowCounter).trim().split(";");
                 dataRowToCsv = prepareArrayForWrite(dataRow);
-                bufferedWriter.write(dataRowToCsv);
-                bufferedWriter.newLine();
+                if (!dataRowToCsv.contains("NaN")) {
+                    bufferedWriter.write(dataRowToCsv);
+                    bufferedWriter.newLine();
+                }
             }  
         } catch (Exception e) {
             System.out.println(e);

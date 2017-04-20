@@ -4,20 +4,45 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 
 import com.taylor.tools.Tools;
 import com.taylor.tools.Tools.COORDINATES;
 
 public class LocalizationAnalysis {
     
+    public static double getDistance(double latitudeOfPoint1, double latitudeOfPoint2, double longitudeOfPoint1, double longitudeOfPoint2, double heightOfPoint1, double heightOfPoint2) {
+        final int earthRadius = 6371;
+        double distance = 0;
+        double height = 0;
+        double latitudeDistance = 0;
+        double longitudeDistance = 0;
+        double a = 0;
+        double c = 0;
+        
+        latitudeDistance = Math.toRadians(latitudeOfPoint2 - latitudeOfPoint1);
+        longitudeDistance = Math.toRadians(longitudeOfPoint2 - longitudeOfPoint1);
+        a = Math.sin(latitudeDistance / 2) * Math.sin(latitudeDistance / 2)
+                + Math.cos(Math.toRadians(latitudeOfPoint1)) * Math.cos(Math.toRadians(latitudeOfPoint2))
+                * Math.sin(longitudeDistance / 2) * Math.sin(longitudeDistance / 2);
+        c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        
+        distance = earthRadius * c * 1000;
+        height = heightOfPoint1 - heightOfPoint2;
+        distance = Math.sqrt(Math.pow(distance, 2) + Math.pow(height, 2));
+
+        return distance;
+    }
+    
     public static void calculateErrorDistance(File resultFile, File controlFile, File errorFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         Hashtable<String, Double> resultCoordinates = null;
         Hashtable<String, Double> controlCoordinates = null;
-        ArrayList<String> results = new ArrayList<String>();
-        ArrayList<String> control = new ArrayList<String>();
+        ArrayList<String> results = null;
+        ArrayList<String> control = null;
         String[] resultLine = null;
         String[] controlLine = null;
         String errorFileHeader = null;
@@ -34,6 +59,8 @@ public class LocalizationAnalysis {
                 + ",DCM:" + COORDINATES.LATITUDE.toString() + ",DCM:" + COORDINATES.LONGITUDE.toString();
         resultCoordinates = new Hashtable<String, Double>();
         controlCoordinates = new Hashtable<String, Double>();
+        results = new ArrayList<String>();
+        control = new ArrayList<String>();
         
         try {
             fileWriter = new FileWriter(errorFile);
@@ -78,30 +105,29 @@ public class LocalizationAnalysis {
         }
     }
     
-    /*
-     * Haversine formula
-     */
-    public static double getDistance(
-            double latitudeOfPoint1, double latitudeOfPoint2,
-            double longitudeOfPoint1, double longitudeOfPoint2,
-            double heightOfPoint1, double heightOfPoint2) {
-
-        final int R = 6371;
-
-        Double latDistance = Math.toRadians(latitudeOfPoint2 - latitudeOfPoint1);
-        Double lonDistance = Math.toRadians(longitudeOfPoint2 - longitudeOfPoint1);
-        Double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(latitudeOfPoint1)) * Math.cos(Math.toRadians(latitudeOfPoint2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    public static double calculateCERP(int percent, File resultFile) {
+        ArrayList<String> results = null;
+        List<Double> errorDistances = null;
+        String[] resultRow = null;
+        double cerpValue = 0;
+        int nthElement = 0;
+        double errorDistance = 0;
         
-        double distance = R * c * 1000;
-
-        double height = heightOfPoint1 - heightOfPoint2;
-
-        distance = Math.pow(distance, 2) + Math.pow(height, 2);
-
-        return Math.sqrt(distance);
+        results = new ArrayList<String>();
+        errorDistances = new ArrayList<Double>();
+        results = Tools.readFileToMemory(resultFile);
+        
+        for(int resultRowCounter = 1; resultRowCounter < results.size(); resultRowCounter++) {
+            resultRow = results.get(resultRowCounter).trim().split(",");
+            errorDistance = Double.parseDouble(resultRow[1]);
+            errorDistances.add(errorDistance);
+        }
+        
+        Collections.sort(errorDistances);
+        nthElement = (int) ((percent * errorDistances.size()) / 100);
+        cerpValue = errorDistances.get(nthElement);
+        
+        return cerpValue;
     }
-
+    
 }
