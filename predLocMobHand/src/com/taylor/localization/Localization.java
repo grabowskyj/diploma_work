@@ -81,7 +81,7 @@ public class Localization {
         return database;
     }
     
-    private Hashtable<String, ArrayList<String>> createDatabaseFromSelection(String indexListName, List<Integer> indexList, Hashtable<String, ArrayList<String>> srcDatabase){
+    private Hashtable<String, ArrayList<String>> createDatabaseFromSelection(String indexListName, List<Integer> indexList, Hashtable<String, ArrayList<String>> srcDatabase) {
         Hashtable<String, ArrayList<String>> databaseSubset = new Hashtable<String, ArrayList<String>>();
         String elementName = null;
         String srcElement = null;
