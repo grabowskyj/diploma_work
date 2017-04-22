@@ -42,7 +42,7 @@ public class ConvertMeasurementFile {
     }
     
     @SuppressWarnings("serial")
-    final private static Hashtable<String, String> convertCellID = new Hashtable<String, String>() {
+    final private Hashtable<String, String> convertCellID = new Hashtable<String, String>() {
         {
             put("21431", "veresegy_m_9001");
             put("21432", "veresegy_m_9002");

@@ -7,8 +7,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.List;
-
 import com.taylor.tools.*;
 import com.taylor.tools.Tools.FILETYPE;
 
@@ -46,11 +44,31 @@ public class ConvertDatFile {
     public File getCsvFile() {
         return csvFile;
     }
-
+    
     private void setCsvFile(File csvFile) {
         this.csvFile = csvFile;
         Tools.createFile(this.csvFile);
     }
+    
+    @SuppressWarnings("serial")
+    final private Hashtable<String, String> convertCellID = new Hashtable<String, String>() {
+        {
+            put("918262136", "veresegy_m_9001");
+            put("918262205", "veresegy_m_9002");
+            put("918262052", "veresegy_m_9004");
+            put("918265031", "erdokert_9001");
+            put("918265115", "erdokert_9003");
+            put("918264437", "Csomad_9001");
+            put("918264506", "Csomad_9002");
+            put("918264353", "Csomad_9003");
+            put("918267999", "veresegyd_9001");
+            put("918268067", "veresegyd_9002");
+            put("918268151", "veresegyd_9003");
+            put("917963201", "Vegyhcity_9003");
+            put("918263566", "Szada_9003");
+            //meg ketto hianyzik
+        }
+    };
     
     private void createRawData() {
         FileInputStream readFile = null;
@@ -182,10 +200,12 @@ public class ConvertDatFile {
         BufferedWriter bufferedWriter = null;
         ArrayList<String> rawData = new ArrayList<String>();
         ArrayList<String> arrToCsvFile = null;
-        List<Integer> arrToWrite = Arrays.asList();
         int dataRowNumFromRawData = 3;
         int hd72EovYcoordinate = 0;
         int hd72EovXcoordinate = 0;
+        int cellId = 0;
+        int signalStrength = 0;
+        String cellName = null;
         String headerRow = null;
         String rowToCsvFile = null;
         String[] mapDataRow = null;
@@ -221,16 +241,28 @@ public class ConvertDatFile {
             for (hd72EovYcoordinate = (int) mapData.get("northMax"); hd72EovYcoordinate > (int) mapData.get("northMin"); hd72EovYcoordinate = hd72EovYcoordinate - (int) mapData.get("resolution")) {
                 for (hd72EovXcoordinate = (int) mapData.get("eastMin"); hd72EovXcoordinate < (int) mapData.get("eastMax"); hd72EovXcoordinate = hd72EovXcoordinate + (int) mapData.get("resolution")) {
                     arrToCsvFile = new ArrayList<String>();
-                    arrToWrite = new ArrayList<Integer>();
                     rowToCsvFile = null;
-                    arrToWrite.add(hd72EovXcoordinate);
-                    arrToWrite.add(hd72EovYcoordinate);
+                    arrToCsvFile.add(Integer.toString(hd72EovXcoordinate));
+                    arrToCsvFile.add(Integer.toString(hd72EovYcoordinate));
+                    
                     if (fileType == FILETYPE.BESTSERVER) {
                         processedLine = rawData.get(dataRowNumFromRawData).split(" ");
+                        /*
+                         * ettol
+                         */
                         cellData = getCellData(processedLine);
-                        //arrToWrite.add(cellData.get("cellLayerID"));
-                        arrToWrite.add(cellData.get("cellID"));
-                        arrToWrite.add(cellData.get("signalStrength"));
+                        cellId = cellData.get("cellID");
+                        cellName = convertCellID.get(Integer.toString(cellId));
+                        if (cellName != null) {
+                            arrToCsvFile.add(cellName);
+                        } else {
+                            arrToCsvFile.add(Integer.toString(cellId));
+                        }
+                        signalStrength = cellData.get("signalStrength");
+                        arrToCsvFile.add(Integer.toString(signalStrength));
+                        /*
+                         * eddig lehetne egy metodus
+                         */
                     }
                     if (fileType == FILETYPE.NTHSERVER) {
                         processedLine = rawData.get(dataRowNumFromRawData).split(" ");
@@ -241,9 +273,15 @@ public class ConvertDatFile {
                                 hexCharCounter++;
                                 if (hexChar.equals("ff") && hexCharCounter == 10) {
                                     cellData = getCellData(hexCharBuffer);
-                                    //arrToWrite.add(cellData.get("cellLayerID"));
-                                    arrToWrite.add(cellData.get("cellID"));
-                                    arrToWrite.add(cellData.get("signalStrength"));
+                                    cellId = cellData.get("cellID");
+                                    cellName = convertCellID.get(Integer.toString(cellId));
+                                    if (cellName != null) {
+                                        arrToCsvFile.add(cellName);
+                                    } else {                                        
+                                        arrToCsvFile.add(Integer.toString(cellId));
+                                    }
+                                    signalStrength = cellData.get("signalStrength");
+                                    arrToCsvFile.add(Integer.toString(signalStrength));
                                     hexCharCounter = 0;
                                 }
                             }
@@ -251,14 +289,7 @@ public class ConvertDatFile {
                     }
                     
                     dataRowNumFromRawData++;
-                    if (arrToWrite.size() > 2) {
-                        for (Integer value : arrToWrite) {
-                            arrToCsvFile.add(Integer.toString(value));
-                        }
-                    } else {
-                        arrToCsvFile.add(Integer.toString(hd72EovXcoordinate));
-                        arrToCsvFile.add(Integer.toString(hd72EovYcoordinate));
-                    }
+                    
                     rowToCsvFile = String.join(",", arrToCsvFile);
                     bufferedWriter.write(rowToCsvFile);
                     bufferedWriter.newLine();
