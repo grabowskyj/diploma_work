@@ -145,7 +145,7 @@ public class Localization {
         ArrayList<Integer> negativeSideIndexList = null;
         ArrayList<String> dataset = null;
         boolean isValueFound = false;
-        int checkRange = 10;
+        int checkRange = 7;
         int range = 1;
         int positiveRangeNumber = 0;
         int negativeRangeNumber = 0;
@@ -312,7 +312,7 @@ public class Localization {
         File veresegyh_5m_G900_bestserver_conv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Veresegyh_5m_G900_v1_bestserver.conv");
         File veresegyh_5m_G900_bestserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Veresegyh_5m_G900_v1_bestserver.csv");
                 
-        ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserver_dat, veresegyhaz_bestserver_conv, veresegyhaz_bestserver_csv);
+        /*ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserver_dat, veresegyhaz_bestserver_conv, veresegyhaz_bestserver_csv);
         ConvertDatFile veresegyhaz_nthserver = new ConvertDatFile(veresegyhaz_nthserver_dat, veresegyhaz_nthserver_conv, veresegyhaz_nthserver_csv);
         ConvertDatFile veresegyh_5m_G900_nthserver = new ConvertDatFile(veresegyh_5m_G900_nthserver_dat, veresegyh_5m_G900_nthserver_conv, veresegyh_5m_G900_nthserver_csv);
         ConvertDatFile veresegyh_5m_G900_bestserver = new ConvertDatFile(veresegyh_5m_G900_bestserver_dat, veresegyh_5m_G900_bestserver_conv, veresegyh_5m_G900_bestserver_csv);
@@ -320,7 +320,7 @@ public class Localization {
         veresegyhaz_bestserver.convertDat2Csv();
         veresegyhaz_nthserver.convertDat2Csv();
         veresegyh_5m_G900_nthserver.convertDat2Csv();
-        veresegyh_5m_G900_bestserver.convertDat2Csv();
+        veresegyh_5m_G900_bestserver.convertDat2Csv();*/
         
         File gmon_gsm_veresegyhaz_1_txt = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
@@ -331,7 +331,7 @@ public class Localization {
         File gmon_umts_budapestTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_umts_budapest.txt");
         File gmon_umts_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_umts_budapest.csv");
         
-        ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1_txt, gmon_gsm_veresegyhaz_1_csv);
+        /*ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1_txt, gmon_gsm_veresegyhaz_1_csv);
         ConvertMeasurementFile gmon_gsm_veresegyhaz_2 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_2_txt, gmon_gsm_veresegyhaz_2_csv);
         ConvertMeasurementFile gmon_gsm_budapest = new ConvertMeasurementFile(gmon_gsm_budapestTXT, gmon_gsm_budapestCSV);
         ConvertMeasurementFile gmon_umts_budapest = new ConvertMeasurementFile(gmon_umts_budapestTXT, gmon_umts_budapestCSV);
@@ -339,7 +339,7 @@ public class Localization {
         gmon_gsm_veresegyhaz_1.convertMeasurement2Csv();
         gmon_gsm_veresegyhaz_2.convertMeasurement2Csv();
         gmon_gsm_budapest.convertMeasurement2Csv();
-        gmon_umts_budapest.convertMeasurement2Csv();
+        gmon_umts_budapest.convertMeasurement2Csv();*/
         
         File veresegyhaz_1_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_1_gmon_gsm_created.csv");
         File veresegyhaz_2_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_2_gmon_gsm_created.csv");
@@ -351,7 +351,7 @@ public class Localization {
         File checkFile_budapest_gmon_gsm_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_gsm_created.csv");
         File checkFile_budapest_gmon_umts_created = new File(GIT_DIRECTORY + CONVERTED_DATA + "checkFile_budapest_gmon_umts_created.csv");
 
-        //Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1_csv, veresegyhaz_1_gmon_gsm_created, checkFile_veresegyhaz_1_gmon_gsm_created, 3);
+        Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_1_csv, veresegyhaz_1_gmon_gsm_created, checkFile_veresegyhaz_1_gmon_gsm_created, 3);
         //Tools.createTestMeasurementFile(3, gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created, 3);
         //Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
         //Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);
@@ -359,15 +359,15 @@ public class Localization {
         File localization_results = new File (GIT_DIRECTORY + RESULTS + "localization_results.csv");
         File localization_error_results = new File(GIT_DIRECTORY + RESULTS + "localization_error_results.csv");
         
-        //Localization newLocaction = new Localization(veresegyh_5m_G900_nthserver_csv, gmon_gsm_veresegyhaz_1_csv);
+        Localization newLocaction = new Localization(gmon_gsm_veresegyhaz_1_csv, veresegyhaz_1_gmon_gsm_created);
         
-        //HashMap<String, ArrayList<String>> database = newLocaction.createDatabase();
-        //newLocaction.getLocationFromDatabase(database, localization_results);
+        HashMap<String, ArrayList<String>> database = newLocaction.createDatabase();
+        newLocaction.getLocationFromDatabase(database, localization_results);
         
-        //LocalizationAnalysis.calculateErrorDistance(localization_results, checkFile_veresegyhaz_2_gmon_gsm_created, localization_error_results);
+        LocalizationAnalysis.calculateErrorDistance(localization_results, checkFile_veresegyhaz_1_gmon_gsm_created, localization_error_results);
         
-        //System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
-        //System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));
+        System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
+        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));
         
         
         

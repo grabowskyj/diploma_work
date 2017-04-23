@@ -74,7 +74,6 @@ public class ConvertMeasurementFile {
             put("60556", "Vegyhcity_18001");
             put("41451", "r30godollo_9001");
             put("49191", "hungring_9001");
-            //ellenorizni-veres1 eleje kicsit erdekes
         }
     };
     
@@ -227,8 +226,5 @@ public class ConvertMeasurementFile {
         
         return sortedMap;
     }
-
-
-
-    
+   
 }
