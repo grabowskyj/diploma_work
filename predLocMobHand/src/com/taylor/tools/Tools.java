@@ -265,6 +265,14 @@ public class Tools {
         return resultFiles;
     }
     
+    public static File[] decoordinateMeasurementFile(File inputFile, File outputFile, File checkFile) {
+        File[] outputFiles = null;
+        
+        outputFiles = createTestMeasurementFile(0, inputFile, outputFile, checkFile, 0);
+                
+        return outputFiles;
+    }
+    
     public static HashMap<String, Double> getMeanValueOfCoordinates(Rengine rEngine, ArrayList<String> latitudeCoordinates, ArrayList<String> longitudeCoordinates) {
         HashMap<String, Double> coordinates = new HashMap<String, Double>();
         double latitudeCoordinate = 0;
