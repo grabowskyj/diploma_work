@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class ConvertDatFile {
     }
     
     @SuppressWarnings("serial")
-    final private Hashtable<String, String> convertCellID = new Hashtable<String, String>() {
+    final private HashMap<String, String> convertCellID = new HashMap<String, String>() {
         {
             put("918262136", "veresegy_m_9001");
             put("918262205", "veresegy_m_9002");
@@ -67,8 +68,9 @@ public class ConvertDatFile {
             put("918268067", "veresegyd_9002");
             put("918268151", "veresegyd_9003");
             put("917963201", "Vegyhcity_9003");
-            put("918263566", "Szada_9003");
-            //meg ketto hianyzik
+            put("918263566", "Szada_9002");
+            put("918263498", "Szada_9004");
+            put("918263635", "hungring_9001");
         }
     };
     
@@ -223,6 +225,7 @@ public class ConvertDatFile {
     private void convertRawData() {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
+        Hashtable<String, Object> mapData = null;
         ArrayList<String> rawData = null;
         ArrayList<String> arrToCsvFile = null;
         List<String> dataPair = null;
@@ -234,9 +237,8 @@ public class ConvertDatFile {
         String[] mapDataRow = null;
         String[] processedRow = null;
         String[] hexCharBuffer = null;
-        Hashtable<Object, Object> mapData = null;
         
-        mapData = new Hashtable<>();
+        mapData = new Hashtable<String, Object>();
         rawData = new ArrayList<String>();
         arrToCsvFile = new ArrayList<String>();
         hexCharBuffer = new String[10];

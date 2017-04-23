@@ -4,8 +4,16 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import com.taylor.tools.*;
 import com.taylor.tools.Tools.COORDINATES;
 
@@ -42,7 +50,7 @@ public class ConvertMeasurementFile {
     }
     
     @SuppressWarnings("serial")
-    final private Hashtable<String, String> convertCellID = new Hashtable<String, String>() {
+    final private HashMap<String, String> convertCellID = new HashMap<String, String>() {
         {
             put("21431", "veresegy_m_9001");
             put("21432", "veresegy_m_9002");
@@ -67,6 +75,7 @@ public class ConvertMeasurementFile {
             put("60556", "Vegyhcity_18001");
             put("41451", "r30godollo_9001");
             put("49191", "hungring_9001");
+            //ellenorizni-veres1 eleje kicsit erdekes
         }
     };
     
@@ -115,44 +124,55 @@ public class ConvertMeasurementFile {
     }
     
     private String prepareArrayForWrite(String[] array) {
-        List<String> setOfData = null;
+        Hashtable<String, Double> coordinates = null;
+        HashMap<String, Integer> cellData = null;
+        HashMap<String, Integer> sortedHashtable = null;
+        Set<Entry<String, Integer>> entries = null;
+        List<String> arrToCsvFile = null;
+        List<String> listOfCellIds = null;
+        List<Integer> listOfSignalStrengths = null;
+        boolean isCellNameUnrecognizable = false;
+        boolean isCellNameAlreadyAdded = false;
         int[] neededCellOfArray = null;
         int neededCellOfArrayCounter = 1;
-        Hashtable<String, Double> coordinates = null;
         String latitude = null;
         String longitude = null;
         String[] filledArray = null;
         String rowToWrite = null;
         String cellName = null;
         
-        setOfData = new ArrayList<String>();
+        cellData = new HashMap<String, Integer>();
+        arrToCsvFile = new ArrayList<String>();
+        listOfCellIds = new ArrayList<String>();
+        listOfSignalStrengths = new ArrayList<Integer>();
         neededCellOfArray = new int[]{1,6,19,21,22,24,25,27,28,30,31,33,34,36};
         coordinates = Tools.wgs84ToHd72Eov(Double.parseDouble(array[12]), Double.parseDouble(array[13]));
         latitude = Double.toString((double) coordinates.get(COORDINATES.LATITUDE.toString()));
         longitude = Double.toString((double) coordinates.get(COORDINATES.LONGITUDE.toString()));
-        setOfData.add(latitude);
-        setOfData.add(longitude);
+        arrToCsvFile.add(latitude);
+        arrToCsvFile.add(longitude);
         
-        for (int cellNum : neededCellOfArray) { 
-            
+        for (int cellNum : neededCellOfArray) {  
             if (cellNum <= (array.length - 1)) {
-                
                 if (neededCellOfArrayCounter % 2 == 1) {
                     cellName = convertCellID.get(array[cellNum]);
                     
-                    if (cellName != null) {
-                        setOfData.add(cellName);
+                    if (cellName != null && !listOfCellIds.contains(cellName)) {
+                        listOfCellIds.add(cellName);
+                    } else if (array[cellNum].equals("-1")) {
+                        isCellNameUnrecognizable = true;
+                    } else if (listOfCellIds.contains(cellName)) {
+                        isCellNameAlreadyAdded = true;
                     } else {
-                        setOfData.add(array[cellNum]);
-                        /*
-                         * for discovering hidden CellIDs 
-                         *
-                        if (Integer.parseInt(array[cellNum]) > -1) {
-                            System.out.println(array[cellNum]);
-                        }*/ 
-                    }  
+                        listOfCellIds.add(array[cellNum]);
+                    }
                 } else {
-                    setOfData.add(array[cellNum]);
+                    if (isCellNameUnrecognizable == false && isCellNameAlreadyAdded == false) {
+                        listOfSignalStrengths.add(Integer.parseInt(array[cellNum]));
+                    } else {
+                        isCellNameUnrecognizable = false;
+                        isCellNameAlreadyAdded = false;
+                    }
                 }
                 
                 neededCellOfArrayCounter++;
@@ -161,10 +181,50 @@ public class ConvertMeasurementFile {
             }
         }
         
-        filledArray = new String[setOfData.size()];
-        filledArray = setOfData.toArray(filledArray);        
+        for (int cellIdCounter = 0; cellIdCounter < listOfCellIds.size(); cellIdCounter++) {
+            cellData.put(listOfCellIds.get(cellIdCounter), listOfSignalStrengths.get(cellIdCounter));
+        }
+        
+        sortedHashtable = sortHashtableByValue(cellData);
+        entries = sortedHashtable.entrySet();
+        
+        for (Entry<String, Integer> entry : entries) {
+            arrToCsvFile.add(entry.getKey());
+            arrToCsvFile.add(Integer.toString(entry.getValue()));
+        }
+
+        filledArray = new String[arrToCsvFile.size()];
+        filledArray = arrToCsvFile.toArray(filledArray);        
         rowToWrite = String.join(",", filledArray);
         
         return rowToWrite;
     }
+    
+    private HashMap<String, Integer> sortHashtableByValue(HashMap<String,Integer> cellData) {
+        HashMap<String, Integer> sortedMap = null;
+        List<Entry<String, Integer>> entries = null;
+        
+        sortedMap = new LinkedHashMap<String, Integer>();
+        entries = new LinkedList<>(cellData.entrySet());
+        
+        Collections.sort(entries, new Comparator<Entry<String, Integer>>() {
+            @Override
+            public int compare(Entry<String, Integer> entry1, Entry<String, Integer> entry2) {
+                int result = entry2.getValue().compareTo(entry1.getValue());
+                
+                return result;
+            }
+        
+        });
+        
+        for (Entry<String, Integer> entry : entries) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        
+        return sortedMap;
+    }
+
+
+
+    
 }
