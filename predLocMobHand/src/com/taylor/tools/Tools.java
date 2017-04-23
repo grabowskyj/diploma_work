@@ -8,8 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Random;
 
 import org.gdal.osr.*;
@@ -89,6 +88,7 @@ public class Tools {
             fileReader = new FileReader(data);
             bufferedReader = new BufferedReader(fileReader);
             String readedLine = null;
+            
             while ((readedLine = bufferedReader.readLine()) != null) {
                 dataInMemory.add(readedLine);
             }
@@ -108,7 +108,7 @@ public class Tools {
         return dataInMemory;
     }
 
-    public static Hashtable<String, Double> wgs84ToHd72Eov(double y, double x) {
+    public static HashMap<String, Double> wgs84ToHd72Eov(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
         wgs84.ImportFromEPSG(4326);
@@ -116,7 +116,7 @@ public class Tools {
         CoordinateTransformation wgs84ToHd72Eov = new CoordinateTransformation(wgs84, hd72eov);
         double[] transformation = wgs84ToHd72Eov.TransformPoint(x, y);
         @SuppressWarnings("serial")
-        Hashtable<String, Double> coordinates = new Hashtable<String, Double>() {
+        HashMap<String, Double> coordinates = new HashMap<String, Double>() {
             {
                 put(COORDINATES.LATITUDE.toString(), transformation[0]);
                 put(COORDINATES.LONGITUDE.toString(), transformation[1]);
@@ -126,7 +126,7 @@ public class Tools {
         return coordinates;
     }
 
-    public static Hashtable<String, Double> hd72EovToWgs84(double y, double x) {
+    public static HashMap<String, Double> hd72EovToWgs84(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
         CoordinateTransformation hd72EovTowgs84;
@@ -137,7 +137,7 @@ public class Tools {
         double[] transformation = hd72EovTowgs84.TransformPoint(y, x);
 
         @SuppressWarnings("serial")
-        Hashtable<String, Double> coordinates = new Hashtable<String, Double>() {
+        HashMap<String, Double> coordinates = new HashMap<String, Double>() {
             {
                 put(COORDINATES.LATITUDE.toString(), transformation[1]);
                 put(COORDINATES.LONGITUDE.toString(), transformation[0]);
@@ -155,24 +155,26 @@ public class Tools {
     }
 
     public static File[] createTestMeasurementFile(int nthRow, File inputFile, File derivedMeasurementFile, File checkFile, int range) {
+        File[] resultFiles = null;
         FileReader fileReader = null;
-        BufferedReader bufferedReader = null;
         FileWriter fileWriter = null;
-        BufferedWriter bufferedWriter = null;
         FileWriter checkFileWriter = null;
+        BufferedReader bufferedReader = null;
+        BufferedWriter bufferedWriter = null;
         BufferedWriter checkFileBufferedWriter = null;
+        FILETYPE typeOfMeasurement = null;
+        ArrayList<String> csvData = null;
+        ArrayList<String> headerRowArrayList = null;
         int signalStrength = 0;
         int randomValue = 0;
-        FILETYPE typeOfMeasurement = null;
         String rowToWrite = null;
         String[] headerRow = null;
         String[] row = null;
         String[] rowWithoutCoordinates = null;
-        String[] headerRowWithoutCoordinates = null;
-        ArrayList<String> csvData = new ArrayList<String>();
-        ArrayList<String> headerRowArrayList = null;
-        File[] resultFiles = new File[]{derivedMeasurementFile, checkFile};
+        String[] headerRowWithoutCoordinates = null;       
         
+        resultFiles = new File[]{derivedMeasurementFile, checkFile};
+        csvData = new ArrayList<String>();
         createFile(checkFile);
 
         try {
@@ -183,29 +185,37 @@ public class Tools {
             checkFileWriter = new FileWriter(checkFile);
             checkFileBufferedWriter = new BufferedWriter(checkFileWriter);
             String readedLine = null;
+            
             while ((readedLine = bufferedReader.readLine()) != null) {
                 csvData.add(readedLine);
             }
+            
             headerRow = csvData.get(0).trim().split(",");
             headerRowArrayList = new ArrayList<String>(Arrays.asList(headerRow));
+            
             if (headerRowArrayList.contains("cellID")) {
                 typeOfMeasurement = FILETYPE.BESTSERVER;
             }
+            
             if (headerRowArrayList.contains("cellID") && headerRowArrayList.contains("n1cellID")) {
                 typeOfMeasurement = FILETYPE.NTHSERVER;
             }
+            
             headerRowWithoutCoordinates = Arrays.copyOfRange(headerRow, 2, headerRow.length);
             bufferedWriter.write(String.join(",", headerRowWithoutCoordinates));
             bufferedWriter.newLine();
             checkFileBufferedWriter.write(String.join(",", headerRow));
             checkFileBufferedWriter.newLine();
+            
             if (nthRow == 0) {
                 nthRow = 1;
             }
+            
             for (int rowCounter = 1; rowCounter < csvData.size(); rowCounter++) {
                 if (rowCounter % nthRow == 0) {
                     row = csvData.get(rowCounter).trim().split(",");
                     randomValue = generateRandomValue(range);
+                    
                     if (typeOfMeasurement == FILETYPE.BESTSERVER) {
                         signalStrength = Integer.parseInt(row[3]);
                         signalStrength = signalStrength + randomValue;
@@ -223,6 +233,7 @@ public class Tools {
                             row[rowElement] = Integer.toString(signalStrength);
                         }
                     }
+                    
                     if (row.length > 2) {
                         rowToWrite = String.join(",", row);
                         checkFileBufferedWriter.write(rowToWrite);
@@ -254,8 +265,8 @@ public class Tools {
         return resultFiles;
     }
     
-    public static Hashtable<String, Double> getMeanValueOfCoordinates(Rengine rEngine, List<String> latitudeCoordinates, List<String> longitudeCoordinates) {
-        Hashtable<String, Double> coordinates = new Hashtable<String, Double>();
+    public static HashMap<String, Double> getMeanValueOfCoordinates(Rengine rEngine, ArrayList<String> latitudeCoordinates, ArrayList<String> longitudeCoordinates) {
+        HashMap<String, Double> coordinates = new HashMap<String, Double>();
         double latitudeCoordinate = 0;
         double longitudeCoordinate = 0;
         String arrLatitudeVector[] = null;

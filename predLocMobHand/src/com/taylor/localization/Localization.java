@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.rosuda.JRI.Rengine;
 
@@ -43,8 +43,8 @@ public class Localization {
         this.measurementFile = measurementFile;
     }
 
-    private Hashtable<String, ArrayList<String>> createDatabase() {
-        Hashtable<String, ArrayList<String>> database = null;
+    private HashMap<String, ArrayList<String>> createDatabase() {
+        HashMap<String, ArrayList<String>> database = null;
         ArrayList<String> data = null;
         int simulationDataHeaderElementCounter = 0;
         String[] simulationDataHeader = null;
@@ -53,7 +53,7 @@ public class Localization {
 
         if (!data.isEmpty()) {
             simulationDataHeader = data.get(0).trim().split(",");
-            database = new Hashtable<String, ArrayList<String>>();
+            database = new HashMap<String, ArrayList<String>>();
             
             for (int headerElement = 0; headerElement < simulationDataHeader.length; headerElement++) {
                 database.put(simulationDataHeader[headerElement], new ArrayList<String>());
@@ -64,10 +64,8 @@ public class Localization {
                 simulationDataHeaderElementCounter = 0;
                 
                 for (String simulationDataHeaderElement : simulationDataHeader) {
-                    
                     if (simulationDataHeaderElementCounter < splittedSimulationDataRow.length) {
-                        database.get(simulationDataHeaderElement).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);
-                        
+                        database.get(simulationDataHeaderElement).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);    
                     } else {
                         database.get(simulationDataHeaderElement).add("0");
                     }
@@ -80,16 +78,18 @@ public class Localization {
         return database;
     }
     
-    private Hashtable<String, ArrayList<String>> createDatabaseFromSelection(String indexListName, List<Integer> indexList, Hashtable<String, ArrayList<String>> srcDatabase) {
-        Hashtable<String, ArrayList<String>> databaseSubset = new Hashtable<String, ArrayList<String>>();
+    private HashMap<String, ArrayList<String>> createDatabaseFromSelection(String indexListName, ArrayList<Integer> indexList, HashMap<String, ArrayList<String>> srcDatabase) {
+        HashMap<String, ArrayList<String>> databaseSubset = new HashMap<String, ArrayList<String>>();
         String elementName = null;
         String srcElement = null;
-        Enumeration<String> keys;
+        Set<String> hashmapKeySet= null;
+        Iterator<String> hashmapKeys = null;
         
-        keys = srcDatabase.keys();
+        hashmapKeySet = srcDatabase.keySet();
+        hashmapKeys = hashmapKeySet.iterator();
         
-        while (keys.hasMoreElements()) {
-            elementName = keys.nextElement();
+        while (hashmapKeys.hasNext()) {
+            elementName = hashmapKeys.next();
             databaseSubset.put(elementName, new ArrayList<String>());
             
             for (int index : indexList) {
@@ -101,18 +101,18 @@ public class Localization {
         return databaseSubset;
     }
     
-    private List<Integer> getIndexListForNewDatabase(String[] elementNameAndElement, Hashtable<String, ArrayList<String>> database){
-        List<Integer> indexListOfElement = new ArrayList<Integer>();
+    private ArrayList<Integer> getIndexListForNewDatabase(String[] elementNameAndElement, HashMap<String, ArrayList<String>> database){
+        ArrayList<String> dataset = null;
+        ArrayList<Integer> indexListOfElement = null;
         String elementName = null;
         String element = null;
-        ArrayList<String> dataset = null;
         
+        indexListOfElement = new ArrayList<Integer>();
         elementName = elementNameAndElement[0];
         element = elementNameAndElement[1];
         dataset = database.get(elementName);
                 
         for (int datasetElementCounter = 0; datasetElementCounter < dataset.size(); datasetElementCounter++) {
-            
             if (element.equals(dataset.get(datasetElementCounter))) {
                 indexListOfElement.add(datasetElementCounter);
             }
@@ -121,16 +121,16 @@ public class Localization {
         return indexListOfElement; 
     }
     
-    private List<Integer> assembleSideValues(int inRange, ArrayList<String> srcDataset) {
-        List<Integer> sideValueList = new ArrayList<Integer>();
+    private ArrayList<Integer> assembleSideValues(int inRange, ArrayList<String> srcDataset) {
+        ArrayList<Integer> sideValueList = null;
         int startIndex = 0;
         int endIndex = 0;
         
+        sideValueList = new ArrayList<Integer>();
         startIndex = srcDataset.indexOf(Integer.toString(inRange));
         endIndex = srcDataset.lastIndexOf(Integer.toString(inRange));
         
         for (int index = startIndex; index <= endIndex; index++ ) {
-            
             if (inRange == Integer.parseInt(srcDataset.get(index))) {
                 sideValueList.add(index);
             }
@@ -139,18 +139,25 @@ public class Localization {
         return sideValueList;
     }
     
-    private List<Integer> checkSideValues(String[] elementNameAndElement, Hashtable<String, ArrayList<String>> database) {
-        List<Integer> indexListOfElements = new ArrayList<Integer>();
-        List<Integer> positiveSideIndexList = new ArrayList<Integer>();
-        List<Integer> negativeSideIndexList = new ArrayList<Integer>();
-        String elementName = elementNameAndElement[0];
-        int element = Integer.parseInt(elementNameAndElement[1]);
-        ArrayList<String> dataset = database.get(elementName);
+    private ArrayList<Integer> checkSideValues(String[] elementNameAndElement, HashMap<String, ArrayList<String>> database) {
+        ArrayList<Integer> indexListOfElements = null;
+        ArrayList<Integer> positiveSideIndexList = null;
+        ArrayList<Integer> negativeSideIndexList = null;
+        ArrayList<String> dataset = null;
         boolean isValueFound = false;
         int checkRange = 10;
         int range = 1;
         int positiveRangeNumber = 0;
         int negativeRangeNumber = 0;
+        int element = 0;
+        String elementName = null;
+        
+        element = Integer.parseInt(elementNameAndElement[1]);
+        elementName = elementNameAndElement[0];
+        indexListOfElements = new ArrayList<Integer>();
+        positiveSideIndexList = new ArrayList<Integer>();
+        negativeSideIndexList = new ArrayList<Integer>();
+        dataset = database.get(elementName);
         
         while (isValueFound == false && range <= checkRange) {
             positiveRangeNumber = element + range;
@@ -184,25 +191,34 @@ public class Localization {
         return indexListOfElements;
     }
     
-    private void getLocationFromDatabase(Hashtable<String, ArrayList<String>> database, File resultFile) {
+    private void getLocationFromDatabase(HashMap<String, ArrayList<String>> database, File resultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
-        Hashtable<String, ArrayList<String>> transitionalDatabase = null; 
-        Hashtable<String, ArrayList<String>> savedDatabase = null;
-        Hashtable<String, Double> coordinates = new Hashtable<String, Double>();
-        List<Integer> indexListOfElements = new ArrayList<Integer>();
-        List<String> lstLatitude = new ArrayList<String>();
-        List<String> lstLongitude = new ArrayList<String>();
-        ArrayList<String> measurement = Tools.readFileToMemory(measurementFile);
-        String[] elementNameAndElement = new String[2];
+        HashMap<String, ArrayList<String>> transitionalDatabase = null; 
+        HashMap<String, ArrayList<String>> savedDatabase = null;
+        HashMap<String, Double> coordinates = null;
+        ArrayList<Integer> indexListOfElements = null;
+        ArrayList<String> lstLatitude = null;
+        ArrayList<String> lstLongitude = null;
+        ArrayList<String> measurement = null;
+        String[] elementNameAndElement = null;
         String[] splittedMeasurementRow = null;
-        String[] measurementDataHeader = measurement.get(0).split(",");
+        String[] measurementDataHeader = null;
         String elementName = null;
         String rowToWrite = null;
         String pointLatitude = null;
         String pointLongitude = null;
         String resultFileHeader = null;
-        int measurementDataHeaderElementCounter;
+        int measurementDataHeaderElementCounter = 0;
+        Rengine rEngine = null;
+        
+        coordinates = new HashMap<String, Double>();
+        indexListOfElements = new ArrayList<Integer>();
+        lstLatitude = new ArrayList<String>();
+        lstLongitude = new ArrayList<String>();
+        measurement = Tools.readFileToMemory(measurementFile);
+        elementNameAndElement = new String[2];
+        measurementDataHeader = measurement.get(0).split(",");
         
         Tools.createFile(resultFile);
 
@@ -214,7 +230,7 @@ public class Localization {
             bufferedWriter.write(resultFileHeader);
             bufferedWriter.newLine();
             
-            Rengine rEngine = new Rengine(new String[] { "--no-save" }, false, null);
+            rEngine = new Rengine(new String[] { "--no-save" }, false, null);
             
             for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
                 transitionalDatabase = database;
@@ -276,7 +292,7 @@ public class Localization {
     @SuppressWarnings("unused")
     public static void main(String[] args) {
         
-        //hashmap-hashtable atirasokat megcsinlani
+        //hashmap-HashMap atirasokat megcsinlani
         
         String GIT_DIRECTORY = System.getenv("GIT_DIRECTORY") + "\\";
         String MEASUREMENT_DATA = "diploma_work\\test_dir\\measurement_data\\";
@@ -345,7 +361,7 @@ public class Localization {
         
         //Localization newLocaction = new Localization(veresegyh_5m_G900_nthserver_csv, gmon_gsm_veresegyhaz_1_csv);
         
-        //Hashtable<String, ArrayList<String>> database = newLocaction.createDatabase();
+        //HashMap<String, ArrayList<String>> database = newLocaction.createDatabase();
         //newLocaction.getLocationFromDatabase(database, localization_results);
         
         //LocalizationAnalysis.calculateErrorDistance(localization_results, checkFile_veresegyhaz_2_gmon_gsm_created, localization_error_results);

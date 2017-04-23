@@ -5,9 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-
+import java.util.HashMap;
 import com.taylor.tools.Tools;
 import com.taylor.tools.Tools.COORDINATES;
 
@@ -39,8 +37,8 @@ public class LocalizationAnalysis {
     public static void calculateErrorDistance(File resultFile, File controlFile, File errorFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
-        Hashtable<String, Double> resultCoordinates = null;
-        Hashtable<String, Double> controlCoordinates = null;
+        HashMap<String, Double> resultCoordinates = null;
+        HashMap<String, Double> controlCoordinates = null;
         ArrayList<String> results = null;
         ArrayList<String> control = null;
         String[] resultLine = null;
@@ -57,8 +55,8 @@ public class LocalizationAnalysis {
         Tools.createFile(errorFile);
         errorFileHeader = "point,error,ORIG:" + COORDINATES.LATITUDE.toString() + ",ORIG:" + COORDINATES.LONGITUDE.toString()
                 + ",DCM:" + COORDINATES.LATITUDE.toString() + ",DCM:" + COORDINATES.LONGITUDE.toString();
-        resultCoordinates = new Hashtable<String, Double>();
-        controlCoordinates = new Hashtable<String, Double>();
+        resultCoordinates = new HashMap<String, Double>();
+        controlCoordinates = new HashMap<String, Double>();
         results = new ArrayList<String>();
         control = new ArrayList<String>();
         
@@ -107,11 +105,11 @@ public class LocalizationAnalysis {
     
     public static double calculateCERP(int percent, File resultFile) {
         ArrayList<String> results = null;
-        List<Double> errorDistances = null;
-        String[] resultRow = null;
-        double cerpValue = 0;
+        ArrayList<Double> errorDistances = null;
         int nthElement = 0;
         double errorDistance = 0;
+        double cerpValue = 0;
+        String[] resultRow = null;
         
         results = new ArrayList<String>();
         errorDistances = new ArrayList<Double>();

@@ -7,9 +7,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-
 import com.taylor.tools.*;
 import com.taylor.tools.Tools.FILETYPE;
 
@@ -225,10 +222,10 @@ public class ConvertDatFile {
     private void convertRawData() {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
-        Hashtable<String, Object> mapData = null;
+        HashMap<String, Object> mapData = null;
         ArrayList<String> rawData = null;
         ArrayList<String> arrToCsvFile = null;
-        List<String> dataPair = null;
+        ArrayList<String> dataPair = null;
         int dataRowNumFromRawData = 3;
         int hd72EovYcoordinate = 0;
         int hd72EovXcoordinate = 0;
@@ -238,7 +235,7 @@ public class ConvertDatFile {
         String[] processedRow = null;
         String[] hexCharBuffer = null;
         
-        mapData = new Hashtable<String, Object>();
+        mapData = new HashMap<String, Object>();
         rawData = new ArrayList<String>();
         arrToCsvFile = new ArrayList<String>();
         hexCharBuffer = new String[10];
@@ -322,15 +319,15 @@ public class ConvertDatFile {
         }        
     }
     
-    private List<String> getDataFromRow(String[] row) {
-        Hashtable <String, Integer> cellData =  null;
-        List<String> dataPair = null;
+    private ArrayList<String> getDataFromRow(String[] row) {
+        HashMap <String, Integer> cellData =  null;
+        ArrayList<String> dataPair = null;
         int cellId = 0;
         int signalStrength = 0;
         String cellName = null;
         
         dataPair = new ArrayList<String>();
-        cellData = new Hashtable <String, Integer>();
+        cellData = new HashMap <String, Integer>();
         
         cellData = getCellData(row);
         cellId = cellData.get("cellID");
@@ -349,14 +346,14 @@ public class ConvertDatFile {
         
     }
     
-    private Hashtable<String,Integer> getCellData(String[] processedCell){
-        Hashtable<String, Integer> cellData = null;
+    private HashMap<String,Integer> getCellData(String[] processedCell){
+        HashMap<String, Integer> cellData = null;
         int cellID = 0;
         int signalStrength = 0;
         String[] hexCellID = null;
         String[] hexSignalStrength = null;
         
-        cellData = new Hashtable<String, Integer>();
+        cellData = new HashMap<String, Integer>();
         
         hexCellID = Arrays.copyOfRange(processedCell, 0, 4);
         hexSignalStrength = Arrays.copyOfRange(processedCell, 8, 10);

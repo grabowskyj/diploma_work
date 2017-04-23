@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,12 +82,14 @@ public class ConvertMeasurementFile {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         ArrayList<String> data = null;
-        String headerRowToCsv = "latitude,longitude,cellID,signalStrength,"
+        String headerRowToCsv = null;
+        String dataRowToCsv = null;
+        String[] dataRow = null;
+        
+        headerRowToCsv = "latitude,longitude,cellID,signalStrength,"
                 + "n1cellID,n1signalStrength,n2cellID,n2signalStrength,"
                 + "n3cellID,n3signalStrength,n4cellID,n4signalStrength,"
                 + "n5cellID,n5signalStrength,n6cellID,n6signalStrength";
-        String dataRowToCsv = null;
-        String[] dataRow = null;
         data = Tools.readFileToMemory(getSrcFile());
         
         try {
@@ -101,6 +102,7 @@ public class ConvertMeasurementFile {
             for (int rowCounter = 1; rowCounter < data.size(); rowCounter++ ) {
                 dataRow = data.get(rowCounter).trim().split(";");
                 dataRowToCsv = prepareArrayForWrite(dataRow);
+                
                 if (!dataRowToCsv.contains("NaN")) {
                     bufferedWriter.write(dataRowToCsv);
                     bufferedWriter.newLine();
@@ -124,13 +126,13 @@ public class ConvertMeasurementFile {
     }
     
     private String prepareArrayForWrite(String[] array) {
-        Hashtable<String, Double> coordinates = null;
+        HashMap<String, Double> coordinates = null;
         HashMap<String, Integer> cellData = null;
-        HashMap<String, Integer> sortedHashtable = null;
+        HashMap<String, Integer> sortedHashMap = null;
         Set<Entry<String, Integer>> entries = null;
-        List<String> arrToCsvFile = null;
-        List<String> listOfCellIds = null;
-        List<Integer> listOfSignalStrengths = null;
+        ArrayList<String> arrToCsvFile = null;
+        ArrayList<String> listOfCellIds = null;
+        ArrayList<Integer> listOfSignalStrengths = null;
         boolean isCellNameUnrecognizable = false;
         boolean isCellNameAlreadyAdded = false;
         int[] neededCellOfArray = null;
@@ -185,8 +187,8 @@ public class ConvertMeasurementFile {
             cellData.put(listOfCellIds.get(cellIdCounter), listOfSignalStrengths.get(cellIdCounter));
         }
         
-        sortedHashtable = sortHashtableByValue(cellData);
-        entries = sortedHashtable.entrySet();
+        sortedHashMap = sortHashMapByValue(cellData);
+        entries = sortedHashMap.entrySet();
         
         for (Entry<String, Integer> entry : entries) {
             arrToCsvFile.add(entry.getKey());
@@ -200,12 +202,14 @@ public class ConvertMeasurementFile {
         return rowToWrite;
     }
     
-    private HashMap<String, Integer> sortHashtableByValue(HashMap<String,Integer> cellData) {
+    private HashMap<String, Integer> sortHashMapByValue(HashMap<String,Integer> cellData) {
         HashMap<String, Integer> sortedMap = null;
+        Set<Entry<String, Integer>> hashmapEntrySet = null;
         List<Entry<String, Integer>> entries = null;
-        
+                
         sortedMap = new LinkedHashMap<String, Integer>();
-        entries = new LinkedList<>(cellData.entrySet());
+        hashmapEntrySet = cellData.entrySet();
+        entries = new LinkedList<>(hashmapEntrySet);
         
         Collections.sort(entries, new Comparator<Entry<String, Integer>>() {
             @Override
