@@ -4,9 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.rosuda.JRI.Rengine;
@@ -191,7 +193,7 @@ public class Localization {
         return indexListOfElements;
     }
     
-    private void getLocationFromDatabase(HashMap<String, ArrayList<String>> database, File resultFile) {
+    private void getLocationFromDatabaseV1(HashMap<String, ArrayList<String>> database, File resultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         HashMap<String, ArrayList<String>> transitionalDatabase = null; 
@@ -277,7 +279,6 @@ public class Localization {
             e.printStackTrace();
             
         } finally {
-            
             try {
                 bufferedWriter.close();
                 fileWriter.close();
@@ -288,11 +289,132 @@ public class Localization {
             }
         }
     }
+    
+    private ArrayList<String> getCellNamesFromList(ArrayList<String> entryList) {
+        ArrayList<String> cellIdList = null;
+        
+        cellIdList = new ArrayList<String>();
+        
+        for (int entryElementCounter = 0; entryElementCounter < entryList.size(); entryElementCounter = entryElementCounter + 2) {
+            cellIdList.add(entryList.get(entryElementCounter));
+        }
+        
+        return cellIdList;
+    }
+    
+    private ArrayList<String> getSignalStrengthsFromList(ArrayList<String> entryList) {
+        ArrayList<String> signalStrengthList = null;
+        
+        signalStrengthList = new ArrayList<String>();
+        
+        for (int entryElementCounter = 1; entryElementCounter < entryList.size(); entryElementCounter = entryElementCounter + 2) {
+            signalStrengthList.add(entryList.get(entryElementCounter));
+        }
+        
+        return signalStrengthList;
+    }
+    
+    private void checkMeasurementPointInDatabase(String[] databaseEntry, String[] measurementPoint) {
+        ArrayList<String> arrLstDatabaseEntry = null;
+        ArrayList<String> arrLstMeasurementPoint = null;
+        ArrayList<String> measurementCellNameList = null;
+        ArrayList<String> meausrementSignalStrengthList = null;
+        ArrayList<String> databaseCellNameList = null;
+        ArrayList<String> databaseSignalStrengthList = null;
+        List<String> lstDatabaseEntry = null;
+        List<String> lstMeasurementPoint = null;
+        
+        
+        arrLstDatabaseEntry = new ArrayList<String>();
+        arrLstMeasurementPoint = new ArrayList<String>();
+        lstDatabaseEntry = Arrays.asList(databaseEntry);
+        lstMeasurementPoint = Arrays.asList(measurementPoint);
+        arrLstDatabaseEntry.addAll(lstDatabaseEntry);
+        arrLstMeasurementPoint.addAll(lstMeasurementPoint);
+        databaseCellNameList = getCellNamesFromList(arrLstDatabaseEntry);
+        databaseSignalStrengthList = getSignalStrengthsFromList(arrLstDatabaseEntry);
+        measurementCellNameList = getCellNamesFromList(arrLstMeasurementPoint);
+        meausrementSignalStrengthList = getSignalStrengthsFromList(arrLstMeasurementPoint);
+        //kov lepes: az egyikben nem letezo cellnameket hozzaadom a masikhoz (majd forditva ugyanezr) ugy, hogy a jelerosseges listaban az uj cellNamekhez a legrosszabb jelerosseget, -140dbM et rakom
+        //de meg atgondolni, hogy ez igy jo lesz eS
+        
+        
+        
+        
+    }
+    
+    private void getLocationFromDatabaseV2(File resultFile) {
+        FileWriter fileWriter = null;
+        BufferedWriter bufferedWriter = null;
+        HashMap<String, Double> coordinates = null;
+        ArrayList<String> lstLatitude = null;
+        ArrayList<String> lstLongitude = null;
+        ArrayList<String> measurement = null;
+        ArrayList<String> database = null;
+        String[] measurementPoint = null;
+        String[] databaseEntry = null;
+        String pointLatitude = null;
+        String pointLongitude = null;
+        String resultFileHeader = null;
+        String rowToWrite = null;
+        Rengine rEngine = null;
+        
+        coordinates = new HashMap<String, Double>();
+        lstLatitude = new ArrayList<String>();
+        lstLongitude = new ArrayList<String>();
+        measurement = Tools.readFileToMemory(measurementFile);
+        database = Tools.readFileToMemory(databaseFile);
+        
+        try {
+            fileWriter = new FileWriter(resultFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            
+            resultFileHeader = "point," + COORDINATES.LATITUDE.toString() + "," + COORDINATES.LONGITUDE.toString();
+            bufferedWriter.write(resultFileHeader);
+            bufferedWriter.newLine();
+            
+            rEngine = new Rengine(new String[] { "--no-save" }, false, null);
+            
+            for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
+                measurementPoint = measurement.get(measurementDataRowCounter).split(",");
+                
+                
+                for (int databaseDataRowCounter = 1; databaseDataRowCounter < database.size(); databaseDataRowCounter++) {
+                    databaseEntry = database.get(databaseDataRowCounter).split(",");
+                    
+                }
 
+                
+                
+                
+                coordinates = Tools.getMeanValueOfCoordinates(rEngine, lstLatitude, lstLongitude);
+                pointLatitude = Double.toString(coordinates.get(COORDINATES.LATITUDE.toString()));
+                pointLongitude = Double.toString(coordinates.get(COORDINATES.LONGITUDE.toString()));
+                rowToWrite = "Point" + measurementDataRowCounter + "," + pointLatitude + "," + pointLongitude;
+                bufferedWriter.write(rowToWrite);
+                bufferedWriter.newLine();
+                coordinates.clear();
+            }
+            
+            rEngine.end();
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+            
+        } finally {
+            try {
+                bufferedWriter.close();
+                fileWriter.close();
+                
+            } catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
+        }
+    }
+    
     @SuppressWarnings("unused")
     public static void main(String[] args) {
-        
-        //hashmap-HashMap atirasokat megcsinlani
         
         String GIT_DIRECTORY = System.getenv("GIT_DIRECTORY") + "\\";
         String MEASUREMENT_DATA = "diploma_work\\test_dir\\measurement_data\\";
@@ -356,17 +478,17 @@ public class Localization {
         //Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
         //Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);
         
-        Tools.decoordinateMeasurementFile(gmon_gsm_veresegyhaz_1_csv, veresegyhaz_1_gmon_gsm_created, checkFile_veresegyhaz_1_gmon_gsm_created);
+        Tools.decoordinateMeasurementFile(gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created);
         
         File localization_results = new File (GIT_DIRECTORY + RESULTS + "localization_results.csv");
         File localization_error_results = new File(GIT_DIRECTORY + RESULTS + "localization_error_results.csv");
         
-        Localization newLocaction = new Localization(gmon_gsm_veresegyhaz_1_csv, veresegyhaz_1_gmon_gsm_created);
+        Localization newLocaction = new Localization(gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created);
         
         HashMap<String, ArrayList<String>> database = newLocaction.createDatabase();
-        newLocaction.getLocationFromDatabase(database, localization_results);
+        newLocaction.getLocationFromDatabaseV1(database, localization_results);
         
-        LocalizationAnalysis.calculateErrorDistance(localization_results, checkFile_veresegyhaz_1_gmon_gsm_created, localization_error_results);
+        LocalizationAnalysis.calculateErrorDistance(localization_results, checkFile_veresegyhaz_2_gmon_gsm_created, localization_error_results);
         
         System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
         System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));

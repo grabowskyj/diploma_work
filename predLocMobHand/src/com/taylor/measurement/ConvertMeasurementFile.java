@@ -129,7 +129,7 @@ public class ConvertMeasurementFile {
         HashMap<String, Integer> cellData = null;
         HashMap<String, Integer> sortedHashMap = null;
         Set<Entry<String, Integer>> entries = null;
-        ArrayList<String> arrToCsvFile = null;
+        ArrayList<String> arrLstToCsvFile = null;
         ArrayList<String> listOfCellIds = null;
         ArrayList<Integer> listOfSignalStrengths = null;
         boolean isCellNameUnrecognizable = false;
@@ -143,15 +143,15 @@ public class ConvertMeasurementFile {
         String cellName = null;
         
         cellData = new HashMap<String, Integer>();
-        arrToCsvFile = new ArrayList<String>();
+        arrLstToCsvFile = new ArrayList<String>();
         listOfCellIds = new ArrayList<String>();
         listOfSignalStrengths = new ArrayList<Integer>();
         neededCellOfArray = new int[]{1,6,19,21,22,24,25,27,28,30,31,33,34,36};
         coordinates = Tools.wgs84ToHd72Eov(Double.parseDouble(array[12]), Double.parseDouble(array[13]));
         latitude = Double.toString((double) coordinates.get(COORDINATES.LATITUDE.toString()));
         longitude = Double.toString((double) coordinates.get(COORDINATES.LONGITUDE.toString()));
-        arrToCsvFile.add(latitude);
-        arrToCsvFile.add(longitude);
+        arrLstToCsvFile.add(latitude);
+        arrLstToCsvFile.add(longitude);
         
         for (int cellNum : neededCellOfArray) {  
             if (cellNum <= (array.length - 1)) {
@@ -190,12 +190,12 @@ public class ConvertMeasurementFile {
         entries = sortedHashMap.entrySet();
         
         for (Entry<String, Integer> entry : entries) {
-            arrToCsvFile.add(entry.getKey());
-            arrToCsvFile.add(Integer.toString(entry.getValue()));
+            arrLstToCsvFile.add(entry.getKey());
+            arrLstToCsvFile.add(Integer.toString(entry.getValue()));
         }
 
-        filledArray = new String[arrToCsvFile.size()];
-        filledArray = arrToCsvFile.toArray(filledArray);        
+        filledArray = new String[arrLstToCsvFile.size()];
+        filledArray = arrLstToCsvFile.toArray(filledArray);        
         rowToWrite = String.join(",", filledArray);
         
         return rowToWrite;
