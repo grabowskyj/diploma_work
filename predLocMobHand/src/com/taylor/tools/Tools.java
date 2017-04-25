@@ -8,8 +8,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.gdal.osr.*;
 import org.rosuda.JRI.Rengine;
@@ -268,7 +275,7 @@ public class Tools {
     public static File[] decoordinateMeasurementFile(File inputFile, File outputFile, File checkFile) {
         File[] outputFiles = null;
         
-        outputFiles = createTestMeasurementFile(0, inputFile, outputFile, checkFile, 0);
+        outputFiles = createTestMeasurementFile(1, inputFile, outputFile, checkFile, 0);
                 
         return outputFiles;
     }
@@ -304,5 +311,31 @@ public class Tools {
         coordinates.put(COORDINATES.LONGITUDE.toString(), longitudeCoordinate);
         
         return coordinates;
+    }
+    
+    public static HashMap<String, Integer> sortHashMapByValue(HashMap<String,Integer> cellData) {
+        HashMap<String, Integer> sortedMap = null;
+        Set<Entry<String, Integer>> hashmapEntrySet = null;
+        List<Entry<String, Integer>> entries = null;
+                
+        sortedMap = new LinkedHashMap<String, Integer>();
+        hashmapEntrySet = cellData.entrySet();
+        entries = new LinkedList<>(hashmapEntrySet);
+        
+        Collections.sort(entries, new Comparator<Entry<String, Integer>>() {
+            @Override
+            public int compare(Entry<String, Integer> entry1, Entry<String, Integer> entry2) {
+                int result = entry2.getValue().compareTo(entry1.getValue());
+                
+                return result;
+            }
+        
+        });
+        
+        for (Entry<String, Integer> entry : entries) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        
+        return sortedMap;
     }
 }

@@ -34,7 +34,7 @@ public class LocalizationAnalysis {
         return distance;
     }
     
-    public static void calculateErrorDistance(File resultFile, File controlFile, File errorFile) {
+    public static void calculateDistanceError(File resultFile, File controlFile, File errorFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         HashMap<String, Double> resultCoordinates = null;

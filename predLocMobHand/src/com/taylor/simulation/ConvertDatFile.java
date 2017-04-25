@@ -65,9 +65,9 @@ public class ConvertDatFile {
             put("918268067", "veresegyd_9002");
             put("918268151", "veresegyd_9003");
             put("917963201", "Vegyhcity_9003");
-            put("918263566", "Szada_9002");
-            put("918263498", "Szada_9004");
-            put("918263635", "hungring_9001");
+            put("918263566", "Szada_9004");
+            put("918263498", "Szada_9003");
+            put("918263635", "Szada_9002");
         }
     };
     

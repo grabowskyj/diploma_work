@@ -23,7 +23,8 @@ public class Localization {
     
     private File databaseFile;
     private File measurementFile;
-
+    private static enum DATATYPE {CELLNAME, SIGNALSTRENGTH};
+    
     public Localization(File databaseFile, File measurementFile) {
         this.setdatabaseFile(databaseFile);
         this.setMeasurementFile(measurementFile);
@@ -45,13 +46,13 @@ public class Localization {
         this.measurementFile = measurementFile;
     }
 
-    private HashMap<String, ArrayList<String>> createDatabase() {
+    private HashMap<String, ArrayList<String>> createDatabaseForVerticalSearch() {
         HashMap<String, ArrayList<String>> database = null;
         ArrayList<String> data = null;
         int simulationDataHeaderElementCounter = 0;
         String[] simulationDataHeader = null;
         
-        data = Tools.readFileToMemory(databaseFile);
+        data = Tools.readFileToMemory(getdatabaseFile());
 
         if (!data.isEmpty()) {
             simulationDataHeader = data.get(0).trim().split(",");
@@ -218,7 +219,7 @@ public class Localization {
         indexListOfElements = new ArrayList<Integer>();
         lstLatitude = new ArrayList<String>();
         lstLongitude = new ArrayList<String>();
-        measurement = Tools.readFileToMemory(measurementFile);
+        measurement = Tools.readFileToMemory(getMeasurementFile());
         elementNameAndElement = new String[2];
         measurementDataHeader = measurement.get(0).split(",");
         
@@ -290,53 +291,105 @@ public class Localization {
         }
     }
     
-    private ArrayList<String> getCellNamesFromList(ArrayList<String> entryList) {
-        ArrayList<String> cellIdList = null;
+    private ArrayList<String> getValuesFromList(DATATYPE data, ArrayList<String> entryList) {
+        ArrayList<String> result = null;
+        int startPoint = 0;
         
-        cellIdList = new ArrayList<String>();
+        result = new ArrayList<String>();
         
-        for (int entryElementCounter = 0; entryElementCounter < entryList.size(); entryElementCounter = entryElementCounter + 2) {
-            cellIdList.add(entryList.get(entryElementCounter));
+        if (data == DATATYPE.CELLNAME) {
+            startPoint = 2;
+        } else if (data == DATATYPE.SIGNALSTRENGTH) {
+            startPoint = 3;
         }
         
-        return cellIdList;
+        for (int entryElementCounter = startPoint; entryElementCounter < entryList.size(); entryElementCounter = entryElementCounter + 2) {
+            result.add(entryList.get(entryElementCounter));
+        }
+        
+        return result;
     }
     
-    private ArrayList<String> getSignalStrengthsFromList(ArrayList<String> entryList) {
-        ArrayList<String> signalStrengthList = null;
+    private ArrayList<ArrayList<String>> extendValueListsWithPenalties(ArrayList<String> srcCellNames, ArrayList<String> srcSignalStrengths, ArrayList<String> destCellNames, ArrayList<String> destSignalStrengths) {
+        ArrayList<ArrayList<String>> result = null;
+        ArrayList<String> resultCellNames = null;
+        ArrayList<String> resultSignalStrengths = null;
+        int extremlyLowSignalStrength = -140;
         
-        signalStrengthList = new ArrayList<String>();
-        
-        for (int entryElementCounter = 1; entryElementCounter < entryList.size(); entryElementCounter = entryElementCounter + 2) {
-            signalStrengthList.add(entryList.get(entryElementCounter));
+        result = new ArrayList<ArrayList<String>>();
+        resultCellNames = destCellNames;
+        resultSignalStrengths = destSignalStrengths;
+                
+        for (String cellName: srcCellNames) {
+            if (!resultCellNames.contains(cellName)) {
+                resultCellNames.add(cellName);
+                resultSignalStrengths.add(Integer.toString(extremlyLowSignalStrength));
+            }
         }
         
-        return signalStrengthList;
+        result.add(resultCellNames);
+        result.add(resultSignalStrengths);
+        
+        return result;
+    }
+    
+    private HashMap<String, Integer> createDatabaseForHorizontalSearch(ArrayList<ArrayList<String>> srcData) {
+        HashMap<String, Integer> result = null;
+        ArrayList<String> cellNames = null;
+        ArrayList<Integer> signalStrengths = null;
+        
+        result = new HashMap<String, Integer>();
+        cellNames = srcData.get(0);
+        signalStrengths = new ArrayList<Integer>();
+                
+        for (String signalStrength : srcData.get(1)) {
+            signalStrengths.add(Integer.parseInt(signalStrength));
+        }
+        
+        for (int elementCounter = 0; elementCounter < cellNames.size(); elementCounter++) {
+            result.put(cellNames.get(elementCounter), signalStrengths.get(elementCounter));
+        }
+        
+        return result;
     }
     
     private void checkMeasurementPointInDatabase(String[] databaseEntry, String[] measurementPoint) {
+        HashMap<String, Integer> databaseMap = null;
+        HashMap<String, Integer> measurementMap = null;
         ArrayList<String> arrLstDatabaseEntry = null;
         ArrayList<String> arrLstMeasurementPoint = null;
-        ArrayList<String> measurementCellNameList = null;
-        ArrayList<String> meausrementSignalStrengthList = null;
         ArrayList<String> databaseCellNameList = null;
         ArrayList<String> databaseSignalStrengthList = null;
+        ArrayList<String> measurementCellNameList = null;
+        ArrayList<String> meausrementSignalStrengthList = null;
+        ArrayList<ArrayList<String>> penaltyExtendedDatabaseEntry = null;
+        ArrayList<ArrayList<String>> penaltyExtendedMeasurementPoint = null;
         List<String> lstDatabaseEntry = null;
         List<String> lstMeasurementPoint = null;
         
-        
+        databaseMap = new HashMap<String, Integer>();
+        measurementMap = new HashMap<String, Integer>();
         arrLstDatabaseEntry = new ArrayList<String>();
         arrLstMeasurementPoint = new ArrayList<String>();
-        lstDatabaseEntry = Arrays.asList(databaseEntry);
-        lstMeasurementPoint = Arrays.asList(measurementPoint);
-        arrLstDatabaseEntry.addAll(lstDatabaseEntry);
-        arrLstMeasurementPoint.addAll(lstMeasurementPoint);
-        databaseCellNameList = getCellNamesFromList(arrLstDatabaseEntry);
-        databaseSignalStrengthList = getSignalStrengthsFromList(arrLstDatabaseEntry);
-        measurementCellNameList = getCellNamesFromList(arrLstMeasurementPoint);
-        meausrementSignalStrengthList = getSignalStrengthsFromList(arrLstMeasurementPoint);
-        //kov lepes: az egyikben nem letezo cellnameket hozzaadom a masikhoz (majd forditva ugyanezr) ugy, hogy a jelerosseges listaban az uj cellNamekhez a legrosszabb jelerosseget, -140dbM et rakom
-        //de meg atgondolni, hogy ez igy jo lesz eS
+        lstDatabaseEntry = Arrays.asList(databaseEntry); //tenyleg szukseg van a ket listara? arraylistre es sima listra?
+        lstMeasurementPoint = Arrays.asList(measurementPoint); // igen, mert csak ez tud sima string[] listabol iteralhatot csinalni
+        arrLstDatabaseEntry.addAll(lstDatabaseEntry); // es igy viszont az arraylistek lesznek feleslegesek
+        arrLstMeasurementPoint.addAll(lstMeasurementPoint); //
+
+        databaseCellNameList = getValuesFromList(DATATYPE.CELLNAME, arrLstDatabaseEntry);
+        databaseSignalStrengthList = getValuesFromList(DATATYPE.SIGNALSTRENGTH, arrLstDatabaseEntry);
+        measurementCellNameList = getValuesFromList(DATATYPE.CELLNAME, arrLstMeasurementPoint); //itt valamiert 2 elemu lesz a tomb a harom helyett
+        meausrementSignalStrengthList = getValuesFromList(DATATYPE.SIGNALSTRENGTH, arrLstMeasurementPoint);
+        
+        penaltyExtendedDatabaseEntry = extendValueListsWithPenalties(databaseCellNameList, databaseSignalStrengthList, measurementCellNameList, meausrementSignalStrengthList);
+        penaltyExtendedMeasurementPoint = extendValueListsWithPenalties(measurementCellNameList, meausrementSignalStrengthList, databaseCellNameList, databaseSignalStrengthList);
+        
+        databaseMap = createDatabaseForHorizontalSearch(penaltyExtendedDatabaseEntry);
+        measurementMap = createDatabaseForHorizontalSearch(penaltyExtendedMeasurementPoint);
+        
+        System.out.println(measurementMap);
+        System.out.println(databaseMap);
+        
         
         
         
@@ -362,9 +415,9 @@ public class Localization {
         coordinates = new HashMap<String, Double>();
         lstLatitude = new ArrayList<String>();
         lstLongitude = new ArrayList<String>();
-        measurement = Tools.readFileToMemory(measurementFile);
-        database = Tools.readFileToMemory(databaseFile);
-        
+        measurement = Tools.readFileToMemory(getMeasurementFile());
+        database = Tools.readFileToMemory(getdatabaseFile());
+
         try {
             fileWriter = new FileWriter(resultFile);
             bufferedWriter = new BufferedWriter(fileWriter);
@@ -381,6 +434,12 @@ public class Localization {
                 
                 for (int databaseDataRowCounter = 1; databaseDataRowCounter < database.size(); databaseDataRowCounter++) {
                     databaseEntry = database.get(databaseDataRowCounter).split(",");
+                    
+                    checkMeasurementPointInDatabase(databaseEntry, measurementPoint);
+                    
+                    if (databaseDataRowCounter == 5) {
+                        System.exit(1);
+                    }
                     
                 }
 
@@ -433,16 +492,21 @@ public class Localization {
         File veresegyh_5m_G900_bestserver_dat = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "Veresegyh_5m_G900_v1_bestserver.dat");
         File veresegyh_5m_G900_bestserver_conv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Veresegyh_5m_G900_v1_bestserver.conv");
         File veresegyh_5m_G900_bestserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Veresegyh_5m_G900_v1_bestserver.csv");
+        File alle_5m_G900_nthserver_dat = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "Alle_5m_G900_nthserver.dat");
+        File alle_5m_G900_nthserver_conv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_G900_nthserver.conv");
+        File alle_5m_G900_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_G900_nthserver.csv");
                 
         /*ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserver_dat, veresegyhaz_bestserver_conv, veresegyhaz_bestserver_csv);
         ConvertDatFile veresegyhaz_nthserver = new ConvertDatFile(veresegyhaz_nthserver_dat, veresegyhaz_nthserver_conv, veresegyhaz_nthserver_csv);
         ConvertDatFile veresegyh_5m_G900_nthserver = new ConvertDatFile(veresegyh_5m_G900_nthserver_dat, veresegyh_5m_G900_nthserver_conv, veresegyh_5m_G900_nthserver_csv);
         ConvertDatFile veresegyh_5m_G900_bestserver = new ConvertDatFile(veresegyh_5m_G900_bestserver_dat, veresegyh_5m_G900_bestserver_conv, veresegyh_5m_G900_bestserver_csv);
+        ConvertDatFile alle_5m_G900_nthserver = new ConvertDatFile(alle_5m_G900_nthserver_dat, alle_5m_G900_nthserver_conv, alle_5m_G900_nthserver_csv);
         
         veresegyhaz_bestserver.convertDat2Csv();
         veresegyhaz_nthserver.convertDat2Csv();
         veresegyh_5m_G900_nthserver.convertDat2Csv();
-        veresegyh_5m_G900_bestserver.convertDat2Csv();*/
+        veresegyh_5m_G900_bestserver.convertDat2Csv();
+        alle_5m_G900_nthserver.convertDat2Csv();*/
         
         File gmon_gsm_veresegyhaz_1_txt = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
@@ -478,20 +542,22 @@ public class Localization {
         //Tools.createTestMeasurementFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
         //Tools.createTestMeasurementFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);
         
-        Tools.decoordinateMeasurementFile(gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created);
+        //Tools.decoordinateMeasurementFile(gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created);
         
         File localization_results = new File (GIT_DIRECTORY + RESULTS + "localization_results.csv");
         File localization_error_results = new File(GIT_DIRECTORY + RESULTS + "localization_error_results.csv");
         
-        Localization newLocaction = new Localization(gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created);
+        Localization newLocaction = new Localization(veresegyh_5m_G900_nthserver_csv, veresegyhaz_2_gmon_gsm_created);
         
-        HashMap<String, ArrayList<String>> database = newLocaction.createDatabase();
-        newLocaction.getLocationFromDatabaseV1(database, localization_results);
+        //HashMap<String, ArrayList<String>> database = newLocaction.createDatabaseForVerticalSearch();
+        //newLocaction.getLocationFromDatabaseV1(database, localization_results);
         
-        LocalizationAnalysis.calculateErrorDistance(localization_results, checkFile_veresegyhaz_2_gmon_gsm_created, localization_error_results);
+        newLocaction.getLocationFromDatabaseV2(localization_results);
         
-        System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
-        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));
+        //LocalizationAnalysis.calculateDistanceError(localization_results, checkFile_veresegyhaz_2_gmon_gsm_created, localization_error_results);
+        
+        //System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
+        //System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));
         
         
         

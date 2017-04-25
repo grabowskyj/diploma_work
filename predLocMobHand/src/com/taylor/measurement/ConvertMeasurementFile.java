@@ -186,7 +186,7 @@ public class ConvertMeasurementFile {
             cellData.put(listOfCellIds.get(cellIdCounter), listOfSignalStrengths.get(cellIdCounter));
         }
         
-        sortedHashMap = sortHashMapByValue(cellData);
+        sortedHashMap = Tools.sortHashMapByValue(cellData);
         entries = sortedHashMap.entrySet();
         
         for (Entry<String, Integer> entry : entries) {
@@ -200,31 +200,4 @@ public class ConvertMeasurementFile {
         
         return rowToWrite;
     }
-    
-    private HashMap<String, Integer> sortHashMapByValue(HashMap<String,Integer> cellData) {
-        HashMap<String, Integer> sortedMap = null;
-        Set<Entry<String, Integer>> hashmapEntrySet = null;
-        List<Entry<String, Integer>> entries = null;
-                
-        sortedMap = new LinkedHashMap<String, Integer>();
-        hashmapEntrySet = cellData.entrySet();
-        entries = new LinkedList<>(hashmapEntrySet);
-        
-        Collections.sort(entries, new Comparator<Entry<String, Integer>>() {
-            @Override
-            public int compare(Entry<String, Integer> entry1, Entry<String, Integer> entry2) {
-                int result = entry2.getValue().compareTo(entry1.getValue());
-                
-                return result;
-            }
-        
-        });
-        
-        for (Entry<String, Integer> entry : entries) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-        
-        return sortedMap;
-    }
-   
 }
