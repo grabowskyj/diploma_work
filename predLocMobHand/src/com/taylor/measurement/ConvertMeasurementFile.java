@@ -15,6 +15,7 @@ import java.util.Set;
 
 import com.taylor.tools.*;
 import com.taylor.tools.Tools.COORDINATES;
+import com.taylor.tools.Tools.DATATYPE;
 
 public class ConvertMeasurementFile {
     
@@ -186,7 +187,7 @@ public class ConvertMeasurementFile {
             cellData.put(listOfCellIds.get(cellIdCounter), listOfSignalStrengths.get(cellIdCounter));
         }
         
-        sortedHashMap = Tools.sortHashMapByValue(cellData);
+        sortedHashMap = Tools.sortHashMap(cellData, DATATYPE.SIGNALSTRENGTH);
         entries = sortedHashMap.entrySet();
         
         for (Entry<String, Integer> entry : entries) {

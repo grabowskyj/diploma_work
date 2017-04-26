@@ -68,6 +68,14 @@ public class ConvertDatFile {
             put("918263566", "Szada_9004");
             put("918263498", "Szada_9003");
             put("918263635", "Szada_9002");
+            put("918264727", "Csomadq_18001");
+            put("918264574", "Csomadq_18003");
+            put("918264643", "Csomadq_18002");
+            put("918262341", "veresegyq_m_18003");
+            put("917963597", "Vegyhcity_18001");
+            put("918262273", "veresegyq_m_18002");
+            put("917963743", "Vegyhcity_18002");
+            put("918268647", "GodolInd_18001");
         }
     };
     

@@ -24,6 +24,7 @@ import org.rosuda.JRI.Rengine;
 public class Tools {
     
     public static enum FILETYPE {BESTSERVER, NTHSERVER, UNDEFINED};
+    public static enum DATATYPE {CELLNAME, SIGNALSTRENGTH};
     
     public static enum COORDINATES {
         LATITUDE ("latitude"),
@@ -313,19 +314,25 @@ public class Tools {
         return coordinates;
     }
     
-    public static HashMap<String, Integer> sortHashMapByValue(HashMap<String,Integer> cellData) {
+    public static HashMap<String, Integer> sortHashMap(HashMap<String,Integer> srcData, DATATYPE byData) {
         HashMap<String, Integer> sortedMap = null;
         Set<Entry<String, Integer>> hashmapEntrySet = null;
         List<Entry<String, Integer>> entries = null;
-                
+        
         sortedMap = new LinkedHashMap<String, Integer>();
-        hashmapEntrySet = cellData.entrySet();
+        hashmapEntrySet = srcData.entrySet();
         entries = new LinkedList<>(hashmapEntrySet);
         
         Collections.sort(entries, new Comparator<Entry<String, Integer>>() {
             @Override
             public int compare(Entry<String, Integer> entry1, Entry<String, Integer> entry2) {
-                int result = entry2.getValue().compareTo(entry1.getValue());
+                int result = 0;
+                
+                if (byData == DATATYPE.SIGNALSTRENGTH) {
+                    result = entry2.getValue().compareTo(entry1.getValue());
+                } else if (byData == DATATYPE.CELLNAME) {
+                    result = entry1.getKey().compareTo(entry2.getKey());
+                }
                 
                 return result;
             }
@@ -337,5 +344,19 @@ public class Tools {
         }
         
         return sortedMap;
+    }
+    
+    public static HashMap<String, Integer> sortHashMapByReference(HashMap<String,Integer> srcData, HashMap<String,Integer> refData) {
+        HashMap<String, Integer> result = null;
+        Set<String> refList = null;
+        
+        result = new LinkedHashMap<String, Integer>();
+        refList = refData.keySet();
+        
+        for (String refElement : refList) {
+            result.put(refElement, srcData.get(refElement));
+        }
+        
+        return result;
     }
 }
