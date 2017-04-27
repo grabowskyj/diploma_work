@@ -363,89 +363,60 @@ public class Tools {
     public static void meltGsmDcs(File gsmFile, File dcsFile, File outputFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
+        HashMap<String, String> coordinatesAndValues = null;
+        Set<Entry<String, String>> coordinatesAndValuesEntries = null; 
         ArrayList<String> gsmData = null;
         ArrayList<String> dcsData = null;
-        ArrayList<ArrayList<String>> gsmCoordinateData = null;
-        ArrayList<ArrayList<String>> dcsCoordinateData = null;
-        ArrayList<String> gsmRowData = null;
-        ArrayList<String> coordinates = null;
-        ArrayList<String> arrSplittedDcsDataRow = null;
-        ArrayList<String> arrSplittedGsmDataRow = null;
-        List<String> lstSplittedDcsDataRow = null;
-        List<String> lstSplittedGsmDataRow = null;
         String[] splittedGsmDataRow = null;
         String[] splittedDcsDataRow = null;
         String gsmLatitude = null;
         String gsmLongitude = null;
+        String gsmCoordinate = null;
+        String gsmCellsAndSignals = null;
         String dcsLatitude = null;
         String dcsLongitude = null;
-        String dcsRow = null;
+        String dcsCoordinate = null;
+        String dcsCellsAndSignals = null;
+        String modifiedCellsAndSignal = null;
         String rowToWrite = null;
-        
+
+        createFile(outputFile);
         gsmData = readFileToMemory(gsmFile);
         dcsData = readFileToMemory(dcsFile);
-        gsmCoordinateData = new ArrayList<ArrayList<String>>();
-        dcsCoordinateData = new ArrayList<ArrayList<String>>();
-        gsmRowData = new ArrayList<String>();
-        createFile(outputFile);
-        
+        coordinatesAndValues = new LinkedHashMap<String, String>();
+                
         try {
             fileWriter = new FileWriter(outputFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             
             for (int gsmRowCounter = 1; gsmRowCounter < gsmData.size(); gsmRowCounter++) {
-                splittedGsmDataRow = gsmData.get(gsmRowCounter).split(",");
-                lstSplittedGsmDataRow = Arrays.asList(splittedGsmDataRow);
-                arrSplittedGsmDataRow = new ArrayList<String>();
-                arrSplittedGsmDataRow.addAll(lstSplittedGsmDataRow);
-                gsmLatitude = arrSplittedGsmDataRow.get(0);
-                gsmLongitude = arrSplittedGsmDataRow.get(1);
-                coordinates = new ArrayList<String>();
-                coordinates.add(gsmLatitude);
-                coordinates.add(gsmLongitude);
-                gsmCoordinateData.add(coordinates);
+                splittedGsmDataRow = gsmData.get(gsmRowCounter).split(",",3);
+                gsmLatitude = splittedGsmDataRow[0];
+                gsmLongitude = splittedGsmDataRow[1];
+                gsmCellsAndSignals = splittedGsmDataRow[2];
+                gsmCoordinate = gsmLatitude + "," + gsmLongitude;
+                coordinatesAndValues.put(gsmCoordinate, gsmCellsAndSignals);
             }
             
-            for (int dcsRowCounter = 1; dcsRowCounter < dcsData.size(); dcsRowCounter++) {
-                splittedDcsDataRow = dcsData.get(dcsRowCounter).split(",");
-                lstSplittedDcsDataRow = Arrays.asList(splittedDcsDataRow);
-                arrSplittedDcsDataRow = new ArrayList<String>();
-                arrSplittedDcsDataRow.addAll(lstSplittedDcsDataRow);
-                dcsLatitude = arrSplittedDcsDataRow.get(0);
-                dcsLongitude = arrSplittedDcsDataRow.get(1);
-                coordinates = new ArrayList<String>();
-                coordinates.add(dcsLatitude);
-                coordinates.add(dcsLongitude);
-                dcsCoordinateData.add(coordinates);
+            for (int dcsDataRowCounter = 1; dcsDataRowCounter < dcsData.size(); dcsDataRowCounter++) {
+                splittedDcsDataRow = dcsData.get(dcsDataRowCounter).split(",",3);
+                dcsLatitude = splittedDcsDataRow[0];
+                dcsLongitude = splittedDcsDataRow[1];
+                dcsCellsAndSignals = splittedDcsDataRow[2];
+                dcsCoordinate = dcsLatitude + "," + dcsLongitude;
+
+                if (coordinatesAndValues.containsKey(dcsCoordinate)) {
+                    modifiedCellsAndSignal = coordinatesAndValues.get(dcsCoordinate) + "," +dcsCellsAndSignals;
+                    coordinatesAndValues.replace(dcsCoordinate, modifiedCellsAndSignal);
+                }
             }
             
-            for (int gsmDataRowCounter = 1; gsmDataRowCounter < gsmData.size(); gsmDataRowCounter++) {
-                coordinates = meltedData.get(gsmDataRowCounter);
-                gsmLatitude = coordinates.get(0);
-                gsmLongitude = coordinates.get(1);
-                
-                for (int dcsDataRowCounter = 1; dcsDataRowCounter < dcsData.size(); dcsDataRowCounter++) {
-                    splittedDcsDataRow = dcsData.get(dcsDataRowCounter).split(",");
-                    lstSplittedDcsDataRow = Arrays.asList(splittedDcsDataRow);
-                    arrSplittedDcsDataRow = new ArrayList<String>();
-                    arrSplittedDcsDataRow.addAll(lstSplittedDcsDataRow);
-                    dcsLongitude = arrSplittedDcsDataRow.remove(1);
-                    dcsLatitude = arrSplittedDcsDataRow.remove(0);
-                    
-                    if (gsmLatitude.equals(dcsLatitude) && gsmLongitude.equals(dcsLongitude)) {
-                        dcsRow = "," + String.join(",", arrSplittedDcsDataRow);
-                        break;
-                    }
-                }
-                
-                if (dcsRow != null) {
-                    rowToWrite = String.join(",", gsmData.get(gsmDataRowCounter)) + dcsRow;
-                } else {
-                    rowToWrite = String.join(",", gsmData.get(gsmDataRowCounter));
-                }
-                
+            coordinatesAndValuesEntries = coordinatesAndValues.entrySet();
+            
+            for (Entry<String, String> coordinatesAndCellsEntry : coordinatesAndValuesEntries) {
+                rowToWrite = coordinatesAndCellsEntry.getKey() + "," + coordinatesAndCellsEntry.getValue();
                 bufferedWriter.write(rowToWrite);
-                bufferedWriter.newLine();                
+                bufferedWriter.newLine();
             }
         } catch (Exception e) {
             System.out.println(e);

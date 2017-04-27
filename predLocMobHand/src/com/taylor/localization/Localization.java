@@ -54,7 +54,8 @@ public class Localization {
         //veresegyh_5m_DCS_nthserver.convertDat2Csv();
         
         File veresegyh_5m_G900_DCS_nthserver = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_DCS_nthserver.csv");
-        Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
+        
+        //Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
         
         File gmon_gsm_veresegyhaz_1_txt = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
@@ -107,13 +108,13 @@ public class Localization {
         File localization_results_for_HS = new File (GIT_DIRECTORY + RESULTS + "localization_results_HS.csv");
         File localization_error_results_for_HS = new File(GIT_DIRECTORY + RESULTS + "localization_error_results_HS.csv");
         
-        /*HorizontalSearchMethod newLocactionHS = new HorizontalSearchMethod(veresegyh_5m_G900_nthserver_csv, veresegyhaz_2_gmon_gsm_created, localization_results_for_HS, localization_error_results_for_HS);
-        newLocactionHS.getLocation();
+        HorizontalSearchMethod newLocactionHS = new HorizontalSearchMethod(veresegyh_5m_G900_DCS_nthserver, veresegyhaz_2_gmon_gsm_created);
+        newLocactionHS.getLocation(localization_results_for_HS);
         
         LocalizationAnalysis.calculateDistanceError(localization_results_for_HS, checkFile_veresegyhaz_2_gmon_gsm_created, localization_error_results_for_HS);
         
         System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results_for_HS));
-        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results_for_HS));*/
+        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results_for_HS));
         
         
         

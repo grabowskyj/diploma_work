@@ -22,15 +22,13 @@ public class HorizontalSearchMethod {
     
     private File databaseFile;
     private File measurementFile;
-    private File resultFile;
-    private File errorFile;
+
     final private String fingerprintDifferenceValue = "fingerprintDifferenceValue";
         
-    public HorizontalSearchMethod(File databaseFile, File measurementFile, File resultFile, File errorFile) {
+    public HorizontalSearchMethod(File databaseFile, File measurementFile) {
         this.setdatabaseFile(databaseFile);
         this.setMeasurementFile(measurementFile);
-        this.setResultFile(resultFile);
-        this.setErrorFile(errorFile);
+
     }
 
     public File getdatabaseFile() {
@@ -47,24 +45,6 @@ public class HorizontalSearchMethod {
 
     private void setMeasurementFile(File measurementFile) {
         this.measurementFile = measurementFile;
-    }
-    
-    public File getResultFile() {
-        return resultFile;
-    }
-
-    public void setResultFile(File resultFile) {
-        this.resultFile = resultFile;
-        Tools.createFile(resultFile);
-    }
-
-    public File getErrorFile() {
-        return errorFile;
-    }
-
-    public void setErrorFile(File errorFile) {
-        this.errorFile = errorFile;
-        Tools.createFile(errorFile);
     }
 
     private ArrayList<String> getValuesFromList(DATATYPE data, List<String> lstDatabaseEntry) {
@@ -239,14 +219,14 @@ public class HorizontalSearchMethod {
         measurementMap = createDatabaseForHorizontalSearch(penaltyExtendedMeasurementPoint);
         databaseMap = createDatabaseForHorizontalSearch(penaltyExtendedDatabaseEntry);
         measurementMap = Tools.sortHashMap(measurementMap, DATATYPE.SIGNALSTRENGTH);
-        databaseMap = Tools.sortHashMapByReference(databaseMap, measurementMap);
+        databaseMap = Tools.sortHashMapByReference(databaseMap, measurementMap);      
         
         measurementEntries = new ArrayList<Entry<String, Integer>>(measurementMap.entrySet());
         firstEntry = measurementEntries.get(0);
         offset = databaseMap.get(firstEntry.getKey()) - measurementMap.get(firstEntry.getKey());
         offsetShiftedMeasurementPoint = shiftDataValuesWithOffset(measurementMap, offset);
-        fingerprintDifference = calculateFingerprintDifference(measurementMap, databaseMap);
-            
+        fingerprintDifference = calculateFingerprintDifference(offsetShiftedMeasurementPoint, databaseMap);
+        
         result.put(fingerprintDifferenceValue, fingerprintDifference);
         result.put(COORDINATES.LONGITUDE.toString(), longitude);
         result.put(COORDINATES.LATITUDE.toString(), latitude);
@@ -254,7 +234,7 @@ public class HorizontalSearchMethod {
         return result;
     }
     
-    public void getLocation() {
+    public void getLocation(File resultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         HashMap<String, Double> coordinates = null;
@@ -281,7 +261,7 @@ public class HorizontalSearchMethod {
         database = Tools.readFileToMemory(getdatabaseFile());
 
         try {
-            fileWriter = new FileWriter(getResultFile());
+            fileWriter = new FileWriter(resultFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             
             resultFileHeader = "point," + COORDINATES.LATITUDE.toString() + "," + COORDINATES.LONGITUDE.toString();
@@ -294,7 +274,7 @@ public class HorizontalSearchMethod {
                 measurementPoint = measurement.get(measurementDataRowCounter).split(",");
                 minimumFingerprintDifference = Integer.MAX_VALUE;
                 
-                for (int databaseDataRowCounter = 1; databaseDataRowCounter < database.size(); databaseDataRowCounter++) {
+                for (int databaseDataRowCounter = 0; databaseDataRowCounter < database.size(); databaseDataRowCounter++) {
                     databaseEntry = database.get(databaseDataRowCounter).split(",");
                     measurementResult = checkMeasurementPointInDatabase(databaseEntry, measurementPoint);
                     
@@ -323,10 +303,10 @@ public class HorizontalSearchMethod {
             }
             
             rEngine.end();
+            
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
-            
         } finally {
             try {
                 bufferedWriter.close();
