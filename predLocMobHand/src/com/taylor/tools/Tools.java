@@ -359,4 +359,19 @@ public class Tools {
         
         return result;
     }
+    
+    public static void meltGsmDcs(File gsmFile, File dcsFile, File outputFile) {
+        ArrayList<String> gsmData = null;
+        ArrayList<String> dcsData = null;
+        List<String> gsmRowData = null;
+        List<String> dcsRowData = null;
+        String[] splittedGsmRowData = null;
+        String[] splittedDcsRowData = null;
+        
+        gsmData = readFileToMemory(gsmFile);
+        dcsData = readFileToMemory(dcsFile);
+        createFile(outputFile);
+        
+
+    }
 }

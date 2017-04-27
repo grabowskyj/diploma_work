@@ -308,9 +308,11 @@ public class ConvertDatFile {
                     
                     dataRowNumFromRawData++;
                     
-                    rowToCsvFile = String.join(",", arrToCsvFile);
-                    bufferedWriter.write(rowToCsvFile);
-                    bufferedWriter.newLine();
+                    if (arrToCsvFile.size() >= 22) {
+                        rowToCsvFile = String.join(",", arrToCsvFile);
+                        bufferedWriter.write(rowToCsvFile);
+                        bufferedWriter.newLine();
+                    }
                 }
             }
         } catch(Exception e) {
