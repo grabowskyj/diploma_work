@@ -51,7 +51,7 @@ public class ConvertDatFile {
     }
     
     @SuppressWarnings("serial")
-    final private HashMap<String, String> convertCellID = new HashMap<String, String>() {
+    final static public HashMap<String, String> convertCellID = new HashMap<String, String>() {
         {
             put("918262136", "veresegy_m_9001");
             put("918262205", "veresegy_m_9002");
