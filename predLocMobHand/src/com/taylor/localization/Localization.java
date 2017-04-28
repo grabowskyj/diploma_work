@@ -20,6 +20,7 @@ public class Localization {
         String CONVERTED_DATA = "diploma_work\\test_dir\\converted_data\\";
         String RESULTS = "diploma_work\\test_dir\\measurement_data\\results\\";
         
+        System.out.println("Converting ...");
         File veresegyhaz_bestserver_dat = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "veresegyhaz_bestserver.dat");
         File veresegyhaz_bestserver_conv = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_bestserver.conv");
         File veresegyhaz_bestserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyhaz_bestserver.csv");
@@ -41,21 +42,22 @@ public class Localization {
                 
         //ConvertDatFile veresegyhaz_bestserver = new ConvertDatFile(veresegyhaz_bestserver_dat, veresegyhaz_bestserver_conv, veresegyhaz_bestserver_csv);
         //ConvertDatFile veresegyhaz_nthserver = new ConvertDatFile(veresegyhaz_nthserver_dat, veresegyhaz_nthserver_conv, veresegyhaz_nthserver_csv);
-        //ConvertDatFile veresegyh_5m_G900_nthserver = new ConvertDatFile(veresegyh_5m_G900_nthserver_dat, veresegyh_5m_G900_nthserver_conv, veresegyh_5m_G900_nthserver_csv);
+        ConvertDatFile veresegyh_5m_G900_nthserver = new ConvertDatFile(veresegyh_5m_G900_nthserver_dat, veresegyh_5m_G900_nthserver_conv, veresegyh_5m_G900_nthserver_csv);
         //ConvertDatFile veresegyh_5m_G900_bestserver = new ConvertDatFile(veresegyh_5m_G900_bestserver_dat, veresegyh_5m_G900_bestserver_conv, veresegyh_5m_G900_bestserver_csv);
         //ConvertDatFile alle_5m_G900_nthserver = new ConvertDatFile(alle_5m_G900_nthserver_dat, alle_5m_G900_nthserver_conv, alle_5m_G900_nthserver_csv);
         //ConvertDatFile veresegyh_5m_DCS_nthserver = new ConvertDatFile(veresegyh_5m_DCS_nthserver_dat, veresegyh_5m_DCS_nthserver_conv, veresegyh_5m_DCS_nthserver_csv);
         
         //veresegyhaz_bestserver.convertDat2Csv();
         //veresegyhaz_nthserver.convertDat2Csv();
-        //veresegyh_5m_G900_nthserver.convertDat2Csv();
+        veresegyh_5m_G900_nthserver.convertDat2Csv();
         //veresegyh_5m_G900_bestserver.convertDat2Csv();
         //alle_5m_G900_nthserver.convertDat2Csv();
         //veresegyh_5m_DCS_nthserver.convertDat2Csv();
         
+        System.out.println("Merging DCS to GSM ...");
         File veresegyh_5m_G900_DCS_nthserver = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_DCS_nthserver.csv");
         
-        //Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
+        Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
         
         File gmon_gsm_veresegyhaz_1_txt = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
@@ -93,6 +95,7 @@ public class Localization {
         
         //Tools.decoordinateMeasurementFile(gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created);
         
+        System.out.println("Localizating ...");
         File localization_results_for_VS = new File (GIT_DIRECTORY + RESULTS + "localization_results_VS.csv");
         File localization_error_results_for_VS = new File(GIT_DIRECTORY + RESULTS + "localization_error_results_VS.csv");
         

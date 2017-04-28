@@ -308,7 +308,7 @@ public class ConvertDatFile {
                     
                     dataRowNumFromRawData++;
                     
-                    if (arrToCsvFile.size() > 2) {
+                    if (arrToCsvFile.size() == 22) { //need to change it according to the type of the converted file
                         rowToCsvFile = String.join(",", arrToCsvFile);
                         bufferedWriter.write(rowToCsvFile);
                         bufferedWriter.newLine();

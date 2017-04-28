@@ -132,6 +132,20 @@ public class HorizontalSearchMethod {
         return resultHashMap;
     }
     
+    private int countOriginalElements(Set<Entry<String, Integer>> entrySet) {
+        int number = 0;
+        int signalStrength = 0;
+        
+        for (Entry<String, Integer> entry : entrySet) {
+            signalStrength = entry.getValue();
+            if ( signalStrength > Integer.parseInt(penaltySignalStrength)) {
+                number++;
+            }
+        }
+
+        return number;     
+    }
+    
     private double calculateFingerprintDifference(HashMap<String, Integer> minuedMap, HashMap<String, Integer> subtrahendMap) {
         Set<Entry<String, Integer>> minuedEntrySet = null;
         Set<Entry<String, Integer>> subtrahendEntrySet = null;
@@ -139,24 +153,26 @@ public class HorizontalSearchMethod {
         int minued = 0;
         int subtrahend = 0;
         int difference = 0;
-        int numberOfMinuedEntries = 0;
-        int numberOfsubtrahendEntries = 0;
+        int numberOfOiginalMeasurementEntries = 0;
+        int numberOfOiginalDatabaseEntries = 0;
         double powerOfDifference = 0;
         double result = 0;
         
         minuedEntrySet = minuedMap.entrySet();
         subtrahendEntrySet = subtrahendMap.entrySet();
         minuedEntries = new LinkedList<>(minuedEntrySet);
-        numberOfMinuedEntries = minuedEntrySet.size();
-        numberOfsubtrahendEntries = subtrahendEntrySet.size();
+        numberOfOiginalMeasurementEntries = countOriginalElements(minuedEntrySet);
+        numberOfOiginalDatabaseEntries = countOriginalElements(subtrahendEntrySet);
         
-        for (Entry<String, Integer> entry : minuedEntries) {
-            minued = entry.getValue();
-            subtrahend = subtrahendMap.get(entry.getKey());
-            difference = minued - subtrahend;
-            powerOfDifference = Math.pow(difference, 2);
-                       
-            result = result + powerOfDifference;
+        if (numberOfOiginalDatabaseEntries > numberOfOiginalMeasurementEntries) {
+            for (Entry<String, Integer> entry : minuedEntries) {
+                minued = entry.getValue();
+                subtrahend = subtrahendMap.get(entry.getKey());
+                difference = minued - subtrahend;
+                powerOfDifference = Math.pow(difference, 2);
+                           
+                result = result + powerOfDifference;
+            }
         }
         
         return result;
@@ -221,6 +237,7 @@ public class HorizontalSearchMethod {
                     coordinate = databaseEntry.getKey().split(",");
                     databaseCellsAndSignals = databaseEntry.getValue();
                     
+
                     measurementCellsAndSignals = putPenalties(databaseCellsAndSignals, measurementCellsAndSignals);
                     hashMappedMeasurementCellsAndSignals = hashMapper(measurementCellsAndSignals);
                     hashMappedMeasurementCellsAndSignals = Tools.sortHashMap(hashMappedMeasurementCellsAndSignals, DATATYPE.SIGNALSTRENGTH);
