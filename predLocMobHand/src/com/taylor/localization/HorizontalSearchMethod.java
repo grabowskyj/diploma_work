@@ -25,7 +25,7 @@ public class HorizontalSearchMethod {
     
     private File databaseFile;
     private File measurementFile;
-    final private String penaltySignalStrength = "-140";
+    final private String penaltySignalStrength = "-125";
         
     public HorizontalSearchMethod(File databaseFile, File measurementFile) {
         this.setdatabaseFile(databaseFile);
@@ -85,25 +85,27 @@ public class HorizontalSearchMethod {
         return databaseHashMap;
     }
     
-    private String putPenalties(String toCellsAndSignals) {
-        String dataWithPenalties = null;
-        String cellWithPenalty = null;
+    private String putPenalties(String srcCellsAndSignals, String destCellsAndSignals) {
+        String penaltyCell = null;
+        String dataWithPenalties = null; 
         String[] data = null;
-        ArrayList<String> modifiableData = null;
-        Collection<String> penaltyCells = null;
+        ArrayList<String> srcData = null;
+        ArrayList<String> dstData = null;
         
-        data = toCellsAndSignals.split(",");
-        modifiableData = new ArrayList<String>(Arrays.asList(data));
-        penaltyCells = ConvertDatFile.convertCellID.values();
+        data = srcCellsAndSignals.split(",");
+        srcData = new ArrayList<String>(Arrays.asList(data));
+        data = destCellsAndSignals.split(",");
+        dstData = new ArrayList<String>(Arrays.asList(data));
         
-        for (String penaltyCell : penaltyCells) {
-            if (!modifiableData.contains(penaltyCell)) {
-                cellWithPenalty = penaltyCell + "," + penaltySignalStrength; 
-                modifiableData.add(cellWithPenalty);
+        for (int elemCounter = 0; elemCounter < srcData.size(); elemCounter = elemCounter + 2) {
+            if (!dstData.contains(srcData.get(elemCounter))) {
+                penaltyCell = srcData.get(elemCounter); 
+                dstData.add(penaltyCell);
+                dstData.add(penaltySignalStrength);
             }
         }
         
-        dataWithPenalties = String.join(",", modifiableData);
+        dataWithPenalties = String.join(",", dstData);
         
         return dataWithPenalties;
     }
@@ -132,15 +134,21 @@ public class HorizontalSearchMethod {
     
     private double calculateFingerprintDifference(HashMap<String, Integer> minuedMap, HashMap<String, Integer> subtrahendMap) {
         Set<Entry<String, Integer>> minuedEntrySet = null;
+        Set<Entry<String, Integer>> subtrahendEntrySet = null;
         List<Entry<String, Integer>> minuedEntries = null;
         int minued = 0;
         int subtrahend = 0;
         int difference = 0;
+        int numberOfMinuedEntries = 0;
+        int numberOfsubtrahendEntries = 0;
         double powerOfDifference = 0;
         double result = 0;
         
         minuedEntrySet = minuedMap.entrySet();
+        subtrahendEntrySet = subtrahendMap.entrySet();
         minuedEntries = new LinkedList<>(minuedEntrySet);
+        numberOfMinuedEntries = minuedEntrySet.size();
+        numberOfsubtrahendEntries = subtrahendEntrySet.size();
         
         for (Entry<String, Integer> entry : minuedEntries) {
             minued = entry.getValue();
@@ -175,8 +183,9 @@ public class HorizontalSearchMethod {
         String pointCounter = null;
         String measurementCellsAndSignals = null;
         String databaseCellsAndSignals = null;
-        String coordinate = null;
+        String coordinate[] = null;
         double fingerprintDifference = 0;
+        double minimumFingerprintDifference = 0;
         Rengine rEngine = null;
         
         coordinates = new HashMap<String, Double>();
@@ -204,27 +213,37 @@ public class HorizontalSearchMethod {
             
             for (Entry<String, String> measurementEntry : measurementEntries) {
                 pointCounter = measurementEntry.getKey();
-                System.out.println("point: " + pointCounter);
                 measurementCellsAndSignals = measurementEntry.getValue();
-                measurementCellsAndSignals = putPenalties(measurementCellsAndSignals);
-                hashMappedMeasurementCellsAndSignals = hashMapper(measurementCellsAndSignals);
-                hashMappedMeasurementCellsAndSignals = Tools.sortHashMap(hashMappedMeasurementCellsAndSignals, DATATYPE.SIGNALSTRENGTH);
+                
+                minimumFingerprintDifference = Integer.MAX_VALUE;
                 
                 for (Entry<String, String> databaseEntry : databaseEntries) {
-                    coordinate = databaseEntry.getKey();
+                    coordinate = databaseEntry.getKey().split(",");
                     databaseCellsAndSignals = databaseEntry.getValue();
-                    databaseCellsAndSignals = putPenalties(databaseCellsAndSignals);
+                    
+                    measurementCellsAndSignals = putPenalties(databaseCellsAndSignals, measurementCellsAndSignals);
+                    hashMappedMeasurementCellsAndSignals = hashMapper(measurementCellsAndSignals);
+                    hashMappedMeasurementCellsAndSignals = Tools.sortHashMap(hashMappedMeasurementCellsAndSignals, DATATYPE.SIGNALSTRENGTH);
+
+                    databaseCellsAndSignals = putPenalties(measurementCellsAndSignals, databaseCellsAndSignals);
                     hashMappedDatabaseCellsAndSignals = hashMapper(databaseCellsAndSignals);
-                    hashMappedDatabaseCellsAndSignals = Tools.sortHashMapByReference(hashMappedDatabaseCellsAndSignals, hashMappedDatabaseCellsAndSignals);
+                    hashMappedDatabaseCellsAndSignals = Tools.sortHashMapByReference(hashMappedDatabaseCellsAndSignals, hashMappedMeasurementCellsAndSignals);
                     fingerprintDifference = calculateFingerprintDifference(hashMappedMeasurementCellsAndSignals, hashMappedDatabaseCellsAndSignals);
                     
+                    if (fingerprintDifference < minimumFingerprintDifference) {
+                        lstLatitude.clear();
+                        lstLongitude.clear();
+                        minimumFingerprintDifference = fingerprintDifference;
+                        lstLatitude.add(coordinate[0]);
+                        lstLongitude.add(coordinate[1]);
+                    }
                 }
-                
-                
+                                
                 coordinates = Tools.getMeanValueOfCoordinates(rEngine, lstLatitude, lstLongitude);
                 pointLatitude = Double.toString(coordinates.get(COORDINATES.LATITUDE.toString()));
                 pointLongitude = Double.toString(coordinates.get(COORDINATES.LONGITUDE.toString()));
-                rowToWrite = "Point" + pointCounter + "," + pointLatitude + "," + pointLongitude;
+                rowToWrite = "Point" + pointCounter + "," + pointLatitude + "," + pointLongitude + "," + minimumFingerprintDifference;
+                System.out.println(rowToWrite);
                 bufferedWriter.write(rowToWrite);
                 bufferedWriter.newLine();
                 coordinates.clear();
