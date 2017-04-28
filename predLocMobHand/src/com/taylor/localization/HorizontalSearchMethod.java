@@ -164,15 +164,13 @@ public class HorizontalSearchMethod {
         numberOfOiginalMeasurementEntries = countOriginalElements(minuedEntrySet);
         numberOfOiginalDatabaseEntries = countOriginalElements(subtrahendEntrySet);
         
-        if (numberOfOiginalDatabaseEntries > numberOfOiginalMeasurementEntries) {
-            for (Entry<String, Integer> entry : minuedEntries) {
-                minued = entry.getValue();
-                subtrahend = subtrahendMap.get(entry.getKey());
-                difference = minued - subtrahend;
-                powerOfDifference = Math.pow(difference, 2);
-                           
-                result = result + powerOfDifference;
-            }
+        for (Entry<String, Integer> entry : minuedEntries) {
+            minued = entry.getValue();
+            subtrahend = subtrahendMap.get(entry.getKey());
+            difference = minued - subtrahend;
+            powerOfDifference = Math.pow(difference, 2);
+                       
+            result = result + powerOfDifference;
         }
         
         return result;
@@ -247,7 +245,7 @@ public class HorizontalSearchMethod {
                     hashMappedDatabaseCellsAndSignals = Tools.sortHashMapByReference(hashMappedDatabaseCellsAndSignals, hashMappedMeasurementCellsAndSignals);
                     fingerprintDifference = calculateFingerprintDifference(hashMappedMeasurementCellsAndSignals, hashMappedDatabaseCellsAndSignals);
                     
-                    if (fingerprintDifference < minimumFingerprintDifference) {
+                    if (fingerprintDifference <= minimumFingerprintDifference) {
                         lstLatitude.clear();
                         lstLongitude.clear();
                         minimumFingerprintDifference = fingerprintDifference;
