@@ -90,22 +90,22 @@ public class HorizontalSearchMethod {
         String dataWithPenalties = null; 
         String[] data = null;
         ArrayList<String> srcData = null;
-        ArrayList<String> dstData = null;
+        ArrayList<String> dcsData = null;
         
         data = srcCellsAndSignals.split(",");
         srcData = new ArrayList<String>(Arrays.asList(data));
         data = destCellsAndSignals.split(",");
-        dstData = new ArrayList<String>(Arrays.asList(data));
+        dcsData = new ArrayList<String>(Arrays.asList(data));
         
         for (int elemCounter = 0; elemCounter < srcData.size(); elemCounter = elemCounter + 2) {
-            if (!dstData.contains(srcData.get(elemCounter))) {
+            if (!dcsData.contains(srcData.get(elemCounter))) {
                 penaltyCell = srcData.get(elemCounter); 
-                dstData.add(penaltyCell);
-                dstData.add(penaltySignalStrength);
+                dcsData.add(penaltyCell);
+                dcsData.add(penaltySignalStrength);
             }
         }
         
-        dataWithPenalties = String.join(",", dstData);
+        dataWithPenalties = String.join(",", dcsData);
         
         return dataWithPenalties;
     }

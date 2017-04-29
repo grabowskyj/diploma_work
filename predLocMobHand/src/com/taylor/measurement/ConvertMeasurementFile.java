@@ -45,33 +45,40 @@ public class ConvertMeasurementFile {
     }
     
     @SuppressWarnings("serial")
-    final private HashMap<String, String> convertCellID = new HashMap<String, String>() {
+    final private HashMap<String, String> convertGsmCellID = new HashMap<String, String>() {
         {
             put("21431", "veresegy_m_9001");
             put("21432", "veresegy_m_9002");
             put("21434", "veresegy_m_9004");
             put("21831", "veresegyd_9001");
             put("21833", "veresegyd_9003");
-            put("21437", "veresegyq_m_18002");
-            put("21438", "veresegyq_m_18003");
             put("41631", "Csomad_9001");
             put("41632", "Csomad_9002");
             put("41633", "Csomad_9003");
-            put("41636", "Csomadq_18001");
-            put("41637", "Csomadq_18002");
-            put("41638", "Csomadq_18003");
             put("21921", "GodolloI_m_9001");
             put("21923", "GodolloI_m_9003");
             put("60553", "Vegyhcity_9003");
             put("41013", "erdokert_9003");
             put("51612", "vacratot_9002");
             put("41052", "szodliget_9002");
-            put("60557", "Vegyhcity_18002");
-            put("60556", "Vegyhcity_18001");
             put("41451", "r30godollo_9001");
             put("49191", "hungring_9001");
         }
     };
+    
+    @SuppressWarnings("serial")
+    final private HashMap<String, String> convertDcsCellID = new HashMap<String, String>() {
+        {
+            put("60557", "Vegyhcity_18002");
+            put("60556", "Vegyhcity_18001");
+            put("41636", "Csomadq_18001");
+            put("41637", "Csomadq_18002");
+            put("41638", "Csomadq_18003");
+            put("21437", "veresegyq_m_18002");
+            put("21438", "veresegyq_m_18003");
+        }
+    };
+    
     
     public File convertMeasurement2Csv() {
         FileWriter fileWriter = null;
@@ -151,7 +158,11 @@ public class ConvertMeasurementFile {
         for (int cellNum : neededCellOfArray) {  
             if (cellNum <= (array.length - 1)) {
                 if (neededCellOfArrayCounter % 2 == 1) {
-                    cellName = convertCellID.get(array[cellNum]);
+                    cellName = convertGsmCellID.get(array[cellNum]);
+                    
+                    if (cellName == null) {
+                        cellName = convertDcsCellID.get(array[cellNum]);
+                    }
                     
                     if (cellName != null && !listOfCellIds.contains(cellName)) {
                         listOfCellIds.add(cellName);

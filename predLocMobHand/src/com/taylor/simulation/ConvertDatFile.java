@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 import com.taylor.tools.*;
 import com.taylor.tools.Tools.FILETYPE;
 
@@ -17,7 +19,7 @@ public class ConvertDatFile {
     private File csvFile;
     private static int maxNoOfServers = 0;
     private static FILETYPE fileType = FILETYPE.UNDEFINED;
-
+    
     public ConvertDatFile(File srcFile, File convFile, File csvFile) {
         this.setsrcFile(srcFile);
         this.setConvFile(convFile);
@@ -51,23 +53,29 @@ public class ConvertDatFile {
     }
     
     @SuppressWarnings("serial")
-    final static public HashMap<String, String> convertCellID = new HashMap<String, String>() {
+    final private HashMap<String, String> convertGsmCellID = new HashMap<String, String>() {
         {
-            put("918262136", "veresegy_m_9001");
             put("918262205", "veresegy_m_9002");
+            put("917963201", "Vegyhcity_9003");
+            put("918264506", "Csomad_9002");
+            put("918268151", "veresegyd_9003");
+            put("918267999", "veresegyd_9001");
+            put("918262136", "veresegy_m_9001");
             put("918262052", "veresegy_m_9004");
+            put("918264437", "Csomad_9001");       
+            put("918268067", "veresegyd_9002");
+            put("918264353", "Csomad_9003");
             put("918265031", "erdokert_9001");
             put("918265115", "erdokert_9003");
-            put("918264437", "Csomad_9001");
-            put("918264506", "Csomad_9002");
-            put("918264353", "Csomad_9003");
-            put("918267999", "veresegyd_9001");
-            put("918268067", "veresegyd_9002");
-            put("918268151", "veresegyd_9003");
-            put("917963201", "Vegyhcity_9003");
             put("918263566", "Szada_9004");
             put("918263498", "Szada_9003");
             put("918263635", "Szada_9002");
+        }
+    };
+    
+    @SuppressWarnings("serial")
+    final private HashMap<String, String> convertDcsCellID = new HashMap<String, String>() {
+        {
             put("918264727", "Csomadq_18001");
             put("918264574", "Csomadq_18003");
             put("918264643", "Csomadq_18002");
@@ -308,11 +316,11 @@ public class ConvertDatFile {
                     
                     dataRowNumFromRawData++;
                     
-                    if (arrToCsvFile.size() == 22) { //need to change it according to the type of the converted file
+                    if (arrToCsvFile.size() > 2) {
                         rowToCsvFile = String.join(",", arrToCsvFile);
                         bufferedWriter.write(rowToCsvFile);
                         bufferedWriter.newLine();
-                    }
+                    } 
                 }
             }
         } catch(Exception e) {
@@ -341,7 +349,7 @@ public class ConvertDatFile {
         
         cellData = getCellData(row);
         cellId = cellData.get("cellID");
-        cellName = convertCellID.get(Integer.toString(cellId));
+        cellName = convertGsmCellID.get(Integer.toString(cellId));
         
         if (cellName != null) {
             dataPair.add(cellName);   
@@ -375,8 +383,52 @@ public class ConvertDatFile {
         return cellData;
     }
     
+    private String generateMissingRow(ArrayList<String> targetRow) { //B terv: ugy megoldani, hogy ujraolvassa a fajlt
+        Collection<String> btsCollection = null;
+        ArrayList<String> btsNameList = null;
+        ArrayList<String> btsCollectionList = null;
+        ArrayList<String> generatedRow = null;
+        String rowToWrite = null;
+        int randomNumber = 0;
+        int rowLength = 0;
+        int lastSignalStrength = 0;
+                
+        Random generateRandomValue = new Random();
+               
+        btsNameList = new ArrayList<String>();
+        generatedRow = targetRow;
+        
+        for (int elementCounter = 2; elementCounter < targetRow.size(); elementCounter = elementCounter + 2) {
+            btsNameList.add(targetRow.get(elementCounter));
+        }
+        
+        if (convertGsmCellID.containsValue(btsNameList.get(0))) {
+            btsCollection = convertGsmCellID.values();
+            rowLength = 22;
+        } else {
+            btsCollection = convertDcsCellID.values();
+            rowLength = 18;
+        }
+        
+        btsCollection.removeAll(btsNameList);
+        btsCollectionList = new ArrayList<String>(btsCollection);
+        lastSignalStrength = Integer.parseInt(generatedRow.get(generatedRow.size() - 1));
+        
+       for (int elementCounter = 0; elementCounter < rowLength - targetRow.size(); elementCounter++) {
+            randomNumber = generateRandomValue.nextInt(5);
+            lastSignalStrength = lastSignalStrength - randomNumber;
+            generatedRow.add(btsCollectionList.get(elementCounter));
+            generatedRow.add(Integer.toString(lastSignalStrength));
+       }
+        
+       rowToWrite = String.join(",", generatedRow);
+       return rowToWrite;
+    }
+    
     public File convertDat2Csv() {
+        System.out.println("Creating raw data ...");
         createRawData();
+        System.out.println("Converting DAT files ...");
         convertRawData();
         getConvFile().delete();
         
