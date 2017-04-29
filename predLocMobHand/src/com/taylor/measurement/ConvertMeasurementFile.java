@@ -88,6 +88,8 @@ public class ConvertMeasurementFile {
         String dataRowToCsv = null;
         String[] dataRow = null;
         
+        System.out.println("Converting G-Mon file " + getCsvFile());
+        
         headerRowToCsv = "latitude,longitude,cellID,signalStrength,"
                 + "n1cellID,n1signalStrength,n2cellID,n2signalStrength,"
                 + "n3cellID,n3signalStrength,n4cellID,n4signalStrength,"

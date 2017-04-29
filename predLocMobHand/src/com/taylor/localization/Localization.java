@@ -44,23 +44,22 @@ public class Localization {
         ConvertDatFile veresegyh_5m_G900_nthserver = new ConvertDatFile(veresegyh_5m_G900_nthserver_dat, veresegyh_5m_G900_nthserver_conv, veresegyh_5m_G900_nthserver_csv);
         //ConvertDatFile veresegyh_5m_G900_bestserver = new ConvertDatFile(veresegyh_5m_G900_bestserver_dat, veresegyh_5m_G900_bestserver_conv, veresegyh_5m_G900_bestserver_csv);
         //ConvertDatFile alle_5m_G900_nthserver = new ConvertDatFile(alle_5m_G900_nthserver_dat, alle_5m_G900_nthserver_conv, alle_5m_G900_nthserver_csv);
-        //ConvertDatFile veresegyh_5m_DCS_nthserver = new ConvertDatFile(veresegyh_5m_DCS_nthserver_dat, veresegyh_5m_DCS_nthserver_conv, veresegyh_5m_DCS_nthserver_csv);
+        ConvertDatFile veresegyh_5m_DCS_nthserver = new ConvertDatFile(veresegyh_5m_DCS_nthserver_dat, veresegyh_5m_DCS_nthserver_conv, veresegyh_5m_DCS_nthserver_csv);
         
         //veresegyhaz_bestserver.convertDat2Csv();
         //veresegyhaz_nthserver.convertDat2Csv();
         veresegyh_5m_G900_nthserver.convertDat2Csv();
         //veresegyh_5m_G900_bestserver.convertDat2Csv();
         //alle_5m_G900_nthserver.convertDat2Csv();
-        //veresegyh_5m_DCS_nthserver.convertDat2Csv();
+        veresegyh_5m_DCS_nthserver.convertDat2Csv();
         
-        System.out.println("Merging DCS to GSM ...");
+        veresegyh_5m_G900_nthserver.regenerateCsvFile();
+        veresegyh_5m_DCS_nthserver.regenerateCsvFile();
         
         File veresegyh_5m_G900_DCS_nthserver = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_DCS_nthserver.csv");
         
-        Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
-        
-        System.out.println("Converting G-Mon files ...");
-        
+        //Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
+         
         File gmon_gsm_veresegyhaz_1_txt = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");
         File gmon_gsm_veresegyhaz_2_txt = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_2.txt");
@@ -76,7 +75,7 @@ public class Localization {
         //ConvertMeasurementFile gmon_umts_budapest = new ConvertMeasurementFile(gmon_umts_budapestTXT, gmon_umts_budapestCSV);
         
         //gmon_gsm_veresegyhaz_1.convertMeasurement2Csv();
-        //.convertMeasurement2Csv();
+        //gmon_gsm_veresegyhaz_2.convertMeasurement2Csv();
         //gmon_gsm_budapest.convertMeasurement2Csv();
         //gmon_umts_budapest.convertMeasurement2Csv();
         

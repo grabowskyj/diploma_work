@@ -100,6 +100,7 @@ public class Tools {
             while ((readedLine = bufferedReader.readLine()) != null) {
                 dataInMemory.add(readedLine);
             }
+            
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
@@ -276,6 +277,8 @@ public class Tools {
     public static File[] decoordinateMeasurementFile(File inputFile, File outputFile, File checkFile) {
         File[] outputFiles = null;
         
+        System.out.println("Decoordinating G-Mon file to " + outputFile);
+        
         outputFiles = createTestMeasurementFile(1, inputFile, outputFile, checkFile, 0);
                 
         return outputFiles;
@@ -379,7 +382,9 @@ public class Tools {
         String dcsCellsAndSignals = null;
         String modifiedCellsAndSignal = null;
         String rowToWrite = null;
-
+        
+        System.out.println("Merging DCS and GSM files to " + outputFile);
+        
         createFile(outputFile);
         gsmData = readFileToMemory(gsmFile);
         dcsData = readFileToMemory(dcsFile);
@@ -425,6 +430,8 @@ public class Tools {
             try {
                 bufferedWriter.close();
                 fileWriter.close();
+                gsmData = null;
+                dcsData = null;
             } catch (Exception e) {
                 System.out.println(e);
                 e.printStackTrace();
