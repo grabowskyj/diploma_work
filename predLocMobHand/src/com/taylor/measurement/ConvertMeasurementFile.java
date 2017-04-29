@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -83,7 +84,7 @@ public class ConvertMeasurementFile {
     public File convertMeasurement2Csv() {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
-        ArrayList<String> data = null;
+        List<String> data = null;
         String headerRowToCsv = null;
         String dataRowToCsv = null;
         String[] dataRow = null;

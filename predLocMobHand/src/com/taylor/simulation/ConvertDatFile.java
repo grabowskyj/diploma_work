@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import com.taylor.tools.*;
 import com.taylor.tools.Tools.FILETYPE;
@@ -239,7 +240,7 @@ public class ConvertDatFile {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         HashMap<String, Object> mapData = null;
-        ArrayList<String> rawData = null;
+        List<String> rawData = null;
         ArrayList<String> arrayToCsvFile = null;
         ArrayList<String> dataPair = null;
         int dataRowNumFromRawData = 3;
@@ -252,7 +253,6 @@ public class ConvertDatFile {
         String[] hexCharBuffer = null;
         
         mapData = new HashMap<String, Object>();
-        rawData = new ArrayList<String>();
         arrayToCsvFile = new ArrayList<String>();
         hexCharBuffer = new String[10];
         
@@ -386,7 +386,7 @@ public class ConvertDatFile {
     public void regenerateCsvFile() {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
-        ArrayList<String> readedSrcFile = null;
+        List<String> readedSrcFile = null;
         Collection<String> btsCollection = null;
         ArrayList<String> btsNameList = null;
         ArrayList<String> btsCollectionList = null;

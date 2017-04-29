@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -16,7 +15,6 @@ import java.util.Map.Entry;
 
 import org.rosuda.JRI.Rengine;
 
-import com.taylor.simulation.ConvertDatFile;
 import com.taylor.tools.Tools;
 import com.taylor.tools.Tools.COORDINATES;
 import com.taylor.tools.Tools.DATATYPE;
@@ -49,7 +47,7 @@ public class HorizontalSearchMethod {
         this.measurementFile = measurementFile;
     }
     
-    private HashMap<String, String> createHashMappedDatabase(ArrayList<String> database) {
+    private HashMap<String, String> createHashMappedDatabase(List<String> database) {
         HashMap<String, String> databaseHashMap = null;
         String[] databaseRow = null;
         String latitude = null;
@@ -188,8 +186,8 @@ public class HorizontalSearchMethod {
         Set<Entry<String, String>> databaseEntries = null;
         ArrayList<String> lstLatitude = null;
         ArrayList<String> lstLongitude = null;
-        ArrayList<String> measurement = null;
-        ArrayList<String> database = null;
+        List<String> measurement = null;
+        List<String> database = null;
         String pointLatitude = null;
         String pointLongitude = null;
         String resultFileHeader = null;

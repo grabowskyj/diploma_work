@@ -58,7 +58,7 @@ public class Localization {
         
         File veresegyh_5m_G900_DCS_nthserver = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_DCS_nthserver.csv");
         
-        //Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
+        Tools.meltGsmDcs(veresegyh_5m_G900_nthserver_csv, veresegyh_5m_DCS_nthserver_csv, veresegyh_5m_G900_DCS_nthserver);
          
         File gmon_gsm_veresegyhaz_1_txt = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_gsm_veresegyhaz_1.txt");
         File gmon_gsm_veresegyhaz_1_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");

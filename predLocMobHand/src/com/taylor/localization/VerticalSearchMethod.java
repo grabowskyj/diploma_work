@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.rosuda.JRI.Rengine;
@@ -42,7 +43,7 @@ public class VerticalSearchMethod {
     
     public HashMap<String, ArrayList<String>> createDatabaseForVerticalSearch() {
         HashMap<String, ArrayList<String>> database = null;
-        ArrayList<String> data = null;
+        List<String> data = null;
         int simulationDataHeaderElementCounter = 0;
         String[] simulationDataHeader = null;
         
@@ -197,7 +198,7 @@ public class VerticalSearchMethod {
         ArrayList<Integer> indexListOfElements = null;
         ArrayList<String> lstLatitude = null;
         ArrayList<String> lstLongitude = null;
-        ArrayList<String> measurement = null;
+        List<String> measurement = null;
         String[] elementNameAndElement = null;
         String[] splittedMeasurementRow = null;
         String[] measurementDataHeader = null;
