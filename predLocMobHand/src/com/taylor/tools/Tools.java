@@ -152,7 +152,7 @@ public class Tools {
         return randomValue;
     }
 
-    public static File[] createTestMeasurementFile(int nthRow, File inputFile, File derivedMeasurementFile, File checkFile, int range) {
+    public static File[] filterDatabaseFile(int nthRow, File inputFile, File derivedMeasurementFile, File checkFile, int range) {
         File[] resultFiles = null;
         FileReader fileReader = null;
         FileWriter fileWriter = null;
@@ -169,7 +169,9 @@ public class Tools {
         String[] headerRow = null;
         String[] row = null;
         String[] rowWithoutCoordinates = null;
-        String[] headerRowWithoutCoordinates = null;       
+        String[] headerRowWithoutCoordinates = null;
+        
+        System.out.println("Creating measurement file " + derivedMeasurementFile);
         
         resultFiles = new File[]{derivedMeasurementFile, checkFile};
         csvData = new ArrayList<String>();
@@ -263,12 +265,12 @@ public class Tools {
         return resultFiles;
     }
     
-    public static File[] decoordinateMeasurementFile(File inputFile, File outputFile, File checkFile) {
+    public static File[] decoordinateDatabaseFile(File inputFile, File outputFile, File checkFile) {
         File[] outputFiles = null;
         
         System.out.println("Decoordinating G-Mon file to " + outputFile);
         
-        outputFiles = createTestMeasurementFile(1, inputFile, outputFile, checkFile, 0);
+        outputFiles = filterDatabaseFile(1, inputFile, outputFile, checkFile, 0);
                 
         return outputFiles;
     }
@@ -390,7 +392,6 @@ public class Tools {
                 coordinatesAndValues.put(coordinate, cellsAndSignals);
             }
             
-            data = new ArrayList<String>();
             data = readFileToMemory(dcsFile);
             
             for (int rowCounter = 1; rowCounter < data.size(); rowCounter++) {
@@ -402,8 +403,6 @@ public class Tools {
                 coordinate = latitude + "," + longitude;
 
                 if (coordinatesAndValues.containsKey(coordinate)) {
-                    modifiedCellsAndSignal = null;
-                    valuesToCoordinate = null;
                     valuesToCoordinate = coordinatesAndValues.get(coordinate);
                     modifiedCellsAndSignal =  valuesToCoordinate + "," + cellsAndSignals;
                     filteredCoordinatesAndValues.put(coordinate, modifiedCellsAndSignal);

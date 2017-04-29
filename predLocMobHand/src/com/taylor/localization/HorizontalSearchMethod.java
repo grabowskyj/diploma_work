@@ -23,7 +23,8 @@ public class HorizontalSearchMethod {
     
     private File databaseFile;
     private File measurementFile;
-    final private String penaltySignalStrength = "-125";
+    final private String penaltySignalStrength = "-140";
+    final private int databaseOffset = 20;
         
     public HorizontalSearchMethod(File databaseFile, File measurementFile) {
         this.setdatabaseFile(databaseFile);
@@ -144,32 +145,82 @@ public class HorizontalSearchMethod {
         return number;     
     }
     
-    private double calculateFingerprintDifference(HashMap<String, Integer> minuedMap, HashMap<String, Integer> subtrahendMap) {
+    private double calculateFingerprintDifferenceMethod1(HashMap<String, Integer> minuedMap, HashMap<String, Integer> subtrahendMap, int avrageOffset) {
         Set<Entry<String, Integer>> minuedEntrySet = null;
-        Set<Entry<String, Integer>> subtrahendEntrySet = null;
         List<Entry<String, Integer>> minuedEntries = null;
         int minued = 0;
         int subtrahend = 0;
         int difference = 0;
-        int numberOfOiginalMeasurementEntries = 0;
-        int numberOfOiginalDatabaseEntries = 0;
         double powerOfDifference = 0;
         double result = 0;
         
         minuedEntrySet = minuedMap.entrySet();
-        subtrahendEntrySet = subtrahendMap.entrySet();
         minuedEntries = new LinkedList<>(minuedEntrySet);
-        numberOfOiginalMeasurementEntries = countOriginalElements(minuedEntrySet);
-        numberOfOiginalDatabaseEntries = countOriginalElements(subtrahendEntrySet);
         
         for (Entry<String, Integer> entry : minuedEntries) {
             minued = entry.getValue();
             subtrahend = subtrahendMap.get(entry.getKey());
-            difference = minued - subtrahend;
+            difference = minued - (subtrahend + avrageOffset);
             powerOfDifference = Math.pow(difference, 2);
                        
             result = result + powerOfDifference;
         }
+        
+        return result;
+    }
+    
+    private double calculateFingerprintDifferenceMethod2(HashMap<String, Integer> minuedMap, HashMap<String, Integer> subtrahendMap, int averageOffset) {
+        Set<Entry<String, Integer>> minuedEntrySet = null;
+        List<Entry<String, Integer>> minuedEntries = null;
+        Set<Entry<String, Integer>> subtrahendEntrySet = null;
+        List<Entry<String, Integer>> subtrahendEntries = null;
+        Entry<String, Integer> lastMinuedEntry = null;
+        Entry<String, Integer> lastSubtrahendEntry = null;
+        int minued = 0;
+        int subtrahend = 0;
+        int difference = 0;
+        int minuedPartDifference = 0;
+        int subtrahendPartDifference = 0;
+        int weakestMinued = 0;
+        int weakestSubtrahend = 0;
+        double weightValue = 0.0;
+        double powerOfDifference = 0;
+        double minuedPartpowerOfDifference = 0;
+        double subtrahendPartpowerOfDifference = 0;
+        double result = 0;
+        double minuedPartresult = 0;
+        double subtrahendPartresult = 0;
+        
+        minuedEntrySet = minuedMap.entrySet();
+        minuedEntries = new LinkedList<>(minuedEntrySet);
+        subtrahendEntrySet = subtrahendMap.entrySet();
+        subtrahendEntries = new LinkedList<>(subtrahendEntrySet);
+        lastMinuedEntry = minuedEntries.get(minuedEntries.size() - 1);
+        lastSubtrahendEntry = subtrahendEntries.get(subtrahendEntries.size() - 1);
+        weakestMinued = lastMinuedEntry.getValue();
+        weakestSubtrahend = lastSubtrahendEntry.getValue();
+        weightValue = 0.0;
+
+        for (Entry<String, Integer> entry : minuedEntries) {
+            minued = entry.getValue();
+            subtrahend = subtrahendMap.get(entry.getKey());
+            
+            if (minued == Integer.parseInt(penaltySignalStrength)) {
+                subtrahendPartDifference = weakestSubtrahend - subtrahend + averageOffset;
+                subtrahendPartpowerOfDifference = Math.pow(subtrahendPartDifference, 2);
+                subtrahendPartresult = subtrahendPartresult + subtrahendPartpowerOfDifference;
+            } else if (subtrahend == Integer.parseInt(penaltySignalStrength)) {
+                minuedPartDifference = minued - weakestMinued + averageOffset;
+                minuedPartpowerOfDifference = Math.pow(minuedPartDifference, 2);
+                minuedPartresult = minuedPartresult + minuedPartpowerOfDifference;
+            } else {
+                difference = minued - subtrahend + averageOffset;
+                powerOfDifference = Math.pow(difference, 2);
+                result = result + powerOfDifference;
+            }
+        }
+        
+        result = result + (weightValue * minuedPartresult) + (weightValue * subtrahendPartresult);
         
         return result;
     }
@@ -241,7 +292,7 @@ public class HorizontalSearchMethod {
                     databaseCellsAndSignals = putPenalties(measurementCellsAndSignals, databaseCellsAndSignals);
                     hashMappedDatabaseCellsAndSignals = hashMapper(databaseCellsAndSignals);
                     hashMappedDatabaseCellsAndSignals = Tools.sortHashMapByReference(hashMappedDatabaseCellsAndSignals, hashMappedMeasurementCellsAndSignals);
-                    fingerprintDifference = calculateFingerprintDifference(hashMappedMeasurementCellsAndSignals, hashMappedDatabaseCellsAndSignals);
+                    fingerprintDifference = calculateFingerprintDifferenceMethod2(hashMappedMeasurementCellsAndSignals, hashMappedDatabaseCellsAndSignals, databaseOffset);
                     
                     if (fingerprintDifference <= minimumFingerprintDifference) {
                         lstLatitude.clear();
@@ -255,7 +306,7 @@ public class HorizontalSearchMethod {
                 coordinates = Tools.getMeanValueOfCoordinates(rEngine, lstLatitude, lstLongitude);
                 pointLatitude = Double.toString(coordinates.get(COORDINATES.LATITUDE.toString()));
                 pointLongitude = Double.toString(coordinates.get(COORDINATES.LONGITUDE.toString()));
-                rowToWrite = "Point" + pointCounter + "," + pointLatitude + "," + pointLongitude + "," + minimumFingerprintDifference;
+                rowToWrite = "Point" + pointCounter + "," + pointLatitude + "," + pointLongitude;
                 System.out.println(rowToWrite);
                 bufferedWriter.write(rowToWrite);
                 bufferedWriter.newLine();
