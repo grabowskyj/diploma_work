@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.rosuda.JRI.Rengine;
@@ -17,55 +16,36 @@ import com.taylor.tools.Tools.COORDINATES;
 
 public class VerticalSearchMethod {
     
-    private File databaseFile;
-    private File measurementFile;
+    private final ArrayList<String> database;
+    private final ArrayList<String> measurement;
         
-    public VerticalSearchMethod(File databaseFile, File measurementFile) {
-        this.setdatabaseFile(databaseFile);
-        this.setMeasurementFile(measurementFile);
-    }
-
-    public File getdatabaseFile() {
-        return databaseFile;
-    }
-
-    private void setdatabaseFile(File databaseFile) {
-        this.databaseFile = databaseFile;
-    }
-
-    public File getMeasurementFile() {
-        return measurementFile;
-    }
-
-    private void setMeasurementFile(File measurementFile) {
-        this.measurementFile = measurementFile;
+    public VerticalSearchMethod(ArrayList<String> database, ArrayList<String> measurement) {
+        this.database = database;
+        this.measurement = measurement;
     }
     
     public HashMap<String, ArrayList<String>> createDatabaseForVerticalSearch() {
-        HashMap<String, ArrayList<String>> database = null;
-        List<String> data = null;
+        HashMap<String, ArrayList<String>> databaseData = null;
         int simulationDataHeaderElementCounter = 0;
         String[] simulationDataHeader = null;
-        
-        data = Tools.readFileToMemory(getdatabaseFile());
 
-        if (!data.isEmpty()) {
-            simulationDataHeader = data.get(0).trim().split(",");
-            database = new HashMap<String, ArrayList<String>>();
+        if (!database.isEmpty()) {
+            simulationDataHeader = database.get(0).trim().split(",");
+            databaseData = new HashMap<String, ArrayList<String>>();
             
             for (int headerElement = 0; headerElement < simulationDataHeader.length; headerElement++) {
-                database.put(simulationDataHeader[headerElement], new ArrayList<String>());
+                databaseData.put(simulationDataHeader[headerElement], new ArrayList<String>());
             }
             
-            for (int simulationDataRowCounter = 1; simulationDataRowCounter < data.size(); simulationDataRowCounter++) {
-                String[] splittedSimulationDataRow = data.get(simulationDataRowCounter).split(",");
+            for (int simulationDataRowCounter = 1; simulationDataRowCounter < database.size(); simulationDataRowCounter++) {
+                String[] splittedSimulationDataRow = database.get(simulationDataRowCounter).split(",");
                 simulationDataHeaderElementCounter = 0;
                 
                 for (String simulationDataHeaderElement : simulationDataHeader) {
                     if (simulationDataHeaderElementCounter < splittedSimulationDataRow.length) {
-                        database.get(simulationDataHeaderElement).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);    
+                        databaseData.get(simulationDataHeaderElement).add(splittedSimulationDataRow[simulationDataHeaderElementCounter]);    
                     } else {
-                        database.get(simulationDataHeaderElement).add("0");
+                        databaseData.get(simulationDataHeaderElement).add("0");
                     }
                     
                     simulationDataHeaderElementCounter++;
@@ -73,7 +53,7 @@ public class VerticalSearchMethod {
             }
         }
         
-        return database;
+        return databaseData;
     }
     
     private HashMap<String, ArrayList<String>> createDatabaseFromSelection(String indexListName, ArrayList<Integer> indexList, HashMap<String, ArrayList<String>> srcDatabase) {
@@ -198,7 +178,6 @@ public class VerticalSearchMethod {
         ArrayList<Integer> indexListOfElements = null;
         ArrayList<String> lstLatitude = null;
         ArrayList<String> lstLongitude = null;
-        List<String> measurement = null;
         String[] elementNameAndElement = null;
         String[] splittedMeasurementRow = null;
         String[] measurementDataHeader = null;
@@ -214,7 +193,6 @@ public class VerticalSearchMethod {
         indexListOfElements = new ArrayList<Integer>();
         lstLatitude = new ArrayList<String>();
         lstLongitude = new ArrayList<String>();
-        measurement = Tools.readFileToMemory(getMeasurementFile());
         elementNameAndElement = new String[2];
         measurementDataHeader = measurement.get(0).split(",");
         

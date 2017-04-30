@@ -6,8 +6,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-
 import com.taylor.tools.Tools;
 import com.taylor.tools.Tools.COORDINATES;
 
@@ -41,8 +39,8 @@ public class LocalizationAnalysis {
         BufferedWriter bufferedWriter = null;
         HashMap<String, Double> resultCoordinates = null;
         HashMap<String, Double> controlCoordinates = null;
-        List<String> results = null;
-        List<String> control = null;
+        ArrayList<String> results = null;
+        ArrayList<String> control = null;
         String[] resultLine = null;
         String[] controlLine = null;
         String errorFileHeader = null;
@@ -105,8 +103,8 @@ public class LocalizationAnalysis {
         }
     }
     
-    public static double calculateCERP(int percent, File resultFile) {
-        List<String> results = null;
+    public static double calculateCERP(int cerpPercent, File resultFile) {
+        ArrayList<String> results = null;
         ArrayList<Double> errorDistances = null;
         int nthElement = 0;
         double errorDistance = 0;
@@ -124,7 +122,7 @@ public class LocalizationAnalysis {
         }
         
         Collections.sort(errorDistances);
-        nthElement = (int) ((percent * errorDistances.size()) / 100);
+        nthElement = (int) ((cerpPercent * errorDistances.size()) / 100);
         cerpValue = errorDistances.get(nthElement);
         
         return cerpValue;

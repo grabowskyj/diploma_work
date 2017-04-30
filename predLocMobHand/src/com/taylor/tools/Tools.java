@@ -6,9 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -90,19 +87,32 @@ public class Tools {
         return reversArray;
     }
 
-    public static List<String> readFileToMemory(File data) {
-        Path path = null;
-        List<String> dataInMemory = null;
-        
-        path = Paths.get(data.getPath());
+    public static ArrayList<String> readFileToMemory(File data) {
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
+        ArrayList<String> dataInMemory = new ArrayList<String>();
 
         try {
-            dataInMemory = Files.readAllLines(path);        
-        } catch (Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
+            fileReader = new FileReader(data);
+            bufferedReader = new BufferedReader(fileReader);
+            String readedLine = null;
+            
+             while ((readedLine = bufferedReader.readLine()) != null) {
+                 dataInMemory.add(readedLine);
+             }
+         } catch (Exception e) {
+             System.out.println(e);
+             e.printStackTrace();
+        } finally {
+            try {
+                bufferedReader.close();
+                fileReader.close();
+            } catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
         }
-        
+
         return dataInMemory;
     }
 
@@ -171,7 +181,7 @@ public class Tools {
         String[] rowWithoutCoordinates = null;
         String[] headerRowWithoutCoordinates = null;
         
-        System.out.println("Creating measurement file " + derivedMeasurementFile);
+        System.out.println("Filtering measurement file " + derivedMeasurementFile);
         
         resultFiles = new File[]{derivedMeasurementFile, checkFile};
         csvData = new ArrayList<String>();
@@ -265,14 +275,12 @@ public class Tools {
         return resultFiles;
     }
     
-    public static File[] decoordinateDatabaseFile(File inputFile, File outputFile, File checkFile) {
-        File[] outputFiles = null;
+    public static File decoordinate(File inputFile, File outputFile, File checkFile) {      
+        System.out.println("Decoordinating " + inputFile + " file to " + outputFile);
         
-        System.out.println("Decoordinating G-Mon file to " + outputFile);
-        
-        outputFiles = filterDatabaseFile(1, inputFile, outputFile, checkFile, 0);
+        filterDatabaseFile(1, inputFile, outputFile, checkFile, 0);
                 
-        return outputFiles;
+        return outputFile;
     }
     
     public static HashMap<String, Double> getMeanValueOfCoordinates(Rengine rEngine, ArrayList<String> latitudeCoordinates, ArrayList<String> longitudeCoordinates) {
@@ -360,7 +368,7 @@ public class Tools {
         HashMap<String, String> coordinatesAndValues = null;
         HashMap<String, String> filteredCoordinatesAndValues = null;
         Set<Entry<String, String>> filteredCoordinateAndValuesEntries = null; 
-        List<String> data = null;
+        ArrayList<String> data = null;
         String[] splittedDataRow = null;
         String latitude = null;
         String longitude = null;

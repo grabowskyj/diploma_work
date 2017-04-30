@@ -6,10 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import com.taylor.localization.GenerateFiles;
 import com.taylor.tools.*;
 import com.taylor.tools.Tools.FILETYPE;
 
@@ -18,6 +16,7 @@ public class ConvertDatFile {
     private File srcFile;
     private File convFile;
     private File csvFile;
+    private static final File cellIdsAndCellNames = new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.MEASUREMENT_DATA + "\\aircom_cellkeys.csv");
     private static int maxNoOfServers = 0;
     private static FILETYPE fileType = FILETYPE.UNDEFINED;
     
@@ -53,40 +52,28 @@ public class ConvertDatFile {
         Tools.createFile(this.csvFile);
     }
     
-    @SuppressWarnings("serial")
-    final private HashMap<String, String> convertGsmCellID = new HashMap<String, String>() {
-        {
-            put("918262205", "veresegy_m_9002");
-            put("917963201", "Vegyhcity_9003");
-            put("918264506", "Csomad_9002");
-            put("918268151", "veresegyd_9003");
-            put("918267999", "veresegyd_9001");
-            put("918262136", "veresegy_m_9001");
-            put("918262052", "veresegy_m_9004");
-            put("918264437", "Csomad_9001");       
-            put("918268067", "veresegyd_9002");
-            put("918264353", "Csomad_9003");
-            put("918265031", "erdokert_9001");
-            put("918265115", "erdokert_9003");
-            put("918263566", "Szada_9004");
-            put("918263498", "Szada_9003");
-            put("918263635", "Szada_9002");
-        }
-    };
     
-    @SuppressWarnings("serial")
-    final private HashMap<String, String> convertDcsCellID = new HashMap<String, String>() {
-        {
-            put("918264727", "Csomadq_18001");
-            put("918264574", "Csomadq_18003");
-            put("918264643", "Csomadq_18002");
-            put("918262341", "veresegyq_m_18003");
-            put("917963597", "Vegyhcity_18001");
-            put("918262273", "veresegyq_m_18002");
-            put("917963743", "Vegyhcity_18002");
-            put("918268647", "GodolInd_18001");
+    
+    private HashMap<String, String> setCellIdsAndCellName (File cellDatabaseFile) {
+        ArrayList<String> cellDatabase = null;
+        HashMap<String, String> cellDatabaseMap = null;
+        String[] splittedDatabaseRow = null;
+        String cellIdInDatabase = null;
+        String cellNameInDatabase = null;
+        
+        cellDatabase = Tools.readFileToMemory(cellDatabaseFile);
+        cellDatabaseMap = new HashMap<String, String>();
+        
+        
+        for (int rowCounter = 1; rowCounter < cellDatabase.size(); rowCounter++) {
+            splittedDatabaseRow = cellDatabase.get(rowCounter).trim().split(";");
+            cellIdInDatabase = splittedDatabaseRow[0];
+            cellNameInDatabase = splittedDatabaseRow[5];
+            cellDatabaseMap.put(cellIdInDatabase, cellNameInDatabase);
         }
-    };
+        
+        return cellDatabaseMap;
+    }
     
     private void createRawData() {
         FileInputStream readFile = null;
@@ -240,7 +227,8 @@ public class ConvertDatFile {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         HashMap<String, Object> mapData = null;
-        List<String> rawData = null;
+        HashMap<String, String> cellIdCellNameMap = null;
+        ArrayList<String> rawData = null;
         ArrayList<String> arrayToCsvFile = null;
         ArrayList<String> dataPair = null;
         int dataRowNumFromRawData = 3;
@@ -255,6 +243,7 @@ public class ConvertDatFile {
         mapData = new HashMap<String, Object>();
         arrayToCsvFile = new ArrayList<String>();
         hexCharBuffer = new String[10];
+        cellIdCellNameMap = setCellIdsAndCellName(cellIdsAndCellNames);
         
         if (fileType == FILETYPE.BESTSERVER) {
             headerRow = "latitude,longitude,cellID,signalStrength";
@@ -292,7 +281,7 @@ public class ConvertDatFile {
                     
                     if (fileType == FILETYPE.BESTSERVER) {
                         processedRow = rawData.get(dataRowNumFromRawData).split(" ");
-                        dataPair = getDataFromRow(processedRow);
+                        dataPair = getDataFromRow(processedRow, cellIdCellNameMap);
                         arrayToCsvFile.addAll(dataPair);
                     }
                     
@@ -306,7 +295,7 @@ public class ConvertDatFile {
                                 hexCharCounter++;
                                 
                                 if (hexChar.equals("ff") && hexCharCounter == 10) {
-                                    dataPair = getDataFromRow(hexCharBuffer);
+                                    dataPair = getDataFromRow(hexCharBuffer, cellIdCellNameMap);
                                     arrayToCsvFile.addAll(dataPair);
                                     hexCharCounter = 0;
                                 }
@@ -338,7 +327,7 @@ public class ConvertDatFile {
         }        
     }
     
-    private ArrayList<String> getDataFromRow(String[] row) {
+    private ArrayList<String> getDataFromRow(String[] row, HashMap<String, String> cellIdCellNameDatabase) {
         HashMap <String, Integer> cellData =  null;
         ArrayList<String> dataPair = null;
         int cellId = 0;
@@ -350,11 +339,7 @@ public class ConvertDatFile {
         
         cellData = getCellData(row);
         cellId = cellData.get("cellID");
-        cellName = convertGsmCellID.get(Integer.toString(cellId));
-        
-        if (cellName == null) {
-            cellName = convertDcsCellID.get(Integer.toString(cellId));
-        }
+        cellName = cellIdCellNameDatabase.get(Integer.toString(cellId));
         
         dataPair.add(cellName);
         signalStrength = cellData.get("signalStrength");
@@ -382,94 +367,7 @@ public class ConvertDatFile {
         
         return cellData;
     }
-    
-    public void regenerateCsvFile() {
-        FileWriter fileWriter = null;
-        BufferedWriter bufferedWriter = null;
-        List<String> readedSrcFile = null;
-        Collection<String> btsCollection = null;
-        ArrayList<String> btsNameList = null;
-        ArrayList<String> btsCollectionList = null;
-        ArrayList<String> generatedRow = null;
-        ArrayList<String> generatedFile = null;
-        String[] splittedRow = null;
-        ArrayList<String> readedRow = null;
-        String rowInMemory = null;
-        int randomNumber = 0;
-        int rowLength = 0;
-        int lastSignalStrength = 0;
-        int requestedElementNumber = 0;
-        
-        System.out.println("Extending original CSV File " + getCsvFile());
-        
-        Random generateRandomValue = new Random();
-        readedSrcFile = Tools.readFileToMemory(getCsvFile());       
-        generatedFile = new ArrayList<String>();
-        Tools.createFile(getCsvFile());
-
-        try {
-             fileWriter = new FileWriter(getCsvFile());
-             bufferedWriter = new BufferedWriter(fileWriter);
-             
-             for (int rowCounter = 1; rowCounter < readedSrcFile.size(); rowCounter++) {
-                 splittedRow = readedSrcFile.get(rowCounter).split(",");
-                 readedRow = new ArrayList<String>(Arrays.asList(splittedRow));
-                 generatedRow = readedRow;
-                 btsNameList = new ArrayList<String>();
-                 
-                 for (int readedRowElementCounter = 2; readedRowElementCounter < readedRow.size(); readedRowElementCounter = readedRowElementCounter + 2) {
-                     btsNameList.add(readedRow.get(readedRowElementCounter));
-                 }
-                 
-                 if (convertGsmCellID.containsValue(btsNameList.get(0))) {
-                     btsCollection = convertGsmCellID.values();
-                     rowLength = 22;
-                 } else {
-                     btsCollection = convertDcsCellID.values();
-                     rowLength = 18;
-                 }
-                 
-                 if (splittedRow.length < rowLength){                 
-                     btsCollectionList = new ArrayList<String>(btsCollection);
-                     btsCollectionList.removeAll(btsNameList);
-                     lastSignalStrength = Integer.parseInt(generatedRow.get(generatedRow.size() - 1));
-                     requestedElementNumber = (rowLength - readedRow.size()) / 2;
-                     
-                     for (int newElementCounter = 0; newElementCounter < requestedElementNumber ; newElementCounter++) {
-                         randomNumber = generateRandomValue.nextInt(5);
-                         lastSignalStrength = lastSignalStrength - randomNumber;
-                         generatedRow.add(btsCollectionList.get(newElementCounter));
-                         generatedRow.add(Integer.toString(lastSignalStrength));
-                     }
-                 }
-                 
-                 rowInMemory = String.join(",", generatedRow);
-                 generatedFile.add(rowInMemory);
-                 bufferedWriter.write(rowInMemory);
-                 bufferedWriter.newLine();
-            }
-            
-            for (String rowToWrite : generatedFile) {
-                bufferedWriter.write(rowToWrite);
-                bufferedWriter.newLine();
-            }
-            
-        } catch(Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
-        } finally {
-            try {
-                bufferedWriter.close();
-                fileWriter.close();
-                readedSrcFile = null;
-                generatedFile = null;
-            } catch (Exception e) {
-                System.out.println(e);
-                e.printStackTrace();
-            }  
-        }
-    }
-    
+      
     public File convertDat2Csv() {
         System.out.println("Creating raw data " + getConvFile());
         createRawData();
