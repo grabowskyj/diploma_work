@@ -88,7 +88,7 @@ public class Localization {
         //Tools.filterDatabaseFile(3, gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created, 3);
         //Tools.filterDatabaseFile(3, gmon_gsm_budapestCSV, budapest_gmon_gsm_created, checkFile_budapest_gmon_gsm_created, 3);
         //Tools.filterDatabaseFile(3, gmon_umts_budapestCSV, budapest_gmon_umts_created, checkFile_budapest_gmon_umts_created, 3);
-        Tools.filterDatabaseFile(10, veresegyh_5m_G900_DCS_nthserver, veresegyh_5m_G900_DCS_nthserver_created, filtered_veresegyh_5m_G900_DCS_nthserver_created, 0);
+        Tools.filterDatabaseFile(50, veresegyh_5m_G900_DCS_nthserver, veresegyh_5m_G900_DCS_nthserver_created, filtered_veresegyh_5m_G900_DCS_nthserver_created, 0);
         
         //Tools.decoordinateDatabaseFile(gmon_gsm_veresegyhaz_2_csv, veresegyhaz_2_gmon_gsm_created, checkFile_veresegyhaz_2_gmon_gsm_created);
         
