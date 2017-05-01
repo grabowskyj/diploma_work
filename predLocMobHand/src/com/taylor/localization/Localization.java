@@ -134,13 +134,12 @@ public class Localization {
          * Use multithreaded HorizontalSearchMethod
          */
         
-        ArrayList<ArrayList<String>> allTasks = null;
+        /*ArrayList<ArrayList<String>> allTasks = null;
         ArrayList<String> taskSet = null;
-        int workerNumber = 0; 
+        int workerNumber = 1; 
         
         allTasks = createTasklist(decoordinated_file, threadNumber);
         ExecutorService executor = Executors.newFixedThreadPool(threadNumber);       
-        workerNumber = 1;
         
         for (int threadCounter = 0; threadCounter < threadNumber; threadCounter++ ) {
             taskSet = allTasks.get(threadCounter);
@@ -154,8 +153,15 @@ public class Localization {
         
         while(!executor.isTerminated()) {}
         
-        System.out.println("All threads have been finished!");
+        System.out.println("All threads have been finished!");*/
         
+        LocalizationAnalysis.summarizeMultithreadRunResults(new File (SingleWorker.multithreadRunResultsDirectory), localization_results, measurementData.size());
+        LocalizationAnalysis.calculateDistanceError(localization_results,
+                new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file), 
+                localization_error_results);
         
+        System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
+        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));
+ 
     }
 }

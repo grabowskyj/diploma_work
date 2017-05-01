@@ -4,8 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+
 import com.taylor.tools.Tools;
 import com.taylor.tools.Tools.COORDINATES;
 
@@ -32,6 +35,67 @@ public class LocalizationAnalysis {
         distance = Math.sqrt(Math.pow(distance, 2) + Math.pow(height, 2));
 
         return distance;
+    }
+    
+    public static void summarizeMultithreadRunResults(File directory, File restoredResultFile, int measurementSize) {
+        FileWriter fileWriter = null;
+        BufferedWriter bufferedWriter = null;
+        LinkedList<File> resultFiles = null;
+        ArrayList<String> accumulator = null;
+        ArrayList<String> results = null;
+        String[] accumulatorRow = null;
+        String[] nullArray = null;
+        String latitude = null;
+        String longitude = null;
+        String resultRow = null;
+        String resultHeader = null;
+        int workerNumber = 1;
+        int workers = 0;
+        int pointNumber = 1;
+        
+        resultFiles = new LinkedList<File>(Arrays.asList(directory.listFiles()));
+        nullArray = new String[measurementSize];
+        results = new ArrayList<String>(Arrays.asList(nullArray));
+        workers = resultFiles.size();
+        resultHeader = "point,latitude,longitude";
+        results.add(0, resultHeader);
+        
+        for (File resultFile : resultFiles) {
+            accumulator = Tools.readFileToMemory(resultFile);
+            
+            for (int rowCounter = 1; rowCounter < accumulator.size(); rowCounter++) {
+                accumulatorRow = accumulator.get(rowCounter).split(",");
+                latitude = accumulatorRow[1];
+                longitude = accumulatorRow[2];
+                resultRow = "Point" + pointNumber + "," + latitude + "," + longitude;
+                results.add(pointNumber, resultRow);
+                pointNumber = pointNumber + workers;
+            }
+            
+            workerNumber++;
+            pointNumber = workerNumber;
+        }
+        
+        try {
+            fileWriter = new FileWriter(restoredResultFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            
+            for (String result : results) {
+                bufferedWriter.write(result);
+                bufferedWriter.newLine();
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+        } finally {
+            try {
+                bufferedWriter.close();
+                fileWriter.close();
+            } catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
+        }
     }
     
     public static void calculateDistanceError(File resultFile, File controlFile, File errorFile) {
