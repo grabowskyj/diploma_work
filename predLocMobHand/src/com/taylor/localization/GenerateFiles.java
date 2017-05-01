@@ -28,10 +28,11 @@ public class GenerateFiles {
     private static File gmon_umts_budapestTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_umts_budapest.txt");
     private static File gmon_umts_veresegyhazTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_umts_veresegyhaz.txt");
     
-    public static File alle_5m_G900_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_G900_nthserver.csv");
-    public static File alle_5m_DCS_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_DCS_10th_nthserver.csv");
-    public static File veresegyh_5m_G900_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_nthserver.csv");
-    public static File veresegyh_5m_DCS_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Veresegyh_5m_DCS_nthserver.csv");
+    private static File alle_5m_G900_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_G900_nthserver.csv");
+    private static File alle_5m_DCS_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_DCS_10th_nthserver.csv");
+    private static File veresegyh_5m_G900_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_nthserver.csv");
+    private static File veresegyh_5m_DCS_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Veresegyh_5m_DCS_nthserver.csv");
+    
     public static File budapest_5m_G900_DCS_database = new File(GIT_DIRECTORY + CONVERTED_DATA + "budapest_5m_G900_DCS_nthserver.csv");
     public static File veresegyh_5m_G900_DCS_database = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_DCS_nthserver.csv");
     public static File gmon_gsm_veresegyhaz_1_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_veresegyhaz_1.csv");

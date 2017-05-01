@@ -162,8 +162,7 @@ public class Tools {
         return randomValue;
     }
 
-    public static File[] filterDatabaseFile(int nthRow, File inputFile, File derivedMeasurementFile, File checkFile, int range) {
-        File[] resultFiles = null;
+    public static File filterDatabaseFile(int nthRow, File inputFile, File derivedMeasurementFile, File checkFile, int range) {
         FileReader fileReader = null;
         FileWriter fileWriter = null;
         FileWriter checkFileWriter = null;
@@ -183,7 +182,6 @@ public class Tools {
         
         System.out.println("Filtering measurement file " + derivedMeasurementFile);
         
-        resultFiles = new File[]{derivedMeasurementFile, checkFile};
         csvData = new ArrayList<String>();
         createFile(checkFile);
 
@@ -272,7 +270,7 @@ public class Tools {
             }
         }
 
-        return resultFiles;
+        return derivedMeasurementFile;
     }
     
     public static File decoordinate(File inputFile, File outputFile, File checkFile) {      

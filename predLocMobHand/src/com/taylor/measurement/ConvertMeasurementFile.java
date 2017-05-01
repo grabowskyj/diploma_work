@@ -45,7 +45,7 @@ public class ConvertMeasurementFile {
     }
     
     @SuppressWarnings("serial")
-    final private HashMap<String, String> convertGsmCellID = new HashMap<String, String>() {
+    final private HashMap<String, String> convertGsmDcsCellID = new HashMap<String, String>() {
         {
             put("21431", "veresegy_m_9001");
             put("21432", "veresegy_m_9002");
@@ -63,12 +63,32 @@ public class ConvertMeasurementFile {
             put("41052", "szodliget_9002");
             put("41451", "r30godollo_9001");
             put("49191", "hungring_9001");
-        }
-    };
-    
-    @SuppressWarnings("serial")
-    final private HashMap<String, String> convertDcsCellID = new HashMap<String, String>() {
-        {
+            put("59312", "baranyai_9002");
+            put("59313", "baranyai_9003");
+            put("59311", "baranyai_9001");
+            put("4311", "Skala_9001");
+            put("4313", "Skala_G09_3");
+            put("3321", "Hamzsabegi_9001");
+            put("1921", "Fehervari_9001");
+            put("9886", "Szeremiq_18001");
+            put("59452", "allee_9002");
+            put("602", "Bartok_18002");
+            put("7763", "Egryut_9003");
+            put("7762", "Egryut_9002");
+            put("7761", "Egryut_9001");
+            put("972", "Villanyi_9002");
+            put("3103", "Karinthy_9003");
+            put("973", "Villanyi_9003");
+            put("6751", "Kosztol_9001");
+            put("3322", "Hamzsabegi_9002");
+            put("3102", "Karinthy_9002");
+            put("4321", "Szuret_9001");
+            put("3971", "Hengermal_9001");
+            put("1923", "Fehervari_9003");
+            put("7673", "UVATERV_G09_3");
+            put("1031", "Karolina_9001");
+            put("2043", "Eromu_9003");
+            put("59451", "allee_9001");
             put("60557", "Vegyhcity_18002");
             put("60556", "Vegyhcity_18001");
             put("41636", "Csomadq_18001");
@@ -76,6 +96,52 @@ public class ConvertMeasurementFile {
             put("41638", "Csomadq_18003");
             put("21437", "veresegyq_m_18002");
             put("21438", "veresegyq_m_18003");
+            put("3328", "Hamzsabegi_18003");
+            put("8686", "dorhonv_18001");
+            put("3101", "Karinthy_18001");
+            put("1037", "Karolinaq7_18002");
+            put("3977", "Hengermalq_18002");
+        }
+    };
+    
+    @SuppressWarnings("serial")
+    final private HashMap<String, String> convertUmtsCellID = new HashMap<String, String>() {
+        {
+            put("59312", "baranyai__UMTS2");
+            put("59313", "baranyai__UMTS3");
+            put("59318", "baranyai__UMTS8");
+            put("59317", "baranyai__UMTS7");
+            put("3107", "Karinthy2__UMTS6");
+            put("6756", "Kosztol__UMTS6");
+            put("44566", "Kosztol__UMTS_11");
+            put("19278", "baranyai__UMTS_8");
+            put("48758", "Hamzsabegi__UMTS_8");
+            put("48756", "Hamzsabegi__UMTS_6");
+            put("3326", "Hamzsabegi__UMTS6");
+            put("6756", "Kosztol__UMTS6");
+            put("4311", "Skala__UMTS1");
+            put("36917", "KARINTHY_UMTS_7");
+            put("4316", "Skala__UMTS6");
+            put("40328", "Skala__UMTS_8");
+            put("4318", "Skala__UMTS8");
+            put("40326", "Skala__UMTS_6");
+            put("6751", "Kosztol__UMTS1");
+            put("4317", "Skala__UMTS7");
+            put("7768", "Egryut__UMTS8");
+            put("3321", "Hamzsabegi__UMTS1");
+            put("3102", "Karinthy2__UMTS1");
+            put("3106", "Karinthy1__UMTS6");
+            put("59316", "baranyai__UMTS6");
+            put("2435", "VERESEGYHAZ__UMTS_12");
+            put("41638", "Csomad__UMTS8");
+            put("21437", "VERESEGYHAZ__UMTS7");
+            put("41633", "Csomad__UMTS3");
+            put("60558", "Vegyhcity_UMTS8");
+            put("52117", "ORBOTTYAN__UMTS7");
+            put("21432", "VERESEGYHAZ__UMTS2");
+            put("21838", "veresegyd__UMTS8");
+            put("52112", "ORBOTTYAN__UMTS2");
+            put("41017", "erdokert__UMTS7");            
         }
     };
     
@@ -160,10 +226,13 @@ public class ConvertMeasurementFile {
         for (int cellNum : neededCellOfArray) {  
             if (cellNum <= (array.length - 1)) {
                 if (neededCellOfArrayCounter % 2 == 1) {
-                    cellName = convertGsmCellID.get(array[cellNum]);
                     
-                    if (cellName == null) {
-                        cellName = convertDcsCellID.get(array[cellNum]);
+                    if (getCsvFile().getName().contains("gsm")) {
+                        cellName = convertGsmDcsCellID.get(array[cellNum]);
+                    }
+                    
+                    if (getCsvFile().getName().contains("umts")) {
+                        cellName = convertUmtsCellID.get(array[cellNum]);
                     }
                     
                     if (cellName != null && !listOfCellIds.contains(cellName)) {

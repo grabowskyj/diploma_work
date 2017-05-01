@@ -42,38 +42,35 @@ public class LocalizationAnalysis {
         BufferedWriter bufferedWriter = null;
         LinkedList<File> resultFiles = null;
         ArrayList<String> accumulator = null;
-        ArrayList<String> results = null;
         String[] accumulatorRow = null;
-        String[] nullArray = null;
+        String[] results = null;
         String latitude = null;
         String longitude = null;
         String resultRow = null;
         String resultHeader = null;
-        int workerNumber = 1;
         int workers = 0;
         int pointNumber = 1;
         
         resultFiles = new LinkedList<File>(Arrays.asList(directory.listFiles()));
-        nullArray = new String[measurementSize];
-        results = new ArrayList<String>(Arrays.asList(nullArray));
+        results = new String[measurementSize];
         workers = resultFiles.size();
         resultHeader = "point,latitude,longitude";
-        results.add(0, resultHeader);
+        results[0] = resultHeader;
         
-        for (File resultFile : resultFiles) {
-            accumulator = Tools.readFileToMemory(resultFile);
-            
-            for (int rowCounter = 1; rowCounter < accumulator.size(); rowCounter++) {
-                accumulatorRow = accumulator.get(rowCounter).split(",");
-                latitude = accumulatorRow[1];
-                longitude = accumulatorRow[2];
-                resultRow = "Point" + pointNumber + "," + latitude + "," + longitude;
-                results.add(pointNumber, resultRow);
-                pointNumber = pointNumber + workers;
+        for (int workerCounter = 0; workerCounter < workers; workerCounter++) {
+            accumulator = Tools.readFileToMemory(resultFiles.get(workerCounter));
+            resultFiles.get(workerCounter).deleteOnExit();
+                        
+            for (int rowCounter = 0; rowCounter < accumulator.size(); rowCounter++) {
+                if (rowCounter > 0) {
+                    accumulatorRow = accumulator.get(rowCounter).split(",");
+                    latitude = accumulatorRow[1];
+                    longitude = accumulatorRow[2];
+                    pointNumber = ((rowCounter - 1) * workers) + workerCounter;
+                    resultRow = "Point" + (pointNumber + 1) + "," + latitude + "," + longitude;
+                    results[pointNumber + 1] = resultRow;
+                }
             }
-            
-            workerNumber++;
-            pointNumber = workerNumber;
         }
         
         try {
@@ -167,16 +164,21 @@ public class LocalizationAnalysis {
         }
     }
     
-    public static double calculateCERP(int cerpPercent, File resultFile) {
+    public static void calculateCERP(int[] cerpPercents, File resultFile, File cerpResultFile) {
+        FileWriter fileWriter = null;
+        BufferedWriter bufferedWriter = null;
         ArrayList<String> results = null;
         ArrayList<Double> errorDistances = null;
         int nthElement = 0;
+        ArrayList<Double> cerpResults = null;
         double errorDistance = 0;
         double cerpValue = 0;
         String[] resultRow = null;
+        String rowToWrite = null;
         
         results = new ArrayList<String>();
         errorDistances = new ArrayList<Double>();
+        cerpResults = new ArrayList<Double>();
         results = Tools.readFileToMemory(resultFile);
         
         for(int resultRowCounter = 1; resultRowCounter < results.size(); resultRowCounter++) {
@@ -185,11 +187,34 @@ public class LocalizationAnalysis {
             errorDistances.add(errorDistance);
         }
         
-        Collections.sort(errorDistances);
-        nthElement = (int) ((cerpPercent * errorDistances.size()) / 100);
-        cerpValue = errorDistances.get(nthElement);
+        for (int cerpPercent : cerpPercents) {
+            Collections.sort(errorDistances);
+            nthElement = (int) ((cerpPercent * errorDistances.size()) / 100);
+            cerpValue = errorDistances.get(nthElement);
+            cerpResults.add(cerpValue);
+        }
         
-        return cerpValue;
+        try {
+            fileWriter = new FileWriter(cerpResultFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            
+            for (int cerpResultCounter = 0; cerpResultCounter < cerpPercents.length; cerpResultCounter++) {
+                rowToWrite = "CERP " + cerpPercents[cerpResultCounter] + "%: " + cerpResults.get(cerpResultCounter);
+                System.out.println(rowToWrite);
+                bufferedWriter.write(rowToWrite);
+                bufferedWriter.newLine();
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+        } finally {
+            try {
+                bufferedWriter.close();
+                fileWriter.close();
+            } catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
+        }
     }
-    
 }

@@ -182,7 +182,7 @@ public class HorizontalSearchMethod {
         lastSubtrahendEntry = subtrahendEntries.get(subtrahendEntries.size() - 1);
         weakestMinued = lastMinuedEntry.getValue();
         weakestSubtrahend = lastSubtrahendEntry.getValue();
-        weightValue = 0.0;
+        weightValue = 0.5;
 
         for (Entry<String, Integer> entry : minuedEntries) {
             minued = entry.getValue();
@@ -248,10 +248,12 @@ public class HorizontalSearchMethod {
             for (Entry<String, String> measurementEntry : measurementEntries) {
                 measurementCellsAndSignals = measurementEntry.getValue(); 
                 minimumFingerprintDifference = Integer.MAX_VALUE;
+                //System.out.println(Thread.currentThread().getName() + " Meas: " +measurementEntry);
                 
                 for (Entry<String, String> databaseEntry : databaseEntries) {
                     coordinate = databaseEntry.getKey().split(",");
                     databaseCellsAndSignals = databaseEntry.getValue();
+                    //System.out.println(Thread.currentThread().getName() + " Checking: " +databaseEntry);
 
                     measurementCellsAndSignals = putPenalties(databaseCellsAndSignals, measurementCellsAndSignals);
                     hashMappedMeasurementCellsAndSignals = hashMapper(measurementCellsAndSignals);
@@ -269,9 +271,10 @@ public class HorizontalSearchMethod {
                     }
                 }
 
-                rowToWrite = "Point" + pointCounter + "," + pointLatitude + "," + pointLongitude;
+                rowToWrite = Thread.currentThread().getName() + ": Point" + pointCounter + "," + pointLatitude + "," + pointLongitude;
                 bufferedWriter.write(rowToWrite);
                 bufferedWriter.newLine();
+                bufferedWriter.flush();
                 pointCounter++;
             }
             
