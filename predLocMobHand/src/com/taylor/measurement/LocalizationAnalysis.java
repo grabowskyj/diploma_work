@@ -40,7 +40,7 @@ public class LocalizationAnalysis {
     public static void summarizeMultithreadRunResults(File directory, File restoredResultFile, int measurementSize) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
-        LinkedList<File> resultFiles = null;
+        ArrayList<File> resultFiles = null;
         ArrayList<String> accumulator = null;
         String[] accumulatorRow = null;
         String[] results = null;
@@ -51,7 +51,7 @@ public class LocalizationAnalysis {
         int workers = 0;
         int pointNumber = 1;
         
-        resultFiles = new LinkedList<File>(Arrays.asList(directory.listFiles()));
+        resultFiles = new ArrayList<File>(Arrays.asList(directory.listFiles()));
         results = new String[measurementSize];
         workers = resultFiles.size();
         resultHeader = "point,latitude,longitude";

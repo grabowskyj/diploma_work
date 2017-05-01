@@ -21,7 +21,7 @@ public class SingleWorker implements Runnable {
     @Override
     public void run(){
         File resultFile = null;
-        String resultFileString = "results" + workerNumber + ".worker";
+        String resultFileString = "result" + (char) (workerNumber + 64) + ".worker";
         
         resultFile = new File (multithreadRunResultsDirectory + resultFileString);
         Tools.createFile(resultFile);
