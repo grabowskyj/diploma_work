@@ -201,7 +201,6 @@ public class HorizontalSearchMethod {
                 rowToWrite = "Point" + pointCounter + "," + pointLatitude + "," + pointLongitude;
                 bufferedWriter.write(rowToWrite);
                 bufferedWriter.newLine();
-                bufferedWriter.flush();
                 pointCounter++;
             }
             

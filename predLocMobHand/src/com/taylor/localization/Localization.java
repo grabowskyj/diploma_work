@@ -18,7 +18,7 @@ import com.taylor.tools.Tools;
 
 public class Localization {
 
-    private static final int threadNumber = 4;
+    private static final int threadNumber = 16;
     
     private static ArrayList<ArrayList<String>> createTasklist(File measurementFile, int divider) {
         ArrayList<ArrayList<String>> allTasks = null;
@@ -63,8 +63,8 @@ public class Localization {
          * Define file names
          */
         
-        String measurement_file_name = "m_bp_gsm";
-        String database_file_name = "s_r3_db_bp_gsm_dcs";
+        String measurement_file_name = "m_v1_gms_5r5dBm";
+        String database_file_name = "m_db_v1_gms";
         String method_type = "hs";
         
         String result_file_name = method_type + "_" + database_file_name + "_" + measurement_file_name;
@@ -106,16 +106,16 @@ public class Localization {
          * Generate measurement file
          */
         
-        /*generatedMeasurementFile = Tools.filterDatabaseFile(5, GenerateFiles.gmon_umts_veresegyhazCSV, 
+        /*generatedMeasurementFile = Tools.filterDatabaseFile(5, GenerateFiles.gmon_gsm_veresegyhaz_1_csv, 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_file_name), 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file), 
-                10);
+                5);
         
         /*
          * Create decoordinated measurement file
          */
 
-        decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_gsm_budapestCSV,
+        /*decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_gsm_veresegyhaz_2_csv,
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_file_name), 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file));
        
@@ -123,7 +123,7 @@ public class Localization {
          * Lower the database
          */
         
-        Tools.filterDatabaseFile(15, GenerateFiles.budapest_5m_G900_DCS_database,
+        /*Tools.filterDatabaseFile(15, GenerateFiles.budapest_5m_G900_DCS_database,
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_lowered_database_file_name),
                 lowered_database_file,
                 0);
@@ -132,8 +132,8 @@ public class Localization {
          * Set database file and measurement file
          */
         
-        databaseData = Tools.readFileToMemory(lowered_database_file);
-        measurementData = Tools.readFileToMemory(decoordinated_file);
+        /*databaseData = Tools.readFileToMemory(GenerateFiles.gmon_gsm_veresegyhaz_1_csv);
+        measurementData = Tools.readFileToMemory(generatedMeasurementFile);
         
         /*
          *  Use VerticalSearchMethod
@@ -166,18 +166,18 @@ public class Localization {
          * Use multithreaded HorizontalSearchMethod
          */
         
+        /*File resultDirectory = null;
+        resultDirectory = new File (SingleWorker.multithreadRunResultsDirectory);
+        
         ArrayList<ArrayList<String>> allTasks = null;
-        File resultDirectory = null;
         ArrayList<String> taskSet = null;
         int workerNumber = 1;
-        
-        resultDirectory = new File (SingleWorker.multithreadRunResultsDirectory);
         
         for (File file : resultDirectory.listFiles()) {
             file.delete();
         }
         
-        allTasks = createTasklist(decoordinated_file, threadNumber);
+        allTasks = createTasklist(generatedMeasurementFile, threadNumber);
         ExecutorService executor = Executors.newFixedThreadPool(threadNumber);       
         
         for (int threadCounter = 0; threadCounter < threadNumber; threadCounter++ ) {
@@ -200,6 +200,10 @@ public class Localization {
                 localization_error_results);
         
         LocalizationAnalysis.calculateCERP(cerpValues, localization_error_results, localization_cerp_results);
+        
+        /*
+         * 
+         */
  
     }
 }
