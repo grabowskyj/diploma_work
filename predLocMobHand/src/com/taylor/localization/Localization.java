@@ -18,7 +18,7 @@ import com.taylor.tools.Tools;
 
 public class Localization {
 
-    private static final int threadNumber = 8;
+    private static final int threadNumber = 4;
     
     private static ArrayList<ArrayList<String>> createTasklist(File measurementFile, int divider) {
         ArrayList<ArrayList<String>> allTasks = null;
@@ -55,7 +55,6 @@ public class Localization {
         return allTasks;
     }
     
-    @SuppressWarnings("unused")
     public static void main(String[] args) {
        
         System.out.println("Localizating ...");
@@ -64,10 +63,24 @@ public class Localization {
          * Define file names
          */
         
-        String decoordinated_file_name = "decoordinated_veresegyhaz_gsm.csv";
-        String check_file_name_for_decoordinated_file = "checkfile_for_decoordinated_veresegyhaz_gsm.csv";
-        String localization_results_file_name = "localization_results.csv";
-        String localization_error_results_file_name = "localization_error_results.csv";
+        String measurement_file_name = "m_bp_gsm";
+        String database_file_name = "s_r3_db_bp_gsm_dcs";
+        String method_type = "hs";
+        
+        String result_file_name = method_type + "_" + database_file_name + "_" + measurement_file_name;
+        String decoordinated_file_name = "decoordinated_" + measurement_file_name + ".csv";
+        String check_file_name_for_decoordinated_file = "checkfile_for_" + decoordinated_file_name + ".csv";
+        String lowered_database_file_name = "lowered_" + database_file_name + ".csv";
+        String decoordinated_lowered_database_file_name = "decoordinated_" + lowered_database_file_name + ".csv";
+        String localization_results_file_name = result_file_name + "_localization_results.csv";
+        String localization_error_results_file_name = result_file_name + "_localization_error_results.csv";
+        String localization_cerp_results_file_name = result_file_name + "_localization_cerp_results.csv";
+        
+        /*
+         * Requested CERP values
+         */
+        
+        int[] cerpValues = new int[]{95,67};
         
         /*
          * Set files for localization
@@ -75,7 +88,10 @@ public class Localization {
         
         File localization_results = new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.RESULTS + localization_results_file_name);
         File localization_error_results = new File(GenerateFiles.GIT_DIRECTORY + GenerateFiles.RESULTS + localization_error_results_file_name);
+        File localization_cerp_results = new File(GenerateFiles.GIT_DIRECTORY + GenerateFiles.RESULTS + localization_cerp_results_file_name);
         File decoordinated_file = null;
+        File lowered_database_file = new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.RESULTS + lowered_database_file_name);
+        File generatedMeasurementFile = null;
         ArrayList<String> databaseData = null;
         ArrayList<String> measurementData = null;
         
@@ -87,18 +103,36 @@ public class Localization {
         //GenerateFiles.generateMeasurements();
         
         /*
+         * Generate measurement file
+         */
+        
+        /*generatedMeasurementFile = Tools.filterDatabaseFile(5, GenerateFiles.gmon_umts_veresegyhazCSV, 
+                new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_file_name), 
+                new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file), 
+                10);
+        
+        /*
          * Create decoordinated measurement file
          */
 
-        decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_gsm_veresegyhaz_2_csv,
+        decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_gsm_budapestCSV,
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_file_name), 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file));
+       
+        /*
+         * Lower the database
+         */
+        
+        Tools.filterDatabaseFile(15, GenerateFiles.budapest_5m_G900_DCS_database,
+                new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_lowered_database_file_name),
+                lowered_database_file,
+                0);
         
         /*
          * Set database file and measurement file
          */
         
-        databaseData = Tools.readFileToMemory(GenerateFiles.gmon_gsm_veresegyhaz_2_csv);
+        databaseData = Tools.readFileToMemory(lowered_database_file);
         measurementData = Tools.readFileToMemory(decoordinated_file);
         
         /*
@@ -113,8 +147,7 @@ public class Localization {
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file),
                 localization_error_results);
         
-        System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
-        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));*/
+        LocalizationAnalysis.calculateCERP(cerpValues, localization_error_results, localization_cerp_results);
         
         /*
          * Use HorizontalSearchMethod
@@ -127,16 +160,22 @@ public class Localization {
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file),
                 localization_error_results);
         
-        System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
-        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));*/
+        LocalizationAnalysis.calculateCERP(cerpValues, localization_error_results, localization_cerp_results);
         
         /*
          * Use multithreaded HorizontalSearchMethod
          */
         
-        /*ArrayList<ArrayList<String>> allTasks = null;
+        ArrayList<ArrayList<String>> allTasks = null;
+        File resultDirectory = null;
         ArrayList<String> taskSet = null;
-        int workerNumber = 1; 
+        int workerNumber = 1;
+        
+        resultDirectory = new File (SingleWorker.multithreadRunResultsDirectory);
+        
+        for (File file : resultDirectory.listFiles()) {
+            file.delete();
+        }
         
         allTasks = createTasklist(decoordinated_file, threadNumber);
         ExecutorService executor = Executors.newFixedThreadPool(threadNumber);       
@@ -153,15 +192,14 @@ public class Localization {
         
         while(!executor.isTerminated()) {}
         
-        System.out.println("All threads have been finished!");*/
+        System.out.println("All threads have been finished!");
         
-        LocalizationAnalysis.summarizeMultithreadRunResults(new File (SingleWorker.multithreadRunResultsDirectory), localization_results, measurementData.size());
+        LocalizationAnalysis.summarizeMultithreadRunResults(resultDirectory, localization_results, measurementData.size());
         LocalizationAnalysis.calculateDistanceError(localization_results,
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file), 
                 localization_error_results);
         
-        System.out.println("CERP 95%: " + LocalizationAnalysis.calculateCERP(95, localization_error_results));
-        System.out.println("CERP 67%: " + LocalizationAnalysis.calculateCERP(67, localization_error_results));
+        LocalizationAnalysis.calculateCERP(cerpValues, localization_error_results, localization_cerp_results);
  
     }
 }

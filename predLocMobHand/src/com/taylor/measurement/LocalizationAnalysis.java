@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-
 import com.taylor.tools.Tools;
 import com.taylor.tools.Tools.COORDINATES;
 
@@ -59,7 +57,7 @@ public class LocalizationAnalysis {
         
         for (int workerCounter = 0; workerCounter < workers; workerCounter++) {
             accumulator = Tools.readFileToMemory(resultFiles.get(workerCounter));
-            resultFiles.get(workerCounter).deleteOnExit();
+            
                         
             for (int rowCounter = 0; rowCounter < accumulator.size(); rowCounter++) {
                 if (rowCounter > 0) {

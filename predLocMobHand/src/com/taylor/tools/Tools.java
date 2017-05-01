@@ -375,17 +375,21 @@ public class Tools {
         String modifiedCellsAndSignal = null;
         String valuesToCoordinate = null;
         String rowToWrite = null;
+        String headerRow = null;
         
-        System.out.println("Merging DCS and GSM files to " + outputFile);
+        System.out.println("Merging GSM and DCS files to " + outputFile);
         
         createFile(outputFile);
         coordinatesAndValues = new LinkedHashMap<String, String>();
         filteredCoordinatesAndValues = new LinkedHashMap<String, String>();
         data = new ArrayList<String>();
+        headerRow = "latitude,longitude,cellID,signalStrength";
                 
         try {
             fileWriter = new FileWriter(outputFile);
             bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(headerRow);
+            bufferedWriter.newLine();
             data = readFileToMemory(gsmFile);
           
             for (int rowCounter = 1; rowCounter < data.size(); rowCounter++) {
