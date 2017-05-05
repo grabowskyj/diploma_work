@@ -14,8 +14,8 @@ public class GenerateFiles {
     public static final String RESULTS = "diploma_work\\test_dir\\measurement_data\\results\\";
     public static final String DECOORDINATED_MEASUREMENT_DATA = "diploma_work\\test_dir\\measurement_data\\decoordinated_data\\";
     
-    private static File alle_5m_DCS_nthserver_dat = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "Alle_5m_DCS_10th_nthserver.dat");
-    private static File alle_5m_DCS_nthserver_conv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_DCS_10th_nthserver.conv");
+    private static File alle_5m_DCS_nthserver_dat = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "Alle_5m_DCS_nthserver.dat");
+    private static File alle_5m_DCS_nthserver_conv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_DCS_nthserver.conv");
     private static File alle_5m_G900_nthserver_dat = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "Alle_5m_G900_nthserver.dat");
     private static File alle_5m_G900_nthserver_conv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_G900_nthserver.conv");
     private static File veresegyh_5m_G900_nthserver_dat = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "veresegyh_5m_G900_nthserver.dat");
@@ -29,7 +29,7 @@ public class GenerateFiles {
     private static File gmon_umts_veresegyhazTXT = new File(GIT_DIRECTORY + MEASUREMENT_DATA + "gmon_umts_veresegyhaz.txt");
     
     private static File alle_5m_G900_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_G900_nthserver.csv");
-    private static File alle_5m_DCS_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_DCS_10th_nthserver.csv");
+    private static File alle_5m_DCS_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Alle_5m_DCS_nthserver.csv");
     private static File veresegyh_5m_G900_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "veresegyh_5m_G900_nthserver.csv");
     private static File veresegyh_5m_DCS_nthserver_csv = new File(GIT_DIRECTORY + CONVERTED_DATA + "Veresegyh_5m_DCS_nthserver.csv");
     
@@ -40,6 +40,7 @@ public class GenerateFiles {
     public static File gmon_umts_veresegyhazCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_umts_veresegyhaz.csv");
     public static File gmon_gsm_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_gsm_budapest.csv");
     public static File gmon_umts_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_umts_budapest.csv");
+    public static File gmon_database_veresegyhaz = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_database_veresegyhaz.csv");
     
     public static void generateDatabase() {
 
@@ -75,6 +76,8 @@ public class GenerateFiles {
         gmon_umts_veresegyhaz.convertMeasurement2Csv();
         gmon_gsm_budapest.convertMeasurement2Csv();
         gmon_umts_budapest.convertMeasurement2Csv();
+        
+        Tools.createDatabaseFromMeasurements(new File[]{gmon_gsm_veresegyhaz_1_csv, gmon_gsm_veresegyhaz_2_csv}, gmon_database_veresegyhaz);
     }
     
 }

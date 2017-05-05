@@ -63,8 +63,8 @@ public class Localization {
          * Define file names
          */
         
-        String measurement_file_name = "m_v1_gms_5r5dBm";
-        String database_file_name = "m_db_v1_gms";
+        String measurement_file_name = "m_v2_gsm_full";
+        String database_file_name = "m_db_v_gsm_dcs";
         String method_type = "hs";
         
         String result_file_name = method_type + "_" + database_file_name + "_" + measurement_file_name;
@@ -106,16 +106,16 @@ public class Localization {
          * Generate measurement file
          */
         
-        /*generatedMeasurementFile = Tools.filterDatabaseFile(5, GenerateFiles.gmon_gsm_veresegyhaz_1_csv, 
+        /*generatedMeasurementFile = Tools.filterDatabaseFile(0, GenerateFiles.gmon_gsm_veresegyhaz_1_csv, 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_file_name), 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file), 
-                5);
+                0);
         
         /*
          * Create decoordinated measurement file
          */
 
-        /*decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_gsm_veresegyhaz_2_csv,
+        decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_umts_veresegyhazCSV,
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_file_name), 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file));
        
@@ -132,16 +132,15 @@ public class Localization {
          * Set database file and measurement file
          */
         
-        /*databaseData = Tools.readFileToMemory(GenerateFiles.gmon_gsm_veresegyhaz_1_csv);
-        measurementData = Tools.readFileToMemory(generatedMeasurementFile);
+        databaseData = Tools.readFileToMemory(GenerateFiles.gmon_umts_veresegyhazCSV);
+        measurementData = Tools.readFileToMemory(decoordinated_file);
         
         /*
          *  Use VerticalSearchMethod
          */
         
         /*VerticalSearchMethod newLocationVS = new VerticalSearchMethod(databaseData, measurementData);
-        HashMap<String, ArrayList<String>> database = newLocationVS.createDatabaseForVerticalSearch();
-        newLocationVS.getLocation(database, localization_results);
+        newLocationVS.getLocation(localization_results);
         
         LocalizationAnalysis.calculateDistanceError(localization_results, 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file),
@@ -166,7 +165,7 @@ public class Localization {
          * Use multithreaded HorizontalSearchMethod
          */
         
-        /*File resultDirectory = null;
+        File resultDirectory = null;
         resultDirectory = new File (SingleWorker.multithreadRunResultsDirectory);
         
         ArrayList<ArrayList<String>> allTasks = null;
@@ -177,7 +176,7 @@ public class Localization {
             file.delete();
         }
         
-        allTasks = createTasklist(generatedMeasurementFile, threadNumber);
+        allTasks = createTasklist(decoordinated_file, threadNumber);
         ExecutorService executor = Executors.newFixedThreadPool(threadNumber);       
         
         for (int threadCounter = 0; threadCounter < threadNumber; threadCounter++ ) {

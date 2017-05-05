@@ -24,7 +24,7 @@ public class VerticalSearchMethod {
         this.measurement = measurement;
     }
     
-    public HashMap<String, ArrayList<String>> createDatabaseForVerticalSearch() {
+    private HashMap<String, ArrayList<String>> createDatabaseForVerticalSearch() {
         HashMap<String, ArrayList<String>> databaseData = null;
         int simulationDataHeaderElementCounter = 0;
         String[] simulationDataHeader = null;
@@ -89,10 +89,12 @@ public class VerticalSearchMethod {
         elementName = elementNameAndElement[0];
         element = elementNameAndElement[1];
         dataset = database.get(elementName);
-                
-        for (int datasetElementCounter = 0; datasetElementCounter < dataset.size(); datasetElementCounter++) {
-            if (element.equals(dataset.get(datasetElementCounter))) {
-                indexListOfElement.add(datasetElementCounter);
+        
+        if (dataset != null) {
+            for (int datasetElementCounter = 0; datasetElementCounter < dataset.size(); datasetElementCounter++) {
+                if (element.equals(dataset.get(datasetElementCounter))) {
+                    indexListOfElement.add(datasetElementCounter);
+                }
             }
         }
         
@@ -169,7 +171,7 @@ public class VerticalSearchMethod {
         return indexListOfElements;
     }
     
-    public void getLocation(HashMap<String, ArrayList<String>> database, File resultFile) {
+    public void getLocation(File resultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         HashMap<String, ArrayList<String>> transitionalDatabase = null; 
@@ -187,6 +189,7 @@ public class VerticalSearchMethod {
         String pointLongitude = null;
         String resultFileHeader = null;
         int measurementDataHeaderElementCounter = 0;
+        boolean isElementInList = true;
         Rengine rEngine = null;
         
         coordinates = new HashMap<String, Double>();
@@ -197,7 +200,8 @@ public class VerticalSearchMethod {
         measurementDataHeader = measurement.get(0).split(",");
         
         Tools.createFile(resultFile);
-
+        HashMap<String, ArrayList<String>> createdDatabase = createDatabaseForVerticalSearch();
+        
         try {
             fileWriter = new FileWriter(resultFile);
             bufferedWriter = new BufferedWriter(fileWriter);
@@ -209,11 +213,17 @@ public class VerticalSearchMethod {
             rEngine = new Rengine(new String[] { "--no-save" }, false, null);
             
             for (int measurementDataRowCounter = 1; measurementDataRowCounter < measurement.size(); measurementDataRowCounter++) {
-                transitionalDatabase = database;
+                transitionalDatabase = createdDatabase;
                 splittedMeasurementRow = measurement.get(measurementDataRowCounter).split(",");
                 measurementDataHeaderElementCounter = 0;
+                System.out.println("Measurement: " + measurementDataRowCounter + "/" + measurement.size());
                 
                 for (String splittedMeasurementRowElement : splittedMeasurementRow) {
+                    if (isElementInList != true) {
+                        isElementInList = true;
+                        continue;
+                    }
+                    
                     elementName = measurementDataHeader[measurementDataHeaderElementCounter];
                     elementNameAndElement[0] = elementName;
                     elementNameAndElement[1] = splittedMeasurementRowElement;
@@ -222,6 +232,11 @@ public class VerticalSearchMethod {
                     
                     if (indexListOfElements.isEmpty() && elementName.endsWith("signalStrength")) {
                         indexListOfElements = checkSideValues(elementNameAndElement, transitionalDatabase); 
+                    }
+                    
+                    if (indexListOfElements.isEmpty() && elementName.endsWith("cellID")) {
+                        isElementInList = false;
+                        continue;
                     }
                     
                     transitionalDatabase = createDatabaseFromSelection(elementName, indexListOfElements, transitionalDatabase);
@@ -243,6 +258,7 @@ public class VerticalSearchMethod {
                 rowToWrite = "Point" + measurementDataRowCounter + "," + pointLatitude + "," + pointLongitude;
                 bufferedWriter.write(rowToWrite);
                 bufferedWriter.newLine();
+                bufferedWriter.flush();
                 coordinates.clear();
             }
             

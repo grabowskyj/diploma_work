@@ -360,6 +360,52 @@ public class Tools {
         return result;
     }
     
+    public static File createDatabaseFromMeasurements(File[] srcFiles, File outputFile) {
+        FileWriter fileWriter = null;
+        BufferedWriter bufferedWriter = null;
+        ArrayList<String> readedFile = null;
+        String headerRow = null;
+        String rowToWrite = null;
+        boolean isHeaderAdded = false;
+        
+        try {
+            fileWriter = new FileWriter(outputFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            
+            for (File srcFile : srcFiles) {
+                readedFile = readFileToMemory(srcFile);
+                
+                if (isHeaderAdded == false) {
+                    headerRow = readedFile.get(0);
+                    rowToWrite = String.join(",", headerRow);
+                    isHeaderAdded = true;
+                    bufferedWriter.write(rowToWrite);
+                    bufferedWriter.newLine();
+                }
+                
+                for (int rowCounter = 1; rowCounter < readedFile.size(); rowCounter++) {
+                    rowToWrite = String.join(",", readedFile.get(rowCounter));
+                    bufferedWriter.write(rowToWrite);
+                    bufferedWriter.newLine();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+        } finally {
+            try {
+                bufferedWriter.close();
+                fileWriter.close();
+                readedFile = null;
+            } catch (Exception e) {
+                System.out.println(e);
+                e.printStackTrace();
+            }
+        }
+        
+        return outputFile;
+    }
+    
     public static void meltGsmDcs(File gsmFile, File dcsFile, File outputFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
