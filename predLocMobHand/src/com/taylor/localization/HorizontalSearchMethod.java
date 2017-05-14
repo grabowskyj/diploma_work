@@ -22,12 +22,22 @@ public class HorizontalSearchMethod {
     private final ArrayList<String> database;
     private final ArrayList<String> measurement;
     private final String penaltySignalStrength = "-140";
-        
+    
+    /**
+     * Constructor for HorizontalSearchMethod
+     * @param database ArrayList type datasource
+     * @param measurement ArrayList type measurement data
+     */
     public HorizontalSearchMethod(ArrayList<String> database, ArrayList<String> measurement) {
         this.database = database;
         this.measurement = measurement;
     }
     
+    /**
+     * Creates HashMap type datasource from the ArrayList type input datasource
+     * @param database ArrayList type input datasource
+     * @return HashMap type input data
+     */
     private HashMap<String, String> createHashMappedDatabase(ArrayList<String> database) {
         HashMap<String, String> databaseHashMap = null;
         String[] databaseRow = null;
@@ -64,7 +74,13 @@ public class HorizontalSearchMethod {
         return databaseHashMap;
     }
     
-    private String putPenalties(String srcCellsAndSignals, String destCellsAndSignals) {
+    /**
+     * Puts penalty cells and data to the target signal strength fingerprint 
+     * @param srcCellsAndSignals source signal strength fingerprint to be taken as base fingerprint
+     * @param targetCellsAndSignals target signal strength fingerprint where penalties will be put
+     * @return penalty modified target fingerprint
+     */
+    private String putPenalties(String srcCellsAndSignals, String targetCellsAndSignals) {
         String penaltyCell = null;
         String dataWithPenalties = null; 
         String[] data = null;
@@ -73,7 +89,7 @@ public class HorizontalSearchMethod {
         
         data = srcCellsAndSignals.split(",");
         srcData = new ArrayList<String>(Arrays.asList(data));
-        data = destCellsAndSignals.split(",");
+        data = targetCellsAndSignals.split(",");
         dcsData = new ArrayList<String>(Arrays.asList(data));
         
         for (int elemCounter = 0; elemCounter < srcData.size(); elemCounter = elemCounter + 2) {
@@ -89,7 +105,12 @@ public class HorizontalSearchMethod {
         return dataWithPenalties;
     }
     
-    private HashMap<String, Integer> hashMapper(String toHashMap) {
+    /**
+     * Creates HashMap type fingerprint from String type fingerpring
+     * @param srcFingerprint String type source fingerprint to be modified
+     * @return HashMap type fingerprint
+     */
+    private HashMap<String, Integer> hashMapper(String srcFingerprint) {
         HashMap<String, Integer> resultHashMap = null;
         ArrayList<String> cellsAndSignals = null;
         Iterator<String> iterableCellsAndSignals = null;
@@ -98,7 +119,7 @@ public class HorizontalSearchMethod {
         int signalStrength = 0; 
         
         resultHashMap = new HashMap<String, Integer>();
-        data = toHashMap.split(",");
+        data = srcFingerprint.split(",");
         cellsAndSignals = new ArrayList<String>(Arrays.asList(data));
         iterableCellsAndSignals = cellsAndSignals.iterator();
         
@@ -111,6 +132,12 @@ public class HorizontalSearchMethod {
         return resultHashMap;
     }
     
+    /**
+     * Calculates the distance between two fingerprint
+     * @param minuedMap fingerprint at measurement point
+     * @param subtrahendMap fingerprint from the datasource
+     * @return distance between the measurement point fingerprint and the datasource fingerprint
+     */
     private double calculateFingerprintDifferenceMethod(HashMap<String, Integer> minuedMap, HashMap<String, Integer> subtrahendMap) {
         Set<Entry<String, Integer>> minuedEntrySet = null;
         List<Entry<String, Integer>> minuedEntries = null;
@@ -135,6 +162,10 @@ public class HorizontalSearchMethod {
         return result;
     }
     
+    /**
+     * Determinates the coordinates of the measurement points
+     * @param resultFile Result file, where the results of the localizations will be stored 
+     */
     public void getLocation(File resultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;

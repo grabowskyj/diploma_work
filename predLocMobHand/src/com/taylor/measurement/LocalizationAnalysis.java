@@ -12,6 +12,16 @@ import com.taylor.tools.Tools.COORDINATES;
 
 public class LocalizationAnalysis {
     
+    /**
+     * Calculates the distance between two geographical position
+     * @param latitudeOfPoint1 latitude of the first geographical point
+     * @param latitudeOfPoint2 latitude of the second geographical point
+     * @param longitudeOfPoint1 longitude of the first geographical point
+     * @param longitudeOfPoint2 longitude of the second geographical point
+     * @param heightOfPoint1 height of the first geographical point
+     * @param heightOfPoint2 height of the second geographical point
+     * @return distance between the two geographical position
+     */
     public static double getDistance(double latitudeOfPoint1, double latitudeOfPoint2, double longitudeOfPoint1, double longitudeOfPoint2, double heightOfPoint1, double heightOfPoint2) {
         final int earthRadius = 6371;
         double distance = 0;
@@ -35,6 +45,12 @@ public class LocalizationAnalysis {
         return distance;
     }
     
+    /**
+     * Summarizes the results of the multithread run
+     * @param directory directory, where separate results are stored
+     * @param restoredResultFile name of the file containing the summarized results
+     * @param measurementSize number of the meausrement points
+     */
     public static void summarizeMultithreadRunResults(File directory, File restoredResultFile, int measurementSize) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
@@ -93,6 +109,12 @@ public class LocalizationAnalysis {
         }
     }
     
+    /**
+     * Calculates error distances between the original locations of measurement points and the algorithm determined locations of measurement points 
+     * @param resultFile file containing the results of the algorithm
+     * @param controlFile file containing the original locations of measurement points
+     * @param errorFile file containing the calculated error distances
+     */
     public static void calculateDistanceError(File resultFile, File controlFile, File errorFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
@@ -162,6 +184,12 @@ public class LocalizationAnalysis {
         }
     }
     
+    /**
+     * Calculates the requested CERP values of the results
+     * @param cerpPercents list containing the requested CERP values
+     * @param resultFile file conatining the results of the algorithm
+     * @param cerpResultFile file, where the results of the calculation will be stored
+     */
     public static void calculateCERP(int[] cerpPercents, File resultFile, File cerpResultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;

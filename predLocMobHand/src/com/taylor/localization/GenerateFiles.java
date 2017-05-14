@@ -42,9 +42,10 @@ public class GenerateFiles {
     public static File gmon_umts_budapestCSV = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_umts_budapest.csv");
     public static File gmon_database_veresegyhaz = new File(GIT_DIRECTORY + CONVERTED_DATA + "gmon_database_veresegyhaz.csv");
     
+    /**
+     * Summarized method for datasource converting
+     */
     public static void generateDatabase() {
-
-        
         ConvertDatFile alle_5m_G900_nthserver = new ConvertDatFile(alle_5m_G900_nthserver_dat, alle_5m_G900_nthserver_conv, alle_5m_G900_nthserver_csv);
         ConvertDatFile alle_5m_DCS_nthserver = new ConvertDatFile(alle_5m_DCS_nthserver_dat, alle_5m_DCS_nthserver_conv, alle_5m_DCS_nthserver_csv);
         ConvertDatFile veresegyh_5m_G900_nthserver = new ConvertDatFile(veresegyh_5m_G900_nthserver_dat, veresegyh_5m_G900_nthserver_conv, veresegyh_5m_G900_nthserver_csv);
@@ -63,8 +64,10 @@ public class GenerateFiles {
         veresegyh_5m_DCS_nthserver_csv.delete();
     }
     
+    /**
+     * Summarized method for measurement converting
+     */
     public static void generateMeasurements() {
-
         ConvertMeasurementFile gmon_gsm_veresegyhaz_1 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_1TXT, gmon_gsm_veresegyhaz_1_csv);
         ConvertMeasurementFile gmon_gsm_veresegyhaz_2 = new ConvertMeasurementFile(gmon_gsm_veresegyhaz_2TXT, gmon_gsm_veresegyhaz_2_csv);
         ConvertMeasurementFile gmon_umts_veresegyhaz = new ConvertMeasurementFile(gmon_umts_veresegyhazTXT, gmon_umts_veresegyhazCSV);

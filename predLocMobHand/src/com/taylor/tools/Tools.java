@@ -26,6 +26,11 @@ public class Tools {
     public static enum FILETYPE {BESTSERVER, NTHSERVER, UNDEFINED};
     public static enum DATATYPE {CELLNAME, SIGNALSTRENGTH};
     
+    /**
+     * Enumeration for coordinates
+     * @author Péter
+     *
+     */
     public static enum COORDINATES {
         LATITUDE ("latitude"),
         LONGITUDE ("longitude");
@@ -42,6 +47,10 @@ public class Tools {
         }
     }
     
+    /**
+     * Creates file given in parameter, removes if it already exists 
+     * @param file to be created
+     */
     public static void createFile(File file) {
         if (file.exists()) {
             file.delete();
@@ -54,7 +63,12 @@ public class Tools {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * Converts hexadecimal value to decimal value
+     * @param array to be converted
+     * @return decimal value of the hexadecimal value
+     */
     public static int convertHex2Dec(String[] array) {
         int value = 0;
         String hexString = String.join("", array);
@@ -69,14 +83,24 @@ public class Tools {
 
         return value;
     }
-
+    
+    /**
+     * Converts hexadecimal value to character
+     * @param hex to be converted
+     * @return char type character of the hexadecimal value
+     */
     public static char convertHex2Char(String hex) {
         int hex2decimal = Integer.parseInt(hex, 16);
         char character = (char) hex2decimal;
 
         return character;
     }
-
+    
+    /**
+     * Reverses array
+     * @param array to be reserved
+     * @return reserved array
+     */
     public static String[] reversArray(String[] array) {
         int reverseArrayLength = array.length;
         String[] reversArray = new String[reverseArrayLength];
@@ -86,7 +110,12 @@ public class Tools {
 
         return reversArray;
     }
-
+    
+    /**
+     * Reads file to the memory
+     * @param data to be read
+     * @return ArrayList type datastructure in memory
+     */
     public static ArrayList<String> readFileToMemory(File data) {
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
@@ -115,7 +144,13 @@ public class Tools {
 
         return dataInMemory;
     }
-
+    
+    /**
+     * Converts WGS84 to HD72EOV
+     * @param y latitude
+     * @param x longitude
+     * @return converted coordinates
+     */
     public static HashMap<String, Double> wgs84ToHd72Eov(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
@@ -133,7 +168,13 @@ public class Tools {
 
         return coordinates;
     }
-
+    
+    /**
+     * Converts HD72EOV to WGS84 
+     * @param y latitude
+     * @param x longitude
+     * @return converted coordinates
+     */
     public static HashMap<String, Double> hd72EovToWgs84(double y, double x) {
         SpatialReference wgs84 = new SpatialReference();
         SpatialReference hd72eov = new SpatialReference();
@@ -154,14 +195,28 @@ public class Tools {
 
         return coordinates;
     }
-
+    
+    /**
+     * Generates random number in symmetric range
+     * @param symmetricRange symmetric range value
+     * @return generated random value
+     */
     public static int generateRandomValue(int symmetricRange) {
         Random generateRandomValue = new Random();
         int randomValue = generateRandomValue.nextInt((2 * symmetricRange) + 1) - symmetricRange;
 
         return randomValue;
     }
-
+    
+    /**
+     * Filters datasource
+     * @param nthRow every nthRow to be read
+     * @param inputFile name of the source file to be filtered
+     * @param derivedMeasurementFile name of the filtered result file
+     * @param checkFile name of the checkfile for filtered result file
+     * @param range modify signal strengths in range
+     * @return name of the filtered result file
+     */
     public static File filterDatabaseFile(int nthRow, File inputFile, File derivedMeasurementFile, File checkFile, int range) {
         FileReader fileReader = null;
         FileWriter fileWriter = null;
@@ -273,6 +328,13 @@ public class Tools {
         return derivedMeasurementFile;
     }
     
+    /**
+     * Decoordinates the given file
+     * @param inputFile name of the source file to be decoordinated
+     * @param outputFile name of the decoordinated file
+     * @param checkFile checkfile for the decoordinated file
+     * @return name of the decoordinated file
+     */
     public static File decoordinate(File inputFile, File outputFile, File checkFile) {      
         System.out.println("Decoordinating " + inputFile + " file to " + outputFile);
         
@@ -281,6 +343,13 @@ public class Tools {
         return outputFile;
     }
     
+    /**
+     * Calculates the mean value of the coordinates
+     * @param rEngine R engine to be used
+     * @param latitudeCoordinates ArrayList type list containing the latitude coordinates
+     * @param longitudeCoordinates ArrayList type list containing the longitude coordinates
+     * @return calculated mean value of the coordinates
+     */
     public static HashMap<String, Double> getMeanValueOfCoordinates(Rengine rEngine, ArrayList<String> latitudeCoordinates, ArrayList<String> longitudeCoordinates) {
         HashMap<String, Double> coordinates = new HashMap<String, Double>();
         double latitudeCoordinate = 0;
@@ -314,6 +383,12 @@ public class Tools {
         return coordinates;
     }
     
+    /**
+     * Sorts HashMap
+     * @param srcData source HashMap to be sorted
+     * @param byData sort by datatype
+     * @return sorted HashMap
+     */
     public static HashMap<String, Integer> sortHashMap(HashMap<String,Integer> srcData, DATATYPE byData) {
         HashMap<String, Integer> sortedMap = null;
         Set<Entry<String, Integer>> hashmapEntrySet = null;
@@ -346,6 +421,12 @@ public class Tools {
         return sortedMap;
     }
     
+    /**
+     * Sorts HashMap by the keys of a reference HashMap
+     * @param srcData source HashMap to be sorted
+     * @param refData reference HashMap
+     * @return sorted HashMap
+     */
     public static HashMap<String, Integer> sortHashMapByReference(HashMap<String,Integer> srcData, HashMap<String,Integer> refData) {
         HashMap<String, Integer> result = null;
         Set<String> refList = null;
@@ -360,6 +441,12 @@ public class Tools {
         return result;
     }
     
+    /**
+     * Create datasource from measurements
+     * @param srcFiles list containing the measurements
+     * @param outputFile name of the datasource to be created
+     * @return name of the datasource file
+     */
     public static File createDatabaseFromMeasurements(File[] srcFiles, File outputFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
@@ -406,6 +493,12 @@ public class Tools {
         return outputFile;
     }
     
+    /**
+     * Melts GSM900 and GSM1800 simulation datasources
+     * @param gsmFile file name of the GSM900 file
+     * @param dcsFile file name of the GSM1800 file
+     * @param outputFile name of the melted simulation datasource to be created
+     */
     public static void meltGsmDcs(File gsmFile, File dcsFile, File outputFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;

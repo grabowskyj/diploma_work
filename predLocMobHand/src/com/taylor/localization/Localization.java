@@ -13,12 +13,13 @@ import com.taylor.localization.HorizontalSearchMethod;
 import com.taylor.tools.Tools;
 
 /*
- * need to set -Xmx4096m in VM Arguments
+ * Need to set -Xmx4096m in VM Arguments to avoid out of memory exceptions
  */
 
 public class Localization {
-
-    private static final int threadNumber = 16;
+    
+    //Change threadNumber according to the number of required threads (optional number lies between 1-4)
+    private static final int threadNumber = 4;
     
     private static ArrayList<ArrayList<String>> createTasklist(File measurementFile, int divider) {
         ArrayList<ArrayList<String>> allTasks = null;
@@ -60,12 +61,16 @@ public class Localization {
         System.out.println("Localizating ...");
         
         /*
-         * Define file names
+         * Define file names for differentiate the result files
          */
         
         String measurement_file_name = "m_v2_gsm_full";
         String database_file_name = "m_db_v_gsm_dcs";
         String method_type = "hs";
+        
+        /*
+         * No modification is needed here 
+         */
         
         String result_file_name = method_type + "_" + database_file_name + "_" + measurement_file_name;
         String decoordinated_file_name = "decoordinated_" + measurement_file_name + ".csv";
@@ -77,13 +82,14 @@ public class Localization {
         String localization_cerp_results_file_name = result_file_name + "_localization_cerp_results.csv";
         
         /*
-         * Requested CERP values
+         * Requested CERP values, change or put numbers into the bracket
          */
         
         int[] cerpValues = new int[]{95,67};
         
         /*
          * Set files for localization
+         * No modification is needed here
          */
         
         File localization_results = new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.RESULTS + localization_results_file_name);
@@ -95,6 +101,8 @@ public class Localization {
         ArrayList<String> databaseData = null;
         ArrayList<String> measurementData = null;
         
+        //Remove the leading comment sign (/* or //) from the beginning of a method if you want to turn it on
+        
         /*
          * Convert database files and measurement files
          */
@@ -103,7 +111,8 @@ public class Localization {
         //GenerateFiles.generateMeasurements();
         
         /*
-         * Generate measurement file
+         * Generate measurement file with randomized signal strength values
+         * Set arguments according to the javadoc (in this case only the first, second and fifth argument needs to be set)
          */
         
         /*generatedMeasurementFile = Tools.filterDatabaseFile(0, GenerateFiles.gmon_gsm_veresegyhaz_1_csv, 
@@ -113,14 +122,16 @@ public class Localization {
         
         /*
          * Create decoordinated measurement file
+         * Set arguments according to the javadoc (in this case only the first argument needs to be set)
          */
 
-        decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_umts_veresegyhazCSV,
+        /*decoordinated_file = Tools.decoordinate(GenerateFiles.gmon_umts_veresegyhazCSV,
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + decoordinated_file_name), 
                 new File (GenerateFiles.GIT_DIRECTORY + GenerateFiles.DECOORDINATED_MEASUREMENT_DATA + check_file_name_for_decoordinated_file));
        
         /*
          * Lower the database
+         * Set arguments according to the javadoc (in this case only the first, second, fourth and fifth argument needs to be set)
          */
         
         /*Tools.filterDatabaseFile(15, GenerateFiles.budapest_5m_G900_DCS_database,
@@ -130,6 +141,8 @@ public class Localization {
         
         /*
          * Set database file and measurement file
+         * databaseData: Change the file at Tools.readFileToMemory's argument for using different datasource
+         * measurementData: Change the file at Tools.readFileToMemory's argument if you want to use generated measurement file instead of decoordinated file
          */
         
         databaseData = Tools.readFileToMemory(GenerateFiles.gmon_umts_veresegyhazCSV);
@@ -165,7 +178,7 @@ public class Localization {
          * Use multithreaded HorizontalSearchMethod
          */
         
-        File resultDirectory = null;
+       /* File resultDirectory = null;
         resultDirectory = new File (SingleWorker.multithreadRunResultsDirectory);
         
         ArrayList<ArrayList<String>> allTasks = null;
@@ -176,7 +189,11 @@ public class Localization {
             file.delete();
         }
         
+        //Create tasklist for multithread execution
+        //Set arguments according to the javadoc (in this case only the first argument needs to be set)
+        
         allTasks = createTasklist(decoordinated_file, threadNumber);
+        
         ExecutorService executor = Executors.newFixedThreadPool(threadNumber);       
         
         for (int threadCounter = 0; threadCounter < threadNumber; threadCounter++ ) {

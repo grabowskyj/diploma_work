@@ -20,41 +20,74 @@ public class ConvertDatFile {
     private static int maxNoOfServers = 0;
     private static FILETYPE fileType = FILETYPE.UNDEFINED;
     
+    /**
+     * Constructor for ConvertDatFile
+     * @param srcFile raw data file with hexadecimal content
+     * @param convFile raw data file with structured hexadecimal content
+     * @param csvFile name of the converted simulation file
+     */
     public ConvertDatFile(File srcFile, File convFile, File csvFile) {
         this.setsrcFile(srcFile);
         this.setConvFile(convFile);
         this.setCsvFile(csvFile);
     }
     
+    /**
+     * Getter method for raw data file with hexadecimal content
+     * @return raw data file with hexadecimal content
+     */
     public File getSrcFile() {
         return srcFile;
     }
-
+    
+    /**
+     * Setter method for raw data file with hexadecimal content
+     * @param srcFile raw data file containing hexadecimal content to be set
+     */
     private void setsrcFile(File srcFile) {
         this.srcFile = srcFile;
     }
     
+    /**
+     * Getter method for raw data file with structured hexadecimal content
+     * @return raw data file with structured hexadecimal content
+     */
     public File getConvFile() {
         return convFile;
     }
-
+    
+    /**
+     * Setter method for raw data file with structured hexadecimal content
+     * @param convFile raw data file containing structured hexadecimal content to be set
+     */
     private void setConvFile(File convFile) {
         this.convFile = convFile;
         Tools.createFile(this.convFile);
     }
     
+    /**
+     * Getter method for converted simulation file
+     * @return converted simulation file
+     */
     public File getCsvFile() {
         return csvFile;
     }
     
+    /**
+     * Getter method for converted simulation file
+     * @param csvFile name of the converted simulation file to be set
+     */
     private void setCsvFile(File csvFile) {
         this.csvFile = csvFile;
         Tools.createFile(this.csvFile);
     }
     
-    
-    
-    private HashMap<String, String> setCellIdsAndCellName (File cellDatabaseFile) {
+    /**
+     * Creates HashMap type structure from file containing cell IDs to cell names    
+     * @param cellDatabaseFile file containing the cell IDs and the corresponding cell names
+     * @return HashMap type datastructure containing the cell ID and cell name pairs
+     */
+    private HashMap<String, String> setCellIdsAndCellName(File cellDatabaseFile) {
         ArrayList<String> cellDatabase = null;
         HashMap<String, String> cellDatabaseMap = null;
         String[] splittedDatabaseRow = null;
@@ -75,6 +108,9 @@ public class ConvertDatFile {
         return cellDatabaseMap;
     }
     
+    /**
+     * Converts raw hexadecimal simulation data into structured hexadecimal simulation data
+     */
     private void createRawData() {
         FileInputStream readFile = null;
         FileWriter fileWriter = null;
@@ -223,6 +259,9 @@ public class ConvertDatFile {
         }
     }
     
+    /**
+     * Converts structured hexadecimal data into readable simulation data
+     */
     private void convertRawData() {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
@@ -327,6 +366,12 @@ public class ConvertDatFile {
         }        
     }
     
+    /**
+     * Converts cell ID to cell name and pairs it with the corresponding signal strength
+     * @param row String type array in which the cell ID and the corresponding signal strength are
+     * @param cellIdCellNameDatabase HashMap type datastructure where cell ID and cell name pairs are found
+     * @return cell name and signal strength pair
+     */
     private ArrayList<String> getDataFromRow(String[] row, HashMap<String, String> cellIdCellNameDatabase) {
         HashMap <String, Integer> cellData =  null;
         ArrayList<String> dataPair = null;
@@ -349,6 +394,11 @@ public class ConvertDatFile {
         
     }
     
+    /**
+     * Reads hexadecimal data from the structured hexadecimal file and converts it to the readable form
+     * @param processedCell cell in process
+     * @return readable cell name and signal strength pair
+     */
     private HashMap<String,Integer> getCellData(String[] processedCell){
         HashMap<String, Integer> cellData = null;
         int cellID = 0;
@@ -367,7 +417,11 @@ public class ConvertDatFile {
         
         return cellData;
     }
-      
+    
+    /**
+     * Summarized converting mechanism
+     * @return converted csv simulation file
+     */
     public File convertDat2Csv() {
         System.out.println("Creating raw data " + getConvFile());
         createRawData();

@@ -12,6 +12,12 @@ public class SingleWorker implements Runnable {
     private final int workerNumber;
     public static final String multithreadRunResultsDirectory = GenerateFiles.GIT_DIRECTORY + GenerateFiles.RESULTS + "\\multithread_run_results\\";
     
+    /**
+     * Constructor for SingleWorker
+     * @param taskSet tasks to be processed
+     * @param database datasource to be used
+     * @param workerNumber number of assigned workers
+     */
     public SingleWorker(ArrayList<String> taskSet, ArrayList<String> database, int workerNumber) {
         this.taskSet = taskSet;
         this.database = database;
@@ -19,6 +25,9 @@ public class SingleWorker implements Runnable {
     }
     
     @Override
+    /**
+     * Main method for the multhithread running
+     */
     public void run(){
         File resultFile = null;
         String resultFileString = "result" + (char) (workerNumber + 64) + ".worker";

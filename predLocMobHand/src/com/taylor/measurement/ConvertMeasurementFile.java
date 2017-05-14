@@ -17,34 +17,53 @@ public class ConvertMeasurementFile {
     private File srcFile;
     private File csvFile;
     
+    /**
+     * Constructor for ConvertMeasurementFile
+     * @param srcFile name of the raw measurement file
+     * @param csvFile name of the converted measurement file
+     */
     public ConvertMeasurementFile(File srcFile, File csvFile) {
-        
         this.setSrcFile(srcFile);
         this.setCsvFile(csvFile);
     }
     
-    private void setSrcFile(File srcFile) {
-        
+    /**
+     * Setter method for the raw measurement file
+     * @param srcFile raw measurement file to be set
+     */
+    private void setSrcFile(File srcFile) { 
         this.srcFile = srcFile;
     }
     
+    /**
+     * Getter method for the raw measurement file
+     * @return raw measurement file
+     */
     public File getSrcFile() {
-        
         return srcFile;
     }
     
+    /**
+     * Setter method for the converted measurement file
+     * @param csvFile converted measurement file to be set
+     */
     private void setCsvFile(File csvFile) {
-        
         this.csvFile = csvFile;
         Tools.createFile(getCsvFile());
     }
     
+    /**
+     * Getter method for the converted measurement file
+     * @return converted measurement file
+     */
     public File getCsvFile() {
-        
         return csvFile;
     }
     
     @SuppressWarnings("serial")
+    /**
+     * HashMap containing the cell IDs and the corresponding cell names in case of GSM900 and GSM1800
+     */
     final private HashMap<String, String> convertGsmDcsCellID = new HashMap<String, String>() {
         {
             put("21431", "veresegy_m_9001");
@@ -105,6 +124,9 @@ public class ConvertMeasurementFile {
     };
     
     @SuppressWarnings("serial")
+    /**
+     * HashMap containing the cell IDs and the corresponding cell names in case of UMTS
+     */
     final private HashMap<String, String> convertUmtsCellID = new HashMap<String, String>() {
         {
             put("59312", "baranyai__UMTS2");
@@ -145,7 +167,10 @@ public class ConvertMeasurementFile {
         }
     };
     
-    
+    /**
+     * Converts raw measurement file into csv file
+     * @return result of the converting
+     */
     public File convertMeasurement2Csv() {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
@@ -194,6 +219,11 @@ public class ConvertMeasurementFile {
         return getCsvFile();
     }
     
+    /**
+     * Prepares String type array for writing to file
+     * @param array to be written
+     * @return row to be written
+     */
     private String prepareArrayForWrite(String[] array) {
         HashMap<String, Double> coordinates = null;
         HashMap<String, Integer> cellData = null;

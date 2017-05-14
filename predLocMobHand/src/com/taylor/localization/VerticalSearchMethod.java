@@ -18,12 +18,21 @@ public class VerticalSearchMethod {
     
     private final ArrayList<String> database;
     private final ArrayList<String> measurement;
-        
+    
+    /**
+     * Constructor for VerticalSearchMethod
+     * @param database ArrayList type datasource
+     * @param measurement ArrayList type measurement data
+     */
     public VerticalSearchMethod(ArrayList<String> database, ArrayList<String> measurement) {
         this.database = database;
         this.measurement = measurement;
     }
     
+    /**
+     * Creates HashMap type datasource from the ArrayList type datasource
+     * @return HashMap type datasource
+     */
     private HashMap<String, ArrayList<String>> createDatabaseForVerticalSearch() {
         HashMap<String, ArrayList<String>> databaseData = null;
         int simulationDataHeaderElementCounter = 0;
@@ -56,6 +65,13 @@ public class VerticalSearchMethod {
         return databaseData;
     }
     
+    /**
+     * Creates HashMap type datasource from a dataselection
+     * @param indexListName name of the dataselection
+     * @param indexList list containing the elements of the dataselection
+     * @param srcDatabase datasource, where the keys and values of the new datasource are taken from
+     * @return datasource containing selected data of the source datasource
+     */
     private HashMap<String, ArrayList<String>> createDatabaseFromSelection(String indexListName, ArrayList<Integer> indexList, HashMap<String, ArrayList<String>> srcDatabase) {
         HashMap<String, ArrayList<String>> databaseSubset = new HashMap<String, ArrayList<String>>();
         String elementName = null;
@@ -79,6 +95,12 @@ public class VerticalSearchMethod {
         return databaseSubset;
     }
     
+    /**
+     * Assembles an indexlist, where the elements of the list are the indexes of the sought element in the given source element list
+     * @param elementNameAndElement type and name of the sought element
+     * @param database datasource, where the search will be performed
+     * @return indexlist of the sought element
+     */
     private ArrayList<Integer> getIndexListForNewDatabase(String[] elementNameAndElement, HashMap<String, ArrayList<String>> database){
         ArrayList<String> dataset = null;
         ArrayList<Integer> indexListOfElement = null;
@@ -101,17 +123,23 @@ public class VerticalSearchMethod {
         return indexListOfElement; 
     }
     
-    private ArrayList<Integer> assembleSideValues(int inRange, ArrayList<String> srcDataset) {
+    /**
+     * Assembles an indexlist, where the elements of the list are the indexes of the sought signal strength in the given source signal strength list
+     * @param checkValue signal strength value to be checked 
+     * @param srcDataset list of signal strengths, where sidevalue will be checked
+     * @return indexlist of the sought signal strength
+     */
+    private ArrayList<Integer> assembleSideValues(int checkValue, ArrayList<String> srcDataset) {
         ArrayList<Integer> sideValueList = null;
         int startIndex = 0;
         int endIndex = 0;
         
         sideValueList = new ArrayList<Integer>();
-        startIndex = srcDataset.indexOf(Integer.toString(inRange));
-        endIndex = srcDataset.lastIndexOf(Integer.toString(inRange));
+        startIndex = srcDataset.indexOf(Integer.toString(checkValue));
+        endIndex = srcDataset.lastIndexOf(Integer.toString(checkValue));
         
         for (int index = startIndex; index <= endIndex; index++ ) {
-            if (inRange == Integer.parseInt(srcDataset.get(index))) {
+            if (checkValue == Integer.parseInt(srcDataset.get(index))) {
                 sideValueList.add(index);
             }
         }
@@ -119,7 +147,13 @@ public class VerticalSearchMethod {
         return sideValueList;
     }
     
-    private ArrayList<Integer> checkSideValues(String[] elementNameAndElement, HashMap<String, ArrayList<String>> database) {
+    /**
+     * Checks signal strength sidevalues of a cell in the datasource fingerprint, if the given signal strength of a cell from the measurement point has not been found in the datasource 
+     * @param cellNameAndSignalStrength cell name and the corresponding signal strength from the measurement point to be checked
+     * @param database datasource where the given cell name and the corresponding signal strength will be checked
+     * @return indexlist, where sidevalues have been found
+     */
+    private ArrayList<Integer> checkSideValues(String[] cellNameAndSignalStrength, HashMap<String, ArrayList<String>> database) {
         ArrayList<Integer> indexListOfElements = null;
         ArrayList<Integer> positiveSideIndexList = null;
         ArrayList<Integer> negativeSideIndexList = null;
@@ -132,8 +166,8 @@ public class VerticalSearchMethod {
         int element = 0;
         String elementName = null;
         
-        element = Integer.parseInt(elementNameAndElement[1]);
-        elementName = elementNameAndElement[0];
+        element = Integer.parseInt(cellNameAndSignalStrength[1]);
+        elementName = cellNameAndSignalStrength[0];
         indexListOfElements = new ArrayList<Integer>();
         positiveSideIndexList = new ArrayList<Integer>();
         negativeSideIndexList = new ArrayList<Integer>();
@@ -171,6 +205,10 @@ public class VerticalSearchMethod {
         return indexListOfElements;
     }
     
+    /**
+     * Determinates the coordinates of the measurement points
+     * @param resultFile Result file, where the results of the localizations will be stored 
+     */
     public void getLocation(File resultFile) {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
